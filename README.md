@@ -1,134 +1,98 @@
-# 💻 Lucky Logic — Residential IT Support Services
+# 💻 Lucky Logic Website
 
-Welcome to the official source code for **Lucky Logic**, a modern, responsive website for an Australian in-home IT support business. This site is built with **Next.js 14**, styled using **Chakra UI**, and deployed via **Netlify**.
+Lucky Logic is a boutique residential IT support service based in Sydney, Australia. This website showcases the company's offerings and facilitates customer contact.
 
-![Lucky Logic Screenshot](./public/og-image.jpg)
+## 📑 Table of Contents
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Technologies](#technologies)
+- [Setup & Development](#setup--development)
+- [Environment Variables](#environment-variables)
+- [Deployment](#deployment)
+- [SEO & Analytics](#seo--analytics)
+- [Legal](#legal)
+- [Contributing](#contributing)
+- [License](#license)
 
----
+## 🎯 Project Overview
+Lucky Logic was founded in 2024 to address a gap in residential IT services in Sydney. The site offers information about services, contact forms, privacy and terms policies, cookie consent, and analytics integrations — all styled using Chakra UI and Next.js 14.
 
-## 🔧 Tech Stack
+## ✨ Features
+- 🎨 Responsive homepage with animated hero section
+- 📄 About Us, Contact Us, Privacy Policy, Terms & Conditions, Cookie Policy pages
+- 🗺️ Google Maps static map showing office location
+- 🍪 Cookie consent banner with preference controls
+- 🔍 SEO optimized with Open Graph and Twitter meta tags
+- 📊 Google Analytics (GA4) integration
+- 🧭 Navigation bar with active links and logo
+- 📝 Easy contact form for customer inquiries
 
-| Tech          | Purpose                                  |
-|---------------|-------------------------------------------|
-| Next.js 14    | React framework for routing + optimization |
-| Chakra UI     | Accessible component library + styling    |
-| TypeScript    | Safer code with type support              |
-| Framer Motion | Animations and transitions                |
-| Lottie React  | Lightweight animated SVGs (hero section)  |
-| Netlify       | CI/CD and hosting                         |
-| next-sitemap  | SEO-ready sitemap/robots.txt generation   |
+## 🛠️ Technologies
+- ⚛️ Next.js 14 (app router)
+- ⚡ React 18
+- 📘 TypeScript
+- 🎨 Chakra UI
+- 🎭 Framer Motion (animations)
+- 🎬 Lottie (animation player)
+- 🗺️ Google Maps Static API
+- 📊 Google Analytics (GA4)
+- 🚀 Netlify (hosting & CI/CD)
 
----
-
-## 🚀 Live Site
-
-🔗 [https://luckylogic.com.au](https://luckylogic.com.au)
-
----
-
-## 📁 Project Structure
-
+## 🚀 Setup & Development
+1. Clone the repository:
 ```bash
-├── app/                   # App Router structure
-│   ├── layout.tsx        # Root layout with ChakraProvider
-│   ├── page.tsx          # Home page content
-├── components/           # UI components (Navbar, Footer, Hero, etc.)
-├── public/               # Static files (images, sitemap, verification)
-├── styles/               # Global CSS
-├── theme/                # Chakra UI custom theme config
-├── next.config.js        # Next.js export + image config
-├── netlify.toml          # Netlify build + plugin config
-└── package.json
+git clone https://github.com/Neesonn/luckylogicit.git
+cd luckylogicit
 ```
 
-✅ **Features**
-
-- 🎨 Clean, accessible UI with Chakra
-- ⚡ Smooth entrance animations with Framer Motion
-- 🧠 SEO-optimised metadata, social cards, Open Graph images
-- 📱 Fully responsive (mobile/tablet/desktop)
-- 🛠️ Google Search Console verified
-- 🗺️ Sitemap and robots.txt auto-generated
-- 🧾 Ready to integrate Google Analytics or Tag Manager
-
----
-
-## 🧪 Development Setup
-
-1. **Clone the Repo**
-   ```bash
-   git clone https://github.com/Neesonn/luckylogicit.git
-   cd luckylogicit
-   ```
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-3. **Run locally**
-   ```bash
-   npm run dev
-   ```
-   Open your browser at http://localhost:3000
-
----
-
-## 📦 Production Build
-
+2. Install dependencies:
 ```bash
-npm run build
-```
-To preview the build locally:
-
-```bash
-npm run start
+npm install
 ```
 
----
+3. Create a `.env.local` file in the root with necessary environment variables (see below).
 
-## 🌐 Deployment
+4. Run the development server:
+```bash
+npm run dev
+```
 
-The site is deployed to Netlify using static export:
+Open http://localhost:3000 to view the site locally.
 
-- `next.config.js` sets `output: 'export'`
-- `netlify.toml` publishes the `out/` directory
-- Deployment is triggered from the main branch
+## 🔑 Environment Variables
+Add the following to `.env.local`:
 
----
+```env
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+```
 
-## 🌍 SEO
+Replace `your-google-maps-api-key` with your actual API key.
+Replace `G-XXXXXXXXXX` with your Google Analytics measurement ID.
 
-- `sitemap.xml` and `robots.txt` auto-generated with next-sitemap
-- Open Graph + Twitter card support
-- Google Search Console verified (`public/google*.html`)
-- Friendly URL structure
+## 🚀 Deployment
+The site is deployed on Netlify using the following build commands:
 
----
+- Build command: `npm run build`
+- Publish directory: `.next`
 
-## 📈 Coming Soon
+Make sure to add environment variables in the Netlify dashboard for Google Maps and Analytics.
 
-- Google Analytics integration
-- Contact form with Netlify Forms or Formspree
-- Service-specific landing pages
+## 🔍 SEO & Analytics
+- 📝 Metadata set in `app/page.tsx` includes titles, descriptions, Open Graph and Twitter card data
+- 📊 Google Analytics GA4 tracking added in `app/layout.tsx`
+- 🗺️ Sitemap and robots.txt are configured for search engine indexing
+- 🍪 Cookie consent banner controls cookie preferences in compliance with GDPR and Australian regulations
 
----
+## ⚖️ Legal
+- 📜 Privacy Policy, Terms & Conditions, and Cookie Policy pages included with content tailored for Australian standards
+- 🍪 Cookie consent banner with accept/decline and preferences management
 
-## 🧑‍💻 Author
-
-**Michael Neeson**  
-📧 michaelneeson92@hotmail.com  
-🔗 [https://luckylogic.com.au](https://luckylogic.com.au)
-
----
+## 🤝 Contributing
+Contributions are welcome! Please fork the repository and submit a pull request. For major changes, open an issue first to discuss what you'd like to change.
 
 ## 📄 License
-
 This project is licensed under the MIT License.
 
----
-
-Would you like me to:
-- Include a section for Google Analytics setup?
-- Add instructions for staging (`test` branch) deployment?
-- Convert this to PDF for client/internal handover?
-
-Let me know and I'll tailor it!
+## 📞 Support
+If you need help or have questions, please reach out at support@luckylogic.com.au.
