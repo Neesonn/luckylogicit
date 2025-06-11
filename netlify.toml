@@ -1,8 +1,9 @@
 [build]
   command = "npm run build"
-  publish = "out"
+  publish = ".next"
 
-# Optional: disable Netlify Next.js plugin cleanly
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  skip = true
+
+  [plugins.inputs]
+  # Add valid inputs here if needed
