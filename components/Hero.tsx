@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
-import { useRouter } from 'next/navigation';  // Next.js 13+ router
+import { useRouter } from 'next/navigation';
 
 const MotionBox = motion(Box);
 const MotionHeading = motion(Heading);
@@ -35,16 +35,12 @@ export default function Hero() {
   };
 
   return (
-    <Box position="relative" bg="white" zIndex={1}>
+    <Box position="relative" bg="white" zIndex={1} px={{ base: 4, md: 8 }} pt={{ base: 16, md: 28 }} pb={{ base: 10, md: 16 }}>
       <Flex
         direction={{ base: 'column', md: 'row' }}
         align="stretch"
         justify="center"
-        pt={{ base: 28, md: 32 }}
-        pb={{ base: 12, md: 16 }}
-        px={8}
-        position="relative"
-        gap={{ base: 12, md: 0 }}
+        gap={{ base: 6, md: 0 }}
       >
         {/* Left: Text Content */}
         <MotionBox
@@ -53,10 +49,11 @@ export default function Hero() {
           flexDirection="column"
           justifyContent="center"
           px={{ base: 0, md: 10 }}
+          mb={{ base: 8, md: 0 }}
           zIndex={2}
         >
           <MotionHeading
-            fontSize={{ base: '2xl', md: '4xl' }}
+            fontSize={{ base: '2xl', sm: '3xl', md: '4xl' }}
             color="brand.green"
             mb={4}
             initial={{ opacity: 0, y: -10 }}
@@ -67,12 +64,13 @@ export default function Hero() {
           </MotionHeading>
 
           <MotionText
-            fontSize="xl"
+            fontSize={{ base: 'md', sm: 'lg', md: 'xl' }}
             color="gray.700"
             mb={8}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
+            maxW={{ base: '100%', md: '80%' }}
           >
             Delivering reliable in-home technology solutions from network
             setup and device troubleshooting to smart home integration and
@@ -83,6 +81,7 @@ export default function Hero() {
             size="lg"
             bg="brand.gold"
             color="white"
+            width={{ base: '100%', md: 'auto' }}
             alignSelf={{ base: 'center', md: 'flex-start' }}
             _hover={{ bg: '#b38d1c' }}
             whileHover={{ scale: 1.05 }}
@@ -114,12 +113,14 @@ export default function Hero() {
             alignItems="center"
             pr={{ md: 10 }}
             zIndex={2}
+            maxW="500px"
+            maxH="400px"
           >
             <Lottie
               animationData={animationData}
               loop
               autoplay
-              style={{ maxWidth: 500 }}
+              style={{ width: '100%', height: 'auto' }}
             />
           </Box>
         )}
