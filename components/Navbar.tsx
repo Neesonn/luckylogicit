@@ -1,5 +1,5 @@
-import { Flex, Button } from '@chakra-ui/react';
-import Link from 'next/link';
+import { Flex, Link } from '@chakra-ui/react';
+import NextLink from 'next/link';
 
 export default function Navbar() {
   return (
@@ -13,13 +13,19 @@ export default function Navbar() {
       boxShadow="md"
       position="relative"
       zIndex={10}
-      gap={4}  // add some spacing
+      gap={6}
     >
-      <Link href="/" passHref legacyBehavior>
-        <Button as="a" colorScheme="green" variant="ghost" size="md">
+      <NextLink href="/" passHref legacyBehavior>
+        <Link color="brand.green" fontWeight="medium" fontSize="md">
           Home
-        </Button>
-      </Link>
+        </Link>
+      </NextLink>
+
+      <NextLink href="/about-us" passHref legacyBehavior>
+        <Link color="brand.green" fontWeight="medium" fontSize="md">
+          About Us
+        </Link>
+      </NextLink>
     </Flex>
   );
 }
