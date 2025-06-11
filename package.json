@@ -15,6 +15,7 @@
     "@chakra-ui/react": "^2.10.9",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@react-google-maps/api": "^2.20.6",
     "framer-motion": "^11.18.2",
     "lottie-react": "^2.4.1",
     "next": "^14.1.0",

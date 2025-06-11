@@ -18,6 +18,12 @@ export default function Footer() {
           <Text fontSize="sm" color="white">
             © {new Date().getFullYear()} Lucky Logic. All rights reserved.
           </Text>
+
+          {/* ABN line added here */}
+          <Text fontSize="sm" color="white" mb={2}>
+            ABN 68 522 123 312
+          </Text>
+
           <Text fontSize="sm" color="white">
             <Link href="/privacy-policy" textDecoration="underline" color="white">
               Privacy Policy
