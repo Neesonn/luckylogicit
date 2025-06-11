@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, Text, Flex } from '@chakra-ui/react';
+import { Box, Button, Text, Flex, Stack } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
 export default function CookieBanner() {
@@ -18,6 +18,11 @@ export default function CookieBanner() {
     setIsVisible(false);
   };
 
+  const handleDecline = () => {
+    localStorage.setItem('cookieConsent', 'false');
+    setIsVisible(false);
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -31,16 +36,30 @@ export default function CookieBanner() {
       px={4}
       py={3}
     >
-      <Flex maxW="6xl" mx="auto" align="center" justify="space-between" flexWrap="wrap">
-        <Text fontSize="sm" mb={{ base: 2, md: 0 }}>
+      <Flex
+        maxW="6xl"
+        mx="auto"
+        align="center"
+        justify="space-between"
+        flexWrap="wrap"
+        direction={{ base: 'column', md: 'row' }}
+        gap={4}
+      >
+        <Text fontSize="sm" textAlign="center">
           We use cookies to improve your experience. By using this site, you agree to our{' '}
           <a href="/privacy-policy" style={{ textDecoration: 'underline' }}>
             Privacy Policy
-          </a>.
+          </a>
+          .
         </Text>
-        <Button size="sm" colorScheme="yellow" onClick={handleAccept}>
-          Got it
-        </Button>
+        <Stack direction="row" spacing={3}>
+          <Button size="sm" colorScheme="green" onClick={handleAccept}>
+            Accept
+          </Button>
+          <Button size="sm" colorScheme="red" variant="outline" onClick={handleDecline}>
+            Decline
+          </Button>
+        </Stack>
       </Flex>
     </Box>
   );
