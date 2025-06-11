@@ -3,4 +3,4 @@
   publish = "out"
 
 [[plugins]]
-  package = "" # disables Netlify's Next.js plugin
+  package = ""  # Disables @netlify/plugin-nextjs
