@@ -115,6 +115,7 @@ export default function Hero() {
             zIndex={2}
             maxW="500px"
             maxH="400px"
+            mt="-20px"  // <-- Move animation container up slightly
           >
             <Lottie
               animationData={animationData}
@@ -127,22 +128,22 @@ export default function Hero() {
       </Flex>
 
       {/* SVG Wave Transition */}
-      <Box
-        position="absolute"
-        bottom={0}
-        left={0}
-        width="100%"
-        height="auto"
-        zIndex={0}
-        pointerEvents="none"
-      >
-        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-          <path
-            fill="#e9f5f1"
-            d="M0,0 C600,100 840,20 1440,100 L1440,120 L0,120 Z"
-          />
-        </svg>
-      </Box>
+<Box
+  position="absolute"
+  bottom="-20px"  // Move the wave down by 20px (adjust as needed)
+  left={0}
+  width="100%"
+  height="auto"
+  zIndex={0}
+  pointerEvents="none"
+>
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <path
+      fill="#e9f5f1"
+      d="M0,0 C600,100 840,20 1440,100 L1440,120 L0,120 Z"
+    />
+  </svg>
+</Box>
     </Box>
   );
 }
