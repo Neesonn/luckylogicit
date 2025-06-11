@@ -1,10 +1,18 @@
 'use client';
 
-import { Box, Button, Text, Flex, Stack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Text,
+  Flex,
+  Stack,
+  useBreakpointValue,
+} from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
 export default function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   useEffect(() => {
     const consent = localStorage.getItem('cookieConsent');
@@ -26,33 +34,41 @@ export default function CookieBanner() {
   if (!isVisible) return null;
 
   return (
-    <Box
-      position="fixed"
-      bottom={0}
-      width="100%"
-      bg="gray.800"
-      color="white"
-      zIndex={999}
-      px={4}
-      py={3}
-    >
-      <Flex
-        maxW="6xl"
-        mx="auto"
-        align="center"
-        justify="space-between"
-        flexWrap="wrap"
-        direction={{ base: 'column', md: 'row' }}
-        gap={4}
+    <>
+      {/* Background overlay */}
+      <Box
+        position="fixed"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        bg="blackAlpha.600"
+        zIndex="9998"
+      />
+
+      {/* Cookie consent popup */}
+      <Box
+        position="fixed"
+        top="50%"
+        left="50%"
+        transform="translate(-50%, -50%)"
+        zIndex="9999"
+        bg="gray.800"
+        color="white"
+        px={6}
+        py={5}
+        rounded="lg"
+        boxShadow="lg"
+        maxW="sm"
+        textAlign="center"
       >
-        <Text fontSize="sm" textAlign="center">
+        <Text fontSize="sm" mb={4}>
           We use cookies to improve your experience. By using this site, you agree to our{' '}
           <a href="/privacy-policy" style={{ textDecoration: 'underline' }}>
             Privacy Policy
-          </a>
-          .
+          </a>.
         </Text>
-        <Stack direction="row" spacing={3}>
+        <Stack direction="row" spacing={4} justify="center" flexWrap="wrap">
           <Button size="sm" colorScheme="green" onClick={handleAccept}>
             Accept
           </Button>
@@ -60,7 +76,7 @@ export default function CookieBanner() {
             Decline
           </Button>
         </Stack>
-      </Flex>
-    </Box>
+      </Box>
+    </>
   );
 }
