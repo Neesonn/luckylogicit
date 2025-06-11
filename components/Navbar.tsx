@@ -1,24 +1,25 @@
-import { Flex, Image } from '@chakra-ui/react';
+import { Flex, Button } from '@chakra-ui/react';
+import Link from 'next/link';
 
 export default function Navbar() {
   return (
     <Flex
       as="nav"
-      justify="space-between"
+      justify="flex-start"
       align="center"
       px={6}
       py={3}
       bg="white"
       boxShadow="md"
-      position="relative"     // ✅ ensure it stacks
-      zIndex={10}             // ✅ sits above Hero SVG
+      position="relative"
+      zIndex={10}
+      gap={4}  // add some spacing
     >
-      <Image
-        src="/logo.png"
-        alt="Lucky Logic Logo"
-        width="50px"
-        height="auto"
-      />
+      <Link href="/" passHref legacyBehavior>
+        <Button as="a" colorScheme="green" variant="ghost" size="md">
+          Home
+        </Button>
+      </Link>
     </Flex>
   );
 }

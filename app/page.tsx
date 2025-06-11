@@ -1,9 +1,7 @@
 import { Box } from '@chakra-ui/react';
-import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
-import Footer from '../components/Footer';
 import ServiceGrid from '../components/ServiceGrid';
-import GoogleHead from '../components/GoogleHead'; // ✅ NEW
+import GoogleHead from '../components/GoogleHead';
 
 export const metadata = {
   metadataBase: new URL('https://www.luckylogic.com.au'),
@@ -36,12 +34,10 @@ export const metadata = {
 export default function Home() {
   return (
     <>
-      <GoogleHead /> {/* ✅ Injects Google verification into <head> */}
+      <GoogleHead />
       <Box>
-        <Navbar />
         <Hero />
         <ServiceGrid />
-        <Footer />
       </Box>
     </>
   );
