@@ -1,4 +1,4 @@
-import { Flex, Link, Box, Image } from '@chakra-ui/react';
+import { Flex, Text, Box } from '@chakra-ui/react';
 import NextLink from 'next/link';
 
 export default function Navbar() {
@@ -14,37 +14,84 @@ export default function Navbar() {
       position="relative"
       zIndex={10}
     >
-      {/* Left side navigation links */}
-      <Flex gap={6} align="center">
+      {/* Left side container for logo and nav links */}
+      <Flex align="center" gap={6}>
+        {/* Lucky Logic Logo (linked to home) */}
         <NextLink href="/" passHref legacyBehavior>
-          <Link color="brand.green" fontWeight="medium" fontSize="md">
+          <Box
+            display="flex"
+            alignItems="center"
+            cursor="pointer"
+            userSelect="none"
+            mr={4}  // adds spacing after the logo and before the divider
+          >
+            <Text fontSize="xl" fontWeight="bold" color="brand.green" mr={2}>
+              Lucky Logic
+            </Text>
+
+            <Box
+              bg="rgba(201, 162, 39, 0.6)"  // brand gold with 60% opacity
+              borderRadius="50%"
+              width="28px"
+              height="28px"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              userSelect="none"
+            >
+              <Text fontSize="lg" lineHeight="1" color="white" aria-label="Four leaf clover" role="img" m="0">
+                🍀
+              </Text>
+            </Box>
+          </Box>
+        </NextLink>
+
+        {/* Vertical Divider Line */}
+        <Box
+          height="24px"
+          borderLeft="1px solid"
+          borderColor="gray.200"
+          opacity={100}
+          mr={0}  // spacing after the divider before nav links
+        />
+
+        {/* Navigation Links */}
+        <NextLink href="/" passHref legacyBehavior>
+          <Text
+            as="a"
+            color="brand.green"
+            fontWeight="medium"
+            fontSize="md"
+            cursor="pointer"
+          >
             Home
-          </Link>
+          </Text>
         </NextLink>
 
         <NextLink href="/about-us" passHref legacyBehavior>
-          <Link color="brand.green" fontWeight="medium" fontSize="md">
+          <Text
+            as="a"
+            color="brand.green"
+            fontWeight="medium"
+            fontSize="md"
+            cursor="pointer"
+          >
             About Us
-          </Link>
+          </Text>
         </NextLink>
 
         <NextLink href="/contact-us" passHref legacyBehavior>
-          <Link color="brand.green" fontWeight="medium" fontSize="md">
+          <Text
+            as="a"
+            color="brand.green"
+            fontWeight="medium"
+            fontSize="md"
+            cursor="pointer"
+          >
             Contact Us
-          </Link>
+          </Text>
         </NextLink>
       </Flex>
-
-      {/* Right side logo box */}
-      <Box width="120px" height="80px">
-        <Image
-          src="/logo.png"
-          alt="Lucky Logic Logo"
-          objectFit="contain"
-          width="100%"
-          height="100%"
-        />
-      </Box>
     </Flex>
   );
 }
