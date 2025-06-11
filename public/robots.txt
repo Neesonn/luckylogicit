@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.luckylogic.com.au
+
+# Sitemaps
+Sitemap: https://www.luckylogic.com.au/sitemap.xml
