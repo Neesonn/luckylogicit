@@ -1,6 +1,6 @@
 'use client';
 
-import { ChakraProvider, Box } from '@chakra-ui/react';
+import { ChakraProvider, Box, Flex } from '@chakra-ui/react';
 import Head from 'next/head';
 import theme from '../theme/theme';
 import Navbar from '../components/Navbar';
@@ -21,8 +21,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ChakraProvider theme={theme}>
           <Navbar />
-          <Box minHeight="calc(100vh - 120px)">{children}</Box>
-          <Footer />
+          <Box pt="80px" minHeight="calc(100vh - 120px)" w="full">
+            {children}
+            <Footer />
+          </Box>
         </ChakraProvider>
       </body>
     </html>

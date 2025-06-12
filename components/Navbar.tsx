@@ -1,121 +1,65 @@
-import { Flex, Text, Box } from '@chakra-ui/react';
+import { Flex, Text, Box, HStack, Spacer } from '@chakra-ui/react';
 import NextLink from 'next/link';
 
 export default function Navbar() {
   return (
     <Flex
       as="nav"
-      justify="space-between"
-      align="center"
-      px={6}
+      direction="row"
+      width="100%"
+      height="80px"
+      px={4}
       py={3}
       bg="white"
       boxShadow="md"
-      position="relative"
+      position="fixed"
+      top={0}
+      left={0}
       zIndex={10}
+      align="center"
     >
-      {/* Left side container for logo and nav links */}
-      <Flex align="center" gap={6}>
-        {/* Logo initials and Clover icon linked to home */}
-        <NextLink href="/" passHref legacyBehavior>
-          <Box
-            display="flex"
-            alignItems="center"
-            cursor="pointer"
-            userSelect="none"
-            mr={4}
-          >
-            {/* First L in dark green */}
-            <Text
-              fontSize="3xl"
-              fontWeight="bold"
-              color="#003f2d"
-              aria-label="Logo initial L"
-            >
-              L
-            </Text>
-            {/* Second L in gold */}
-            <Text
-              fontSize="3xl"
-              fontWeight="bold"
-              color="#c9a227"
-              mr={-3}  // spacing before clover
-              aria-label="Logo initial L"
-            >
-              L
-            </Text>
-            {/* Clover icon */}
-            <Text
-              fontSize="3xl"
-              lineHeight="1"
-              color="brand.green"
-              aria-label="Four leaf clover"
-              role="img"
-              m="0"
-            >
-              🍀
-            </Text>
-          </Box>
-        </NextLink>
-
-        {/* Vertical Divider Line */}
+      {/* Logo */}
+      <NextLink href="/" passHref legacyBehavior>
         <Box
-          height="24px"
-          borderLeft="1px solid"
-          borderColor="gray.200"
-          opacity={0.4}
-          mr={0}
+          as="img"
+          src="/lucky-logic-logo.png"
+          alt="Lucky Logic logo"
+          height="200px"
+          width="auto"
+          objectFit="contain"
+          display="block"
+          cursor="pointer"
         />
+      </NextLink>
 
-        {/* Navigation Links */}
+      {/* Navigation Links */}
+      <HStack spacing={6} ml={6} align="center">
         <NextLink href="/" passHref legacyBehavior>
-          <Text
-            as="a"
-            color="brand.green"
-            fontWeight="medium"
-            fontSize="md"
-            cursor="pointer"
-          >
+          <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
             Home
           </Text>
         </NextLink>
 
         <NextLink href="/about-us" passHref legacyBehavior>
-          <Text
-            as="a"
-            color="brand.green"
-            fontWeight="medium"
-            fontSize="md"
-            cursor="pointer"
-          >
+          <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
             About Us
           </Text>
         </NextLink>
 
         <NextLink href="/services" passHref legacyBehavior>
-          <Text
-            as="a"
-            color="brand.green"
-            fontWeight="medium"
-            fontSize="md"
-            cursor="pointer"
-          >
+          <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
             Services
           </Text>
         </NextLink>
 
         <NextLink href="/contact-us" passHref legacyBehavior>
-          <Text
-            as="a"
-            color="brand.green"
-            fontWeight="medium"
-            fontSize="md"
-            cursor="pointer"
-          >
+          <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
             Contact Us
           </Text>
         </NextLink>
-      </Flex>
+      </HStack>
+
+      <Spacer />
     </Flex>
   );
 }
