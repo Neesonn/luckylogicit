@@ -22,7 +22,7 @@ export default function AboutUsPage() {
 
       {/* Main Heading */}
       <Heading as="h1" size="2xl" color="brand.green" textAlign="center" mb={12}>
-        About Lucky Logic
+        About Lucky Logic!
       </Heading>
 
       {/* Our Story */}
