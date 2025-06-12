@@ -16,7 +16,7 @@ export default function Navbar() {
     >
       {/* Left side container for logo and nav links */}
       <Flex align="center" gap={6}>
-        {/* Lucky Logic Logo (linked to home) */}
+        {/* Logo initials and Clover icon linked to home */}
         <NextLink href="/" passHref legacyBehavior>
           <Box
             display="flex"
@@ -25,19 +25,28 @@ export default function Navbar() {
             userSelect="none"
             mr={4}
           >
+            {/* First L in dark green */}
             <Text
-  fontSize="xl"
-  fontWeight="bold"
-  bgGradient="linear(to-r, #003f2d 70%, #c9a227 100%)"
-  bgClip="text"
-  mr={2}
->
-  Lucky Logic
-</Text>
-
-
+              fontSize="3xl"
+              fontWeight="bold"
+              color="#003f2d"
+              aria-label="Logo initial L"
+            >
+              L
+            </Text>
+            {/* Second L in gold */}
             <Text
-              fontSize="lg"
+              fontSize="3xl"
+              fontWeight="bold"
+              color="#c9a227"
+              mr={-3}  // spacing before clover
+              aria-label="Logo initial L"
+            >
+              L
+            </Text>
+            {/* Clover icon */}
+            <Text
+              fontSize="3xl"
               lineHeight="1"
               color="brand.green"
               aria-label="Four leaf clover"
@@ -60,25 +69,49 @@ export default function Navbar() {
 
         {/* Navigation Links */}
         <NextLink href="/" passHref legacyBehavior>
-          <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
+          <Text
+            as="a"
+            color="brand.green"
+            fontWeight="medium"
+            fontSize="md"
+            cursor="pointer"
+          >
             Home
           </Text>
         </NextLink>
 
         <NextLink href="/about-us" passHref legacyBehavior>
-          <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
+          <Text
+            as="a"
+            color="brand.green"
+            fontWeight="medium"
+            fontSize="md"
+            cursor="pointer"
+          >
             About Us
           </Text>
         </NextLink>
 
         <NextLink href="/services" passHref legacyBehavior>
-          <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
+          <Text
+            as="a"
+            color="brand.green"
+            fontWeight="medium"
+            fontSize="md"
+            cursor="pointer"
+          >
             Services
           </Text>
         </NextLink>
 
         <NextLink href="/contact-us" passHref legacyBehavior>
-          <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
+          <Text
+            as="a"
+            color="brand.green"
+            fontWeight="medium"
+            fontSize="md"
+            cursor="pointer"
+          >
             Contact Us
           </Text>
         </NextLink>
