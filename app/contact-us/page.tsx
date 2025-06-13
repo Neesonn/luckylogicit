@@ -29,7 +29,11 @@ import {
 import { useState } from 'react';
 
 export default function ContactUsPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
+  const [message, setMessage] = useState('');
 
   const topics = [
     { label: 'Network Wi-Fi and Internet Setup & Troubleshooting', icon: InfoIcon },
@@ -42,6 +46,30 @@ export default function ContactUsPage() {
     { label: 'Mobile Device Support', icon: QuestionIcon },
     { label: 'Anything else', icon: QuestionIcon },
   ];
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!name || !email || !phone || !selectedTopic || !message) {
+      alert('Please fill out all required fields.');
+      return;
+    }
+
+    const encodedMessage = encodeURIComponent(
+      `New Enquiry via Website:
+
+Name: ${name}
+Email: ${email}
+Phone: ${phone}
+Topic: ${selectedTopic}
+Message: ${message}`
+    );
+
+    const phoneNumber = '61413346507'; // Replace with your WhatsApp number (e.g., 61 for Australia)
+    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+    window.open(whatsappURL, '_blank');
+  };
 
   return (
     <Box
@@ -62,20 +90,34 @@ export default function ContactUsPage() {
         Get in Touch
       </Heading>
 
-      <VStack as="form" spacing={6}>
+      <VStack as="form" spacing={6} onSubmit={handleSubmit}>
         <FormControl isRequired>
           <FormLabel>Your Name</FormLabel>
-          <Input placeholder="Enter your full name" />
+          <Input
+            placeholder="Enter your full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
         </FormControl>
 
         <FormControl isRequired>
           <FormLabel>Email Address</FormLabel>
-          <Input type="email" placeholder="Enter your email" />
+          <Input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </FormControl>
 
         <FormControl isRequired>
           <FormLabel>Phone Number</FormLabel>
-          <Input type="tel" placeholder="Enter your phone number" />
+          <Input
+            type="tel"
+            placeholder="Enter your phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
         </FormControl>
 
         <FormControl isRequired>
@@ -105,6 +147,8 @@ export default function ContactUsPage() {
             size="lg"
             minH="150px"
             resize="vertical"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
           />
         </FormControl>
 
@@ -114,7 +158,7 @@ export default function ContactUsPage() {
           colorScheme="green"
           width={{ base: 'full', md: 'auto' }}
         >
-          Send Enquiry
+          Send Enquiry via WhatsApp
         </Button>
       </VStack>
     </Box>
