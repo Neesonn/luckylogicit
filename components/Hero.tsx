@@ -41,7 +41,7 @@ export default function Hero() {
       zIndex={1}
       px={{ base: 4, md: 8 }}
       pt={{ base: 16, md: 28 }}
-      pb={{ base: 10, md: 16 }}
+      pb={{ base: 40, md: 48 }}
       overflow="hidden"
     >
       <Flex
@@ -138,7 +138,7 @@ export default function Hero() {
       {/* Parallax Waves */}
       <MotionBox
         position="absolute"
-        bottom="-30px"
+        bottom="-20px"
         left={0}
         width="100%"
         height="auto"
@@ -179,7 +179,7 @@ export default function Hero() {
 
       <MotionBox
         position="absolute"
-        bottom="-10px"
+        bottom="-20px"
         left={0}
         width="100%"
         height="auto"
