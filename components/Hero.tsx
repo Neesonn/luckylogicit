@@ -120,10 +120,10 @@ export default function Hero() {
             justifyContent="center"
             alignItems="center"
             pr={{ md: 10 }}
-            zIndex={2}
+            zIndex={1}
             maxW="500px"
-            maxH="400px"
-            mt="-20px"
+            maxH="300px"
+            mt={{ base: '-10px', md: '-30px' }}
           >
             <Lottie
               animationData={animationData}
@@ -135,10 +135,10 @@ export default function Hero() {
         )}
       </Flex>
 
-      {/* Parallax Waves */}
+      {/* Parallax Waves - Foreground */}
       <MotionBox
         position="absolute"
-        bottom="-20px"
+        bottom="-60px"
         left={0}
         width="100%"
         height="auto"
@@ -151,14 +151,15 @@ export default function Hero() {
         <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
           <path
             fill="#e9f5f1"
-            d="M0,0 C600,100 840,20 1440,100 L1440,120 L0,120 Z"
+            d="M0,0 C480,90 960,30 1440,90 L1440,120 L0,120 Z"
           />
         </svg>
       </MotionBox>
 
+      {/* Middle Layer */}
       <MotionBox
         position="absolute"
-        bottom="-20px"
+        bottom="-80px"
         left={0}
         width="100%"
         height="auto"
@@ -172,14 +173,15 @@ export default function Hero() {
         <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
           <path
             fill="#cfeee3"
-            d="M0,0 C600,90 840,30 1440,90 L1440,120 L0,120 Z"
+            d="M0,10 C400,100 1040,20 1440,100 L1440,120 L0,120 Z"
           />
         </svg>
       </MotionBox>
 
+      {/* Background */}
       <MotionBox
         position="absolute"
-        bottom="-20px"
+        bottom="-100px"
         left={0}
         width="100%"
         height="auto"
@@ -193,7 +195,7 @@ export default function Hero() {
         <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
           <path
             fill="#b8e4d5"
-            d="M0,0 C600,80 840,40 1440,80 L1440,120 L0,120 Z"
+            d="M0,0 C360,80 1080,40 1440,80 L1440,120 L0,120 Z"
           />
         </svg>
       </MotionBox>
