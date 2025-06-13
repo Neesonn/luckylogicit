@@ -57,23 +57,23 @@ function ContactForm() {
             bg="green.500"
             borderRadius="md"
             boxShadow="lg"
-            textAlign="center"
-            position="fixed"
-            top="50%"
-            left="50%"
-            transform="translate(-50%, -50%)"
-            zIndex={9999}
+            position="relative"
             minW="300px"
           >
-            <Heading size="md" mb={2}>Enquiry sent!</Heading>
-            <Text mb={4}>Your enquiry has been sent via WhatsApp. We'll get back to you soon.</Text>
             <Button
-              colorScheme="whiteAlpha"
-              onClick={() => toast.closeAll()}
+              position="absolute"
+              top="8px"
+              right="8px"
               size="sm"
+              variant="ghost"
+              color="white"
+              _hover={{ bg: 'whiteAlpha.200' }}
+              onClick={() => toast.closeAll()}
             >
-              Return to site
+              ✕
             </Button>
+            <Heading size="md" mb={2}>Enquiry sent!</Heading>
+            <Text>Your enquiry has been sent via WhatsApp. We'll get back to you soon.</Text>
           </Box>
         ),
       });
