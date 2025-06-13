@@ -27,7 +27,8 @@ import {
   UnlockIcon,
   QuestionIcon,
 } from '@chakra-ui/icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function ContactUsPage() {
   const [name, setName] = useState('');
@@ -36,6 +37,21 @@ export default function ContactUsPage() {
   const [selectedTopic, setSelectedTopic] = useState('');
   const [messageText, setMessageText] = useState('');
   const toast = useToast();
+  const searchParams = useSearchParams();
+  const showToast = searchParams.get('showToast');
+
+  useEffect(() => {
+    if (showToast === 'true') {
+      toast({
+        title: "Enquiry sent!",
+        description: "Your enquiry has been sent via WhatsApp. We'll get back to you soon.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+    }
+  }, [showToast, toast]);
 
   const topics = [
     { label: 'Network Wi-Fi and Internet Setup & Troubleshooting', icon: InfoIcon },
@@ -70,16 +86,6 @@ ${messageText}
     // Create WhatsApp URL with the message
     const whatsappURL = `https://wa.me/61413346507?text=${encodeURIComponent(whatsappMessage)}`;
     
-    // Show success toast
-    toast({
-      title: "Enquiry sent!",
-      description: "Your enquiry has been sent via WhatsApp. We'll get back to you soon.",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-      position: "top",
-    });
-
     // Open WhatsApp in a new tab
     window.open(whatsappURL, '_blank');
 
@@ -89,6 +95,9 @@ ${messageText}
     setPhone('');
     setSelectedTopic('');
     setMessageText('');
+
+    // Redirect to the same page with a query parameter to show toast
+    window.location.href = '/contact-us?showToast=true';
   };
 
   return (
