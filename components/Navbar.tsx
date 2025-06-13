@@ -94,7 +94,7 @@ export default function Navbar() {
         />
         <IconButton
           as="a"
-          href="https://facebook.com/luckylogicit"
+          href="https://www.facebook.com/profile.php?id=61577444454300"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Follow us on Facebook"
