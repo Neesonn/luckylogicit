@@ -35,12 +35,21 @@ export default function Hero() {
   };
 
   return (
-    <Box position="relative" bg="white" zIndex={1} px={{ base: 4, md: 8 }} pt={{ base: 16, md: 28 }} pb={{ base: 10, md: 16 }}>
+    <Box
+      position="relative"
+      bg="white"
+      overflow="hidden"
+      px={{ base: 4, md: 8 }}
+      pt={{ base: 16, md: 28 }}
+      pb={{ base: 20, md: 32 }}
+      zIndex={1}
+    >
       <Flex
         direction={{ base: 'column', md: 'row' }}
         align="stretch"
         justify="center"
         gap={{ base: 6, md: 0 }}
+        minH={{ md: '500px' }}
       >
         {/* Left: Text Content */}
         <MotionBox
@@ -115,7 +124,7 @@ export default function Hero() {
             zIndex={2}
             maxW="500px"
             maxH="400px"
-            mt="-20px"  // <-- Move animation container up slightly
+            mt="-20px"
           >
             <Lottie
               animationData={animationData}
@@ -128,22 +137,26 @@ export default function Hero() {
       </Flex>
 
       {/* SVG Wave Transition */}
-<Box
-  position="absolute"
-  bottom="-20px"  // Move the wave down by 20px (adjust as needed)
-  left={0}
-  width="100%"
-  height="auto"
-  zIndex={0}
-  pointerEvents="none"
->
-  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-    <path
-      fill="#e9f5f1"
-      d="M0,0 C600,100 840,20 1440,100 L1440,120 L0,120 Z"
-    />
-  </svg>
-</Box>
+      <Box
+        position="absolute"
+        bottom={0}
+        left={0}
+        width="100%"
+        height="100px"
+        zIndex={0}
+        pointerEvents="none"
+      >
+        <svg
+          viewBox="0 0 1440 120"
+          preserveAspectRatio="none"
+          style={{ display: 'block', width: '100%', height: '100%' }}
+        >
+          <path
+            fill="#e9f5f1"
+            d="M0,0 C600,100 840,20 1440,100 L1440,120 L0,120 Z"
+          />
+        </svg>
+      </Box>
     </Box>
   );
 }
