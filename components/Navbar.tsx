@@ -1,5 +1,6 @@
-import { Flex, Text, Box, HStack, Spacer } from '@chakra-ui/react';
+import { Flex, Text, Box, HStack, Spacer, IconButton } from '@chakra-ui/react';
 import NextLink from 'next/link';
+import { FaWhatsapp, FaInstagram, FaFacebook } from 'react-icons/fa';
 
 export default function Navbar() {
   return (
@@ -60,6 +61,52 @@ export default function Navbar() {
       </HStack>
 
       <Spacer />
+
+      {/* Social Media Icons */}
+      <HStack spacing={2}>
+        <IconButton
+          as="a"
+          href="https://wa.me/6100000000"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Contact us on WhatsApp"
+          icon={<FaWhatsapp />}
+          colorScheme="whatsapp"
+          size="lg"
+          fontSize="24px"
+          variant="ghost"
+          _hover={{ transform: 'scale(1.1)' }}
+          transition="transform 0.2s"
+        />
+        <IconButton
+          as="a"
+          href="https://instagram.com/luckylogicit"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Follow us on Instagram"
+          icon={<FaInstagram />}
+          colorScheme="pink"
+          size="lg"
+          fontSize="24px"
+          variant="ghost"
+          _hover={{ transform: 'scale(1.1)' }}
+          transition="transform 0.2s"
+        />
+        <IconButton
+          as="a"
+          href="https://facebook.com/luckylogicit"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Follow us on Facebook"
+          icon={<FaFacebook />}
+          colorScheme="facebook"
+          size="lg"
+          fontSize="24px"
+          variant="ghost"
+          _hover={{ transform: 'scale(1.1)' }}
+          transition="transform 0.2s"
+        />
+      </HStack>
     </Flex>
   );
 }
