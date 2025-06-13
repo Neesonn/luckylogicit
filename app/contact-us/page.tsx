@@ -14,6 +14,7 @@ import {
   MenuItem,
   Icon,
   Textarea,
+  useToast,
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
@@ -34,6 +35,7 @@ export default function ContactUsPage() {
   const [phone, setPhone] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
   const [messageText, setMessageText] = useState('');
+  const toast = useToast();
 
   const topics = [
     { label: 'Network Wi-Fi and Internet Setup & Troubleshooting', icon: InfoIcon },
@@ -68,8 +70,25 @@ ${messageText}
     // Create WhatsApp URL with the message
     const whatsappURL = `https://wa.me/61413346507?text=${encodeURIComponent(whatsappMessage)}`;
     
+    // Show success toast
+    toast({
+      title: "Enquiry sent!",
+      description: "Your enquiry has been sent via WhatsApp. We'll get back to you soon.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "top",
+    });
+
     // Open WhatsApp in a new tab
     window.open(whatsappURL, '_blank');
+
+    // Reset form
+    setName('');
+    setEmail('');
+    setPhone('');
+    setSelectedTopic('');
+    setMessageText('');
   };
 
   return (
