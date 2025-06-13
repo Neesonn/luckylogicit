@@ -14,9 +14,6 @@ import {
   MenuItem,
   Icon,
   Textarea,
-  Text,
-  HStack,
-  useToast,
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
@@ -32,14 +29,11 @@ import {
 import { useState } from 'react';
 
 export default function ContactUsPage() {
-  const toast = useToast();
-
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [message, setMessage] = useState('');
+  const [messageText, setMessageText] = useState('');
 
   const topics = [
     { label: 'Network Wi-Fi and Internet Setup & Troubleshooting', icon: InfoIcon },
@@ -55,7 +49,8 @@ export default function ContactUsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+    
+    // Create the message with all form data
     const whatsappMessage = `
 *New Enquiry from ${name}*
 
@@ -66,36 +61,15 @@ export default function ContactUsPage() {
 *Enquiry Topic:*
 ${selectedTopic}
 
-${selectedImage ? `*📎 Image Note:*\n"${selectedImage.name}" uploaded. Please attach this image manually in WhatsApp.` : ''}
-
 *Message:*
-${message}
+${messageText}
     `.trim();
 
+    // Create WhatsApp URL with the message
     const whatsappURL = `https://wa.me/61413346507?text=${encodeURIComponent(whatsappMessage)}`;
+    
+    // Open WhatsApp in a new tab
     window.open(whatsappURL, '_blank');
-
-    toast({
-      title: 'Enquiry sent!',
-      description: 'We’ve opened WhatsApp so you can finalise your message.',
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    });
-
-    // Reset the form
-    setName('');
-    setEmail('');
-    setPhone('');
-    setSelectedTopic('');
-    setSelectedImage(null);
-    setMessage('');
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedImage(e.target.files[0]);
-    }
   };
 
   return (
@@ -107,15 +81,21 @@ ${message}
       color="gray.800"
       minH="80vh"
     >
-      <Heading as="h1" size="2xl" mb={10} color="brand.green" textAlign="center">
+      <Heading
+        as="h1"
+        size="2xl"
+        mb={10}
+        color="brand.green"
+        textAlign="center"
+      >
         Get in Touch
       </Heading>
 
       <VStack as="form" spacing={6} onSubmit={handleSubmit}>
         <FormControl isRequired>
           <FormLabel>Your Name</FormLabel>
-          <Input
-            placeholder="Enter your full name"
+          <Input 
+            placeholder="Enter your full name" 
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -123,8 +103,8 @@ ${message}
 
         <FormControl isRequired>
           <FormLabel>Email Address</FormLabel>
-          <Input
-            type="email"
+          <Input 
+            type="email" 
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -133,8 +113,8 @@ ${message}
 
         <FormControl isRequired>
           <FormLabel>Phone Number</FormLabel>
-          <Input
-            type="tel"
+          <Input 
+            type="tel" 
             placeholder="Enter your phone number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -161,33 +141,6 @@ ${message}
           </Menu>
         </FormControl>
 
-        <FormControl>
-          <FormLabel>Do you have an image of the problem/product?</FormLabel>
-          <Input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            display="none"
-            id="image-upload"
-          />
-          <HStack spacing={4}>
-            <Button
-              as="label"
-              htmlFor="image-upload"
-              cursor="pointer"
-              colorScheme="green"
-              variant="outline"
-            >
-              Choose Image
-            </Button>
-            {selectedImage && (
-              <Text fontSize="sm" color="gray.600">
-                {selectedImage.name}
-              </Text>
-            )}
-          </HStack>
-        </FormControl>
-
         <FormControl isRequired>
           <FormLabel>Tell us more about what you're specifically after</FormLabel>
           <Textarea
@@ -195,8 +148,8 @@ ${message}
             size="lg"
             minH="150px"
             resize="vertical"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
           />
         </FormControl>
 
@@ -206,7 +159,7 @@ ${message}
           colorScheme="green"
           width={{ base: 'full', md: 'auto' }}
         >
-          Send Enquiry via WhatsApp
+          Send Enquiry
         </Button>
       </VStack>
     </Box>
