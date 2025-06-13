@@ -38,18 +38,17 @@ export default function Hero() {
     <Box
       position="relative"
       bg="white"
-      overflow="hidden"
+      zIndex={1}
       px={{ base: 4, md: 8 }}
       pt={{ base: 16, md: 28 }}
-      pb={{ base: 20, md: 32 }}
-      zIndex={1}
+      pb={{ base: 10, md: 16 }}
+      overflow="hidden"
     >
       <Flex
         direction={{ base: 'column', md: 'row' }}
         align="stretch"
         justify="center"
         gap={{ base: 6, md: 0 }}
-        minH={{ md: '500px' }}
       >
         {/* Left: Text Content */}
         <MotionBox
@@ -136,27 +135,68 @@ export default function Hero() {
         )}
       </Flex>
 
-      {/* SVG Wave Transition */}
-      <Box
+      {/* Parallax Waves */}
+      <MotionBox
         position="absolute"
-        bottom={0}
+        bottom="-30px"
         left={0}
         width="100%"
-        height="100px"
+        height="auto"
         zIndex={0}
         pointerEvents="none"
+        initial={{ y: 0 }}
+        animate={{ y: [0, -10, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <svg
-          viewBox="0 0 1440 120"
-          preserveAspectRatio="none"
-          style={{ display: 'block', width: '100%', height: '100%' }}
-        >
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
           <path
             fill="#e9f5f1"
             d="M0,0 C600,100 840,20 1440,100 L1440,120 L0,120 Z"
           />
         </svg>
-      </Box>
+      </MotionBox>
+
+      <MotionBox
+        position="absolute"
+        bottom="-20px"
+        left={0}
+        width="100%"
+        height="auto"
+        zIndex={-1}
+        pointerEvents="none"
+        opacity={0.6}
+        initial={{ y: 0 }}
+        animate={{ y: [0, -15, 0] }}
+        transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+          <path
+            fill="#cfeee3"
+            d="M0,0 C600,90 840,30 1440,90 L1440,120 L0,120 Z"
+          />
+        </svg>
+      </MotionBox>
+
+      <MotionBox
+        position="absolute"
+        bottom="-10px"
+        left={0}
+        width="100%"
+        height="auto"
+        zIndex={-2}
+        pointerEvents="none"
+        opacity={0.4}
+        initial={{ y: 0 }}
+        animate={{ y: [0, -5, 0] }}
+        transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+          <path
+            fill="#b8e4d5"
+            d="M0,0 C600,80 840,40 1440,80 L1440,120 L0,120 Z"
+          />
+        </svg>
+      </MotionBox>
     </Box>
   );
 }
