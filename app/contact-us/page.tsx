@@ -27,10 +27,10 @@ import {
   UnlockIcon,
   QuestionIcon,
 } from '@chakra-ui/icons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export default function ContactUsPage() {
+function ContactForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -101,6 +101,82 @@ ${messageText}
   };
 
   return (
+    <VStack as="form" spacing={6} onSubmit={handleSubmit}>
+      <FormControl isRequired>
+        <FormLabel>Your Name</FormLabel>
+        <Input 
+          placeholder="Enter your full name" 
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </FormControl>
+
+      <FormControl isRequired>
+        <FormLabel>Email Address</FormLabel>
+        <Input 
+          type="email" 
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </FormControl>
+
+      <FormControl isRequired>
+        <FormLabel>Phone Number</FormLabel>
+        <Input 
+          type="tel" 
+          placeholder="Enter your phone number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+      </FormControl>
+
+      <FormControl isRequired>
+        <FormLabel>I want to enquire about</FormLabel>
+        <Menu>
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />} width="full">
+            {selectedTopic || 'Select a topic'}
+          </MenuButton>
+          <MenuList>
+            {topics.map(({ label, icon }) => (
+              <MenuItem
+                key={label}
+                icon={<Icon as={icon} />}
+                onClick={() => setSelectedTopic(label)}
+              >
+                {label}
+              </MenuItem>
+            ))}
+          </MenuList>
+        </Menu>
+      </FormControl>
+
+      <FormControl isRequired>
+        <FormLabel>Tell us more about what you're specifically after</FormLabel>
+        <Textarea
+          placeholder="Please provide details about your enquiry..."
+          size="lg"
+          minH="150px"
+          resize="vertical"
+          value={messageText}
+          onChange={(e) => setMessageText(e.target.value)}
+        />
+      </FormControl>
+
+      <Button
+        type="submit"
+        size="lg"
+        colorScheme="green"
+        width={{ base: 'full', md: 'auto' }}
+      >
+        Send Enquiry via WhatsApp
+      </Button>
+    </VStack>
+  );
+}
+
+export default function ContactUsPage() {
+  return (
     <Box
       px={{ base: 4, md: 8 }}
       py={{ base: 16, md: 24 }}
@@ -119,77 +195,9 @@ ${messageText}
         Get in Touch
       </Heading>
 
-      <VStack as="form" spacing={6} onSubmit={handleSubmit}>
-        <FormControl isRequired>
-          <FormLabel>Your Name</FormLabel>
-          <Input 
-            placeholder="Enter your full name" 
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </FormControl>
-
-        <FormControl isRequired>
-          <FormLabel>Email Address</FormLabel>
-          <Input 
-            type="email" 
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </FormControl>
-
-        <FormControl isRequired>
-          <FormLabel>Phone Number</FormLabel>
-          <Input 
-            type="tel" 
-            placeholder="Enter your phone number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </FormControl>
-
-        <FormControl isRequired>
-          <FormLabel>I want to enquire about</FormLabel>
-          <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} width="full">
-              {selectedTopic || 'Select a topic'}
-            </MenuButton>
-            <MenuList>
-              {topics.map(({ label, icon }) => (
-                <MenuItem
-                  key={label}
-                  icon={<Icon as={icon} />}
-                  onClick={() => setSelectedTopic(label)}
-                >
-                  {label}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-        </FormControl>
-
-        <FormControl isRequired>
-          <FormLabel>Tell us more about what you're specifically after</FormLabel>
-          <Textarea
-            placeholder="Please provide details about your enquiry..."
-            size="lg"
-            minH="150px"
-            resize="vertical"
-            value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
-          />
-        </FormControl>
-
-        <Button
-          type="submit"
-          size="lg"
-          colorScheme="green"
-          width={{ base: 'full', md: 'auto' }}
-        >
-          Send Enquiry via WhatsApp
-        </Button>
-      </VStack>
+      <Suspense fallback={<div>Loading...</div>}>
+        <ContactForm />
+      </Suspense>
     </Box>
   );
 }
