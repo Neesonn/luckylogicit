@@ -14,6 +14,8 @@ import {
   MenuItem,
   Icon,
   Textarea,
+  Text,
+  HStack,
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
@@ -33,6 +35,7 @@ export default function ContactUsPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [message, setMessage] = useState('');
 
   const topics = [
@@ -49,26 +52,35 @@ export default function ContactUsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Create the message with all form data
+    const whatsappMessage = `
+*New Enquiry from ${name}*
 
-    if (!name || !email || !phone || !selectedTopic || !message) {
-      alert('Please fill out all required fields.');
-      return;
-    }
+*Contact Details:*
+📧 Email: ${email}
+📱 Phone: ${phone}
 
-    const encodedMessage = encodeURIComponent(
-      `New Enquiry via Website:
+*Enquiry Topic:*
+${selectedTopic}
 
-Name: ${name}
-Email: ${email}
-Phone: ${phone}
-Topic: ${selectedTopic}
-Message: ${message}`
-    );
+${selectedImage ? `*Image Uploaded:*\n${selectedImage.name}` : ''}
 
-    const phoneNumber = '61413346507'; // Replace with your WhatsApp number (e.g., 61 for Australia)
-    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+*Message:*
+${message}
+    `.trim();
 
+    // Create WhatsApp URL with the message
+    const whatsappURL = `https://wa.me/61400000000?text=${encodeURIComponent(whatsappMessage)}`;
+    
+    // Open WhatsApp in a new tab
     window.open(whatsappURL, '_blank');
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedImage(e.target.files[0]);
+    }
   };
 
   return (
@@ -138,6 +150,33 @@ Message: ${message}`
               ))}
             </MenuList>
           </Menu>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Do you have an image of the problem/product?</FormLabel>
+          <Input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            display="none"
+            id="image-upload"
+          />
+          <HStack spacing={4}>
+            <Button
+              as="label"
+              htmlFor="image-upload"
+              cursor="pointer"
+              colorScheme="green"
+              variant="outline"
+            >
+              Choose Image
+            </Button>
+            {selectedImage && (
+              <Text fontSize="sm" color="gray.600">
+                {selectedImage.name}
+              </Text>
+            )}
+          </HStack>
         </FormControl>
 
         <FormControl isRequired>
