@@ -16,6 +16,7 @@ import {
   Textarea,
   Text,
   HStack,
+  useToast,
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
@@ -31,6 +32,8 @@ import {
 import { useState } from 'react';
 
 export default function ContactUsPage() {
+  const toast = useToast();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -52,8 +55,7 @@ export default function ContactUsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Create the message with all form data
+
     const whatsappMessage = `
 *New Enquiry from ${name}*
 
@@ -64,17 +66,30 @@ export default function ContactUsPage() {
 *Enquiry Topic:*
 ${selectedTopic}
 
-${selectedImage ? `*Image Uploaded:*\n${selectedImage.name}` : ''}
+${selectedImage ? `*📎 Image Note:*\n"${selectedImage.name}" uploaded. Please attach this image manually in WhatsApp.` : ''}
 
 *Message:*
 ${message}
     `.trim();
 
-    // Create WhatsApp URL with the message
     const whatsappURL = `https://wa.me/61413346507?text=${encodeURIComponent(whatsappMessage)}`;
-    
-    // Open WhatsApp in a new tab
     window.open(whatsappURL, '_blank');
+
+    toast({
+      title: 'Enquiry sent!',
+      description: 'We’ve opened WhatsApp so you can finalise your message.',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    });
+
+    // Reset the form
+    setName('');
+    setEmail('');
+    setPhone('');
+    setSelectedTopic('');
+    setSelectedImage(null);
+    setMessage('');
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,13 +107,7 @@ ${message}
       color="gray.800"
       minH="80vh"
     >
-      <Heading
-        as="h1"
-        size="2xl"
-        mb={10}
-        color="brand.green"
-        textAlign="center"
-      >
+      <Heading as="h1" size="2xl" mb={10} color="brand.green" textAlign="center">
         Get in Touch
       </Heading>
 
