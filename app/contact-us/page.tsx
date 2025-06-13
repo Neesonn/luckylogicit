@@ -15,6 +15,7 @@ import {
   Icon,
   Textarea,
   useToast,
+  Text,
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
@@ -46,9 +47,35 @@ function ContactForm() {
         title: "Enquiry sent!",
         description: "Your enquiry has been sent via WhatsApp. We'll get back to you soon.",
         status: "success",
-        duration: 5000,
+        duration: null,
         isClosable: true,
         position: "top",
+        render: () => (
+          <Box
+            color="white"
+            p={3}
+            bg="green.500"
+            borderRadius="md"
+            boxShadow="lg"
+            textAlign="center"
+            position="fixed"
+            top="50%"
+            left="50%"
+            transform="translate(-50%, -50%)"
+            zIndex={9999}
+            minW="300px"
+          >
+            <Heading size="md" mb={2}>Enquiry sent!</Heading>
+            <Text mb={4}>Your enquiry has been sent via WhatsApp. We'll get back to you soon.</Text>
+            <Button
+              colorScheme="whiteAlpha"
+              onClick={() => toast.closeAll()}
+              size="sm"
+            >
+              Return to site
+            </Button>
+          </Box>
+        ),
       });
     }
   }, [showToast, toast]);
