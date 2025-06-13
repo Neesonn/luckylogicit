@@ -159,7 +159,7 @@ ${messageText}
           colorScheme="green"
           width={{ base: 'full', md: 'auto' }}
         >
-          Send Enquiry
+          Send Enquiry via WhatsApp
         </Button>
       </VStack>
     </Box>
