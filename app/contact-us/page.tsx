@@ -228,11 +228,12 @@ ${messageText}
         <Button
           type="submit"
           size="lg"
-          colorScheme="green"
+          bg="brand.green"
+          color="white"
           width="full"
           leftIcon={<FaWhatsapp />}
           boxShadow="md"
-          _hover={{ boxShadow: 'lg', transform: 'translateY(-2px)' }}
+          _hover={{ bg: 'green.700', boxShadow: 'lg', transform: 'translateY(-2px)' }}
           transition="all 0.2s"
           mb={{ base: 4, md: 0 }}
         >
@@ -241,12 +242,13 @@ ${messageText}
         <Button
           type="button"
           size="lg"
-          colorScheme="blue"
+          bg="brand.gold"
+          color="white"
           width="full"
           leftIcon={<FaEnvelope />}
           onClick={handleEmailSubmit}
           boxShadow="md"
-          _hover={{ boxShadow: 'lg', transform: 'translateY(-2px)' }}
+          _hover={{ bg: '#b38d1c', boxShadow: 'lg', transform: 'translateY(-2px)' }}
           transition="all 0.2s"
         >
           Send Enquiry via Email
