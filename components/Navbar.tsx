@@ -76,16 +76,16 @@ export default function Navbar() {
           />
           <MenuList>
             <NextLink href="/" passHref>
-              <MenuItem as="a">Home</MenuItem>
+              <MenuItem>Home</MenuItem>
             </NextLink>
             <NextLink href="/about-us" passHref>
-              <MenuItem as="a">About Us</MenuItem>
+              <MenuItem>About Us</MenuItem>
             </NextLink>
             <NextLink href="/services" passHref>
-              <MenuItem as="a">Services</MenuItem>
+              <MenuItem>Services</MenuItem>
             </NextLink>
             <NextLink href="/contact-us" passHref>
-              <MenuItem as="a">Contact Us</MenuItem>
+              <MenuItem>Contact Us</MenuItem>
             </NextLink>
           </MenuList>
         </Menu>
