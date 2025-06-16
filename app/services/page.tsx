@@ -3,17 +3,12 @@
 import {
   Box,
   Heading,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
   Text,
   VStack,
   HStack,
-  useColorModeValue,
+  Icon,
+  SimpleGrid,
 } from '@chakra-ui/react';
-
 import {
   FiWifi,
   FiCpu,
@@ -28,54 +23,97 @@ import {
 const services = [
   {
     title: 'Network Setup & Troubleshooting',
-    description: `From router configuration and Wi-Fi optimization to troubleshooting with your internet service provider, we ensure your home network is fast, reliable, and secure.`,
+    summary: 'We optimise your internet and fix dropouts or black spots around the home.',
+    bullets: [
+      'Router & modem configuration',
+      'Wi-Fi blackspot fixes and mesh network setups',
+      'ISP connectivity troubleshooting',
+    ],
+    ideal: 'Perfect for households with slow or unstable internet.',
     icon: FiWifi,
   },
   {
     title: 'Computer Repairs & Upgrades',
-    description: `We provide expert repairs and upgrades for your PC or laptop, including hardware diagnostics, component replacements, and performance enhancements.`,
+    summary: 'Repair, replace or upgrade your hardware to boost performance.',
+    bullets: [
+      'RAM and storage upgrades',
+      'Laptop screen/keyboard repair',
+      'Fan, power, and thermal troubleshooting',
+    ],
+    ideal: 'Great for slow, aging, or malfunctioning PCs/laptops.',
     icon: FiCpu,
   },
   {
     title: 'Software Installation & Support',
-    description: `Installing operating systems, software applications, and managing virus/malware removal to keep your devices running smoothly and securely.`,
+    summary: 'Install or repair software, OS, or remove malware.',
+    bullets: [
+      'Windows/macOS installation',
+      'Office & licensed software setup',
+      'Malware/virus removal',
+    ],
+    ideal: 'Anyone needing smooth, secure software operation.',
     icon: FiDownload,
   },
   {
     title: 'Custom PC Builds',
-    description: `Build your ideal computer tailored to your needs — whether for gaming, work, or general use — with expert advice and quality components.`,
+    summary: 'Let us help you design and build a high-performance desktop.',
+    bullets: [
+      'Gaming PCs and workstation builds',
+      'Component selection & compatibility checks',
+      'Assembly and OS setup',
+    ],
+    ideal: 'Gamers, editors, and power users needing performance.',
     icon: FiSettings,
   },
   {
     title: 'Smart Home Automation Assistance',
-    description: `Setup and troubleshooting for smart home devices like lights, thermostats, security cameras, and voice assistants to enhance your living experience.`,
+    summary: 'We connect and configure your smart home devices.',
+    bullets: [
+      'Google Home, Alexa, Apple HomeKit setup',
+      'Smart lighting, switches, cameras',
+      'Wi-Fi automation compatibility',
+    ],
+    ideal: 'Ideal for modern households wanting automation.',
     icon: FiTool,
   },
   {
     title: 'Printer & Peripheral Support',
-    description: `Installation, setup, and troubleshooting of printers, scanners, and other peripheral devices for seamless connectivity and performance.`,
+    summary: 'Get your printers, scanners and accessories working seamlessly.',
+    bullets: [
+      'Printer and driver installations',
+      'Wi-Fi printing & network setup',
+      'Peripheral troubleshooting',
+    ],
+    ideal: 'Anyone struggling with devices that won’t connect.',
     icon: FiPrinter,
   },
   {
     title: 'Virus & Malware Removal',
-    description: `Thorough scanning and removal of malicious software to protect your data and restore device performance.`,
+    summary: 'Clean your computer from unwanted software and threats.',
+    bullets: [
+      'Full security scans',
+      'Malware and ransomware removal',
+      'System hardening recommendations',
+    ],
+    ideal: 'For compromised systems or suspicious behaviour.',
     icon: FiShield,
   },
   {
     title: 'Ongoing Tech Support',
-    description: `Reliable remote or onsite support plans designed to keep your home technology running without interruptions.`,
+    summary: 'We’re available for on-demand or ongoing remote or on-site support.',
+    bullets: [
+      'Flexible remote support options',
+      'On-site visits for setup or repair',
+      'Scheduled maintenance plans',
+    ],
+    ideal: 'Elderly, busy professionals, or families needing tech help.',
     icon: FiHeadphones,
   },
 ];
 
 export default function ServicesPage() {
-  const bgActive = useColorModeValue('brand.lightGreen', 'brand.darkGreen');
-  const iconBgActive = useColorModeValue('rgba(201, 162, 39, 0.2)', 'rgba(201, 162, 39, 0.4)');
-  const iconColorActive = useColorModeValue('brand.gold', 'brand.gold');
-  const iconColorInactive = useColorModeValue('gray.400', 'gray.500');
-
   return (
-    <Box px={6} py={{ base: 16, md: 24 }} maxW="4xl" mx="auto" color="gray.800">
+    <Box px={{ base: 4, md: 8 }} py={{ base: 16, md: 24 }} maxW="7xl" mx="auto">
       <Heading
         as="h1"
         size="2xl"
@@ -87,77 +125,39 @@ export default function ServicesPage() {
         Our Services
       </Heading>
 
-      <Accordion allowMultiple>
-        {services.map(({ title, description, icon: Icon }, idx) => (
-          <AccordionItem
+      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
+        {services.map((service, idx) => (
+          <Box
             key={idx}
-            mb={4}
+            p={6}
             borderRadius="lg"
-            boxShadow="sm"
-            border="1px solid"
-            borderColor="transparent"
-            overflow="hidden"
-            _last={{ mb: 0 }}
-            transition="box-shadow 0.3s ease"
-            _hover={{ boxShadow: 'md', borderColor: 'gray.200' }}
+            boxShadow="md"
+            bg="gray.50"
+            transition="all 0.3s"
+            _hover={{ transform: 'translateY(-4px)', boxShadow: 'xl' }}
           >
-            {({ isExpanded }) => (
-              <>
-                <AccordionButton
-                  px={6}
-                  py={6}
-                  _hover={{ bg: 'gray.50' }}
-                  bg={isExpanded ? bgActive : 'white'}
-                  color={isExpanded ? iconColorActive : 'gray.800'}
-                  fontWeight={isExpanded ? 'bold' : 'semibold'}
-                  borderRadius="lg"
-                  transition="all 0.3s ease"
-                  _focus={{ boxShadow: 'outline' }}
-                  cursor="pointer"
-                >
-                  <HStack spacing={5} flex="1" textAlign="left">
-                    <Box
-                      bg={isExpanded ? iconBgActive : 'transparent'}
-                      borderRadius="full"
-                      w="48px"
-                      h="48px"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      transition="background-color 0.3s ease"
-                    >
-                      <Icon
-                        size="28px"
-                        color={isExpanded ? iconColorActive : iconColorInactive}
-                      />
-                    </Box>
-                    <Heading
-                      as="h3"
-                      fontSize="lg"
-                      fontWeight="bold"
-                      color={isExpanded ? iconColorActive : 'gray.800'}
-                      m={0}
-                    >
-                      {title}
-                    </Heading>
-                  </HStack>
-                  <AccordionIcon />
-                </AccordionButton>
-                <AccordionPanel
-                  pb={6}
-                  fontSize="md"
-                  color="gray.600"
-                  lineHeight="tall"
-                  bg="white"
-                  transition="all 0.3s ease"
-                >
-                  <Text>{description}</Text>
-                </AccordionPanel>
-              </>
-            )}
-          </AccordionItem>
+            <HStack spacing={4} align="start">
+              <Box p={3} bg="green.100" borderRadius="full">
+                <Icon as={service.icon} boxSize={6} color="brand.green" />
+              </Box>
+              <VStack align="start" spacing={2} flex="1">
+                <Heading fontSize="lg" color="gray.800">
+                  {service.title}
+                </Heading>
+                <Text color="gray.600">{service.summary}</Text>
+                <VStack align="start" spacing={0} pt={2} fontSize="sm">
+                  {service.bullets.map((item, i) => (
+                    <Text key={i}>• {item}</Text>
+                  ))}
+                </VStack>
+                <Text fontSize="sm" color="gray.500" pt={2}>
+                  <strong>Ideal for:</strong> {service.ideal}
+                </Text>
+              </VStack>
+            </HStack>
+          </Box>
         ))}
-      </Accordion>
+      </SimpleGrid>
     </Box>
   );
 }
