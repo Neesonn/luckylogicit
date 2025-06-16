@@ -59,6 +59,7 @@ export default function Hero() {
           px={{ base: 0, md: 10 }}
           mb={{ base: 8, md: 0 }}
           zIndex={2}
+          order={{ base: 2, md: 1 }}
         >
           <MotionHeading
             fontSize={{ base: '2xl', sm: '3xl', md: '4xl' }}
@@ -109,6 +110,7 @@ export default function Hero() {
             mx={4}
             alignSelf="stretch"
             boxShadow="0 0 4px rgba(0, 0, 0, 0.05)"
+            order={{ md: 2 }}
           />
         )}
 
@@ -125,6 +127,7 @@ export default function Hero() {
             maxH={{ base: '200px', md: '300px' }}
             mt={{ base: '-10px', md: '-30px' }}
             mx="auto"
+            order={{ base: 1, md: 3 }}
           >
             <Lottie
               animationData={animationData}
