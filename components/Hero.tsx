@@ -113,7 +113,7 @@ export default function Hero() {
         )}
 
         {/* Right: Lottie Animation */}
-        {!isMobile && animationData && (
+        {animationData && (
           <Box
             flex="1"
             display="flex"
@@ -121,9 +121,10 @@ export default function Hero() {
             alignItems="center"
             pr={{ md: 10 }}
             zIndex={1}
-            maxW="500px"
-            maxH="300px"
+            maxW={{ base: '300px', md: '500px' }}
+            maxH={{ base: '200px', md: '300px' }}
             mt={{ base: '-10px', md: '-30px' }}
+            mx="auto"
           >
             <Lottie
               animationData={animationData}
