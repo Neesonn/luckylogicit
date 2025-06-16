@@ -16,6 +16,7 @@ import {
   Textarea,
   useToast,
   Text,
+  HStack,
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
@@ -127,8 +128,35 @@ ${messageText}
     window.location.href = '/contact-us?showToast=true';
   };
 
+  const handleEmailSubmit = () => {
+    const subject = encodeURIComponent(`Enquiry from ${name} regarding ${selectedTopic}`);
+    const body = encodeURIComponent(`
+New Enquiry from ${name}
+
+Contact Details:
+Email: ${email}
+Phone: ${phone}
+
+Enquiry Topic:
+${selectedTopic}
+
+Message:
+${messageText}
+    `.trim());
+    
+    const mailtoLink = `mailto:michael@luckylogic.com.au?subject=${subject}&body=${body}`;
+    window.open(mailtoLink, '_blank');
+
+    // Reset form (optional, depending on desired UX after email client opens)
+    setName('');
+    setEmail('');
+    setPhone('');
+    setSelectedTopic('');
+    setMessageText('');
+  };
+
   return (
-    <VStack as="form" spacing={6} onSubmit={handleSubmit}>
+    <VStack as="form" spacing={6}>
       <FormControl isRequired>
         <FormLabel>Your Name</FormLabel>
         <Input 
@@ -190,14 +218,25 @@ ${messageText}
         />
       </FormControl>
 
-      <Button
-        type="submit"
-        size="lg"
-        colorScheme="green"
-        width={{ base: 'full', md: 'auto' }}
-      >
-        Send Enquiry via WhatsApp
-      </Button>
+      <HStack spacing={4} width={{ base: 'full', md: 'auto' }}>
+        <Button
+          type="submit"
+          size="lg"
+          colorScheme="green"
+          width="full"
+        >
+          Send Enquiry via WhatsApp
+        </Button>
+        <Button
+          type="button"
+          size="lg"
+          colorScheme="blue"
+          width="full"
+          onClick={handleEmailSubmit}
+        >
+          Send Enquiry via Email
+        </Button>
+      </HStack>
     </VStack>
   );
 }
