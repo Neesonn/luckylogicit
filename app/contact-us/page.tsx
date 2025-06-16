@@ -17,6 +17,7 @@ import {
   useToast,
   Text,
   HStack,
+  Flex,
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
@@ -219,7 +220,11 @@ ${messageText}
         />
       </FormControl>
 
-      <HStack spacing={4} width={{ base: 'full', md: 'auto' }}>
+      <Flex
+        direction={{ base: 'column', md: 'row' }}
+        gap={4}
+        width={{ base: 'full', md: 'auto' }}
+      >
         <Button
           type="submit"
           size="lg"
@@ -229,6 +234,7 @@ ${messageText}
           boxShadow="md"
           _hover={{ boxShadow: 'lg', transform: 'translateY(-2px)' }}
           transition="all 0.2s"
+          mb={{ base: 4, md: 0 }}
         >
           Send Enquiry via WhatsApp
         </Button>
@@ -245,7 +251,7 @@ ${messageText}
         >
           Send Enquiry via Email
         </Button>
-      </HStack>
+      </Flex>
     </VStack>
   );
 }
