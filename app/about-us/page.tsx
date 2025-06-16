@@ -38,7 +38,7 @@ export default function AboutUsPage() {
         A Needed Solution
       </Heading>
       <Text fontSize="lg" lineHeight="taller">
-        In 2024, after closely observing the IT landscape across Sydney, we realised there was a noticeable gap in dedicated residential IT services. While commercial IT solutions thrive in the business world, many households and home offices face challenges when seeking reliable, trustworthy and personalised IT assistance. That’s where Lucky Logic steps in—with boutique services designed exclusively for Sydney’s residential customers.
+        In 2024, after closely observing the IT landscape across Sydney, we realised there was a noticeable gap in dedicated residential IT services. While commercial IT solutions thrive in the business world, many households and home offices face challenges when seeking reliable, trustworthy and personalised IT assistance. That’s where Lucky Logic steps in with boutique services designed exclusively for Sydney’s residential customers.
       </Text>
 
       {/* Boutique Approach */}
@@ -46,7 +46,7 @@ export default function AboutUsPage() {
         What Makes Us Boutique?
       </Heading>
       <Text fontSize="lg" lineHeight="taller">
-        We deliver tailored, personal service that’s often missing from large, generic providers. We take the time to listen and understand your unique situation—whether it’s on-site or remote assistance—so you get solutions that truly fit. Boutique IT is about more than quick fixes; it’s about lasting relationships built on trust, detail, and care.
+        We deliver tailored, personal service that’s often missing from large, generic providers. We take the time to listen and understand your unique situation, whether it’s on-site or remote assistance so you get solutions that truly fit. Boutique IT is about more than quick fixes; it’s about lasting relationships built on trust, detail, and care.
       </Text>
 
       <Divider my={10} />
