@@ -16,6 +16,7 @@ import {
   useBreakpointValue,
   useColorModeValue,
   Divider,
+  Button,
 } from '@chakra-ui/react';
 import {
   FiWifi,
@@ -27,6 +28,7 @@ import {
   FiShield,
   FiHeadphones,
 } from 'react-icons/fi';
+import { useRouter } from 'next/navigation';
 
 const services = [
   {
@@ -92,7 +94,7 @@ const services = [
       'Wi-Fi printing & network setup',
       'Peripheral troubleshooting',
     ],
-    ideal: 'Anyone struggling with devices that won’t connect.',
+    ideal: "Anyone struggling with devices that won't connect.",
     icon: FiPrinter,
   },
   {
@@ -108,7 +110,7 @@ const services = [
   },
   {
     title: 'Ongoing Tech Support',
-    summary: 'We’re available for on-demand or ongoing remote or on-site support.',
+    summary: "We're available for on-demand or ongoing remote or on-site support.",
     bullets: [
       'Flexible remote support options',
       'On-site visits for setup or repair',
@@ -122,6 +124,11 @@ const services = [
 export default function ServicesPage() {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const iconBg = useColorModeValue('gray.100', 'gray.700');
+  const router = useRouter();
+
+  const handleContactClick = () => {
+    router.push('/contact');
+  };
 
   return (
     <Box px={{ base: 4, md: 8 }} py={{ base: 16, md: 24 }} maxW="7xl" mx="auto" bg="white">
@@ -157,9 +164,19 @@ export default function ServicesPage() {
                   ))}
                 </VStack>
                 <Divider mb={2} />
-                <Text fontSize="xs" color="gray.500">
+                <Text fontSize="xs" color="gray.500" mb={3}>
                   <strong>Ideal for:</strong> {service.ideal}
                 </Text>
+                <Button
+                  size="sm"
+                  colorScheme="green"
+                  variant="outline"
+                  width="full"
+                  mt={2}
+                  onClick={handleContactClick}
+                >
+                  Get in touch
+                </Button>
               </AccordionPanel>
             </AccordionItem>
           ))}
@@ -199,9 +216,18 @@ export default function ServicesPage() {
 
               <Divider my={4} />
 
-              <Text fontSize="sm" color="gray.500" fontStyle="italic">
+              <Text fontSize="sm" color="gray.500" fontStyle="italic" mb={3}>
                 <strong>Ideal for:</strong> {service.ideal}
               </Text>
+              <Button
+                size="sm"
+                colorScheme="green"
+                variant="outline"
+                width="full"
+                onClick={handleContactClick}
+              >
+                Get in touch
+              </Button>
             </Box>
           ))}
         </SimpleGrid>
