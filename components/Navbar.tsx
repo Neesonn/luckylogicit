@@ -1,6 +1,7 @@
 import { Flex, Text, Box, HStack, Spacer, IconButton, useBreakpointValue, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { FaWhatsapp, FaInstagram, FaFacebook, FaBars } from 'react-icons/fa';
+import React from 'react';
 
 export default function Navbar() {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -32,6 +33,7 @@ export default function Navbar() {
           objectFit="contain"
           display="block"
           cursor="pointer"
+          onContextMenu={(e: React.MouseEvent) => e.preventDefault()}
         />
       </NextLink>
 
