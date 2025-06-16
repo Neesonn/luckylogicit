@@ -7,7 +7,15 @@ import {
   VStack,
   HStack,
   Icon,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
   SimpleGrid,
+  useBreakpointValue,
+  useColorModeValue,
+  Divider,
 } from '@chakra-ui/react';
 import {
   FiWifi,
@@ -112,52 +120,92 @@ const services = [
 ];
 
 export default function ServicesPage() {
-  return (
-    <Box px={{ base: 4, md: 8 }} py={{ base: 16, md: 24 }} maxW="7xl" mx="auto">
-      <Heading
-        as="h1"
-        size="2xl"
-        mb={10}
-        color="brand.green"
-        textAlign="center"
-        fontWeight="extrabold"
-      >
-        Our Services
-      </Heading>
+  const isMobile = useBreakpointValue({ base: true, md: false });
+  const iconBg = useColorModeValue('gray.100', 'gray.700');
 
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
-        {services.map((service, idx) => (
-          <Box
-            key={idx}
-            p={6}
-            borderRadius="lg"
-            boxShadow="md"
-            bg="gray.50"
-            transition="all 0.3s"
-            _hover={{ transform: 'translateY(-4px)', boxShadow: 'xl' }}
-          >
-            <HStack spacing={4} align="start">
-              <Box p={3} bg="green.100" borderRadius="full">
-                <Icon as={service.icon} boxSize={6} color="brand.green" />
-              </Box>
-              <VStack align="start" spacing={2} flex="1">
+  return (
+    <Box px={{ base: 4, md: 8 }} py={{ base: 16, md: 24 }} maxW="7xl" mx="auto" bg="white">
+      <VStack spacing={4} textAlign="center" mb={12}>
+        <Heading as="h1" size="2xl" fontWeight="bold" color="brand.green">
+          Our Services
+        </Heading>
+        <Text fontSize="lg" color="gray.600" maxW="2xl">
+          Friendly, professional IT help delivered to your door.
+        </Text>
+      </VStack>
+
+      {isMobile ? (
+        <Accordion allowToggle>
+          {services.map((service, idx) => (
+            <AccordionItem key={idx} border="1px solid" borderColor="gray.200" borderRadius="xl" mb={4}>
+              <h2>
+                <AccordionButton px={4} py={6} _expanded={{ bg: 'green.50' }}>
+                  <HStack spacing={4} flex="1" textAlign="left">
+                    <Box p={2} bg={iconBg} borderRadius="full">
+                      <Icon as={service.icon} boxSize={5} color="brand.green" />
+                    </Box>
+                    <Text fontWeight="semibold">{service.title}</Text>
+                  </HStack>
+                  <AccordionIcon />
+                </AccordionButton>
+              </h2>
+              <AccordionPanel px={6} pb={6}>
+                <Text mb={2} fontSize="sm" color="gray.700">{service.summary}</Text>
+                <VStack align="start" spacing={1} fontSize="sm" color="gray.600" mb={3}>
+                  {service.bullets.map((point, i) => (
+                    <Text key={i}>• {point}</Text>
+                  ))}
+                </VStack>
+                <Divider mb={2} />
+                <Text fontSize="xs" color="gray.500">
+                  <strong>Ideal for:</strong> {service.ideal}
+                </Text>
+              </AccordionPanel>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      ) : (
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
+          {services.map((service, idx) => (
+            <Box
+              key={idx}
+              p={6}
+              borderRadius="xl"
+              boxShadow="sm"
+              border="1px solid"
+              borderColor="gray.200"
+              transition="all 0.2s"
+              _hover={{ boxShadow: 'md' }}
+              bg="white"
+            >
+              <HStack spacing={4} mb={3}>
+                <Box bg={iconBg} p={3} borderRadius="full">
+                  <Icon as={service.icon} boxSize={6} color="brand.green" />
+                </Box>
                 <Heading fontSize="lg" color="gray.800">
                   {service.title}
                 </Heading>
-                <Text color="gray.600">{service.summary}</Text>
-                <VStack align="start" spacing={0} pt={2} fontSize="sm">
-                  {service.bullets.map((item, i) => (
-                    <Text key={i}>• {item}</Text>
-                  ))}
-                </VStack>
-                <Text fontSize="sm" color="gray.500" pt={2}>
-                  <strong>Ideal for:</strong> {service.ideal}
-                </Text>
+              </HStack>
+
+              <Text fontSize="sm" color="gray.700" mb={2}>
+                {service.summary}
+              </Text>
+
+              <VStack align="start" spacing={1} fontSize="sm" color="gray.600" mt={2}>
+                {service.bullets.map((point, i) => (
+                  <Text key={i}>• {point}</Text>
+                ))}
               </VStack>
-            </HStack>
-          </Box>
-        ))}
-      </SimpleGrid>
+
+              <Divider my={4} />
+
+              <Text fontSize="sm" color="gray.500" fontStyle="italic">
+                <strong>Ideal for:</strong> {service.ideal}
+              </Text>
+            </Box>
+          ))}
+        </SimpleGrid>
+      )}
     </Box>
   );
 }
