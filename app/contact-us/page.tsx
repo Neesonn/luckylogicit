@@ -29,6 +29,7 @@ import {
   UnlockIcon,
   QuestionIcon,
 } from '@chakra-ui/icons';
+import { FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
@@ -224,6 +225,10 @@ ${messageText}
           size="lg"
           colorScheme="green"
           width="full"
+          leftIcon={<FaWhatsapp />}
+          boxShadow="md"
+          _hover={{ boxShadow: 'lg', transform: 'translateY(-2px)' }}
+          transition="all 0.2s"
         >
           Send Enquiry via WhatsApp
         </Button>
@@ -232,7 +237,11 @@ ${messageText}
           size="lg"
           colorScheme="blue"
           width="full"
+          leftIcon={<FaEnvelope />}
           onClick={handleEmailSubmit}
+          boxShadow="md"
+          _hover={{ boxShadow: 'lg', transform: 'translateY(-2px)' }}
+          transition="all 0.2s"
         >
           Send Enquiry via Email
         </Button>
