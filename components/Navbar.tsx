@@ -1,8 +1,10 @@
-import { Flex, Text, Box, HStack, Spacer, IconButton } from '@chakra-ui/react';
+import { Flex, Text, Box, HStack, Spacer, IconButton, useBreakpointValue, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
 import NextLink from 'next/link';
-import { FaWhatsapp, FaInstagram, FaFacebook } from 'react-icons/fa';
+import { FaWhatsapp, FaInstagram, FaFacebook, FaBars } from 'react-icons/fa';
 
 export default function Navbar() {
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   return (
     <Flex
       as="nav"
@@ -33,37 +35,64 @@ export default function Navbar() {
         />
       </NextLink>
 
-      {/* Navigation Links */}
-      <HStack spacing={6} ml={6} align="center">
-        <NextLink href="/" passHref legacyBehavior>
-          <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
-            Home
-          </Text>
-        </NextLink>
-
-        <NextLink href="/about-us" passHref legacyBehavior>
-          <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
-            About Us
-          </Text>
-        </NextLink>
-
-        <NextLink href="/services" passHref legacyBehavior>
-          <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
-            Services
-          </Text>
-        </NextLink>
-
-        <NextLink href="/contact-us" passHref legacyBehavior>
-          <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
-            Contact Us
-          </Text>
-        </NextLink>
-      </HStack>
-
       <Spacer />
 
+      {/* Navigation Links (Desktop) / Hamburger Menu (Mobile) */}
+      {!isMobile ? (
+        <HStack spacing={6} ml={6} align="center">
+          <NextLink href="/" passHref legacyBehavior>
+            <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
+              Home
+            </Text>
+          </NextLink>
+
+          <NextLink href="/about-us" passHref legacyBehavior>
+            <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
+              About Us
+            </Text>
+          </NextLink>
+
+          <NextLink href="/services" passHref legacyBehavior>
+            <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
+              Services
+            </Text>
+          </NextLink>
+
+          <NextLink href="/contact-us" passHref legacyBehavior>
+            <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
+              Contact Us
+            </Text>
+          </NextLink>
+        </HStack>
+      ) : (
+        <Menu>
+          <MenuButton
+            as={IconButton}
+            aria-label="Options"
+            icon={<FaBars />}
+            variant="outline"
+            size="lg"
+            colorScheme="green"
+          />
+          <MenuList>
+            <NextLink href="/" passHref>
+              <MenuItem as="a">Home</MenuItem>
+            </NextLink>
+            <NextLink href="/about-us" passHref>
+              <MenuItem as="a">About Us</MenuItem>
+            </NextLink>
+            <NextLink href="/services" passHref>
+              <MenuItem as="a">Services</MenuItem>
+            </NextLink>
+            <NextLink href="/contact-us" passHref>
+              <MenuItem as="a">Contact Us</MenuItem>
+            </NextLink>
+          </MenuList>
+        </Menu>
+      )}
+
       {/* Social Media Icons */}
-      <HStack spacing={2}>
+      <HStack spacing={2} ml={{ base: 4, md: 6 }}>
         <IconButton
           as="a"
           href="https://wa.me/61413346507"
