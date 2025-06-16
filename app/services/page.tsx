@@ -127,7 +127,7 @@ export default function ServicesPage() {
   const router = useRouter();
 
   const handleContactClick = () => {
-    router.push('/contact');
+    router.push('/contact-us');
   };
 
   return (
