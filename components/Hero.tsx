@@ -65,6 +65,7 @@ export default function Hero() {
             fontSize={{ base: '2xl', sm: '3xl', md: '4xl' }}
             color="brand.green"
             mb={4}
+            mt={{ base: 4, md: 0 }}
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
