@@ -45,7 +45,7 @@ export default function AboutUsPage() {
   return (
     <Box px={6} pt="100px" pb={{ base: 16, md: 24 }} maxW="7xl" mx="auto" color="gray.800">
       {/* Hero Section with Animation */}
-      <VStack spacing={8} mb={{ base: 16, md: 24 }} py={{ base: 8, md: 16 }} bg="linear-gradient(135deg, #e0f2f1 0%, #a7d9d1 100%)" borderRadius="xl" boxShadow="xl">
+      <VStack spacing={8} mb={{ base: 16, md: 24 }} py={{ base: 8, md: 16 }} bg="brand.green" borderRadius="xl" boxShadow="xl">
         {animationData && (
           <Box width={{ base: "200px", md: "320px" }} height={{ base: "200px", md: "320px" }}>
             <Lottie
@@ -60,7 +60,7 @@ export default function AboutUsPage() {
         <MotionHeading
           as="h1"
           size={{ base: "xl", md: "3xl" }}
-          color="brand.green"
+          color="white"
           textAlign="center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -70,7 +70,7 @@ export default function AboutUsPage() {
         </MotionHeading>
         <MotionText
           fontSize={{ base: "md", md: "lg" }}
-          color="gray.700"
+          color="white"
           textAlign="center"
           maxW="3xl"
           initial={{ opacity: 0, y: 20 }}
