@@ -87,14 +87,33 @@ export default function TermsPage() {
         9. Billing, Payments & Refunds
       </Heading>
       <Text mb={6}>
-        Lucky Logic IT Services is operated by Michael Neeson, trading as a sole trader. Payments are processed securely via Stripe. The following terms apply to billing and refunds:
+        Lucky Logic IT Services is operated by Michael Neeson, trading as a sole trader. Payments are processed securely via Stripe. The following terms apply to billing, payments, and refunds:
       </Text>
       <UnorderedList mb={6} pl={6}>
-        <ListItem>Invoices are issued with payment due upon receipt unless otherwise agreed.</ListItem>
-        <ListItem>Stripe fees may apply: 1.75% + $0.30 for Visa/Mastercard; 3.5% + $0.30 for AMEX.</ListItem>
-        <ListItem>Hardware and software purchases are non-refundable once installed or delivered.</ListItem>
-        <ListItem>A 14-day warranty applies to all services provided.</ListItem>
-        <ListItem>No GST has been charged. Lucky Logic is not currently registered for GST.</ListItem>
+        <ListItem>
+          Invoices are issued with payment due upon receipt unless otherwise agreed in writing.
+        </ListItem>
+        <ListItem>
+          Stripe fees may apply: 1.75% + $0.30 for Visa/Mastercard; 3.5% + $0.30 for AMEX.
+        </ListItem>
+        <ListItem>
+          Hardware and software purchases are non-refundable once installed, delivered, or digitally transferred.
+        </ListItem>
+        <ListItem>
+          A 14-day warranty applies to all services provided unless otherwise specified in writing.
+        </ListItem>
+        <ListItem>
+          No GST has been charged. Lucky Logic is not currently registered for GST.
+        </ListItem>
+        <ListItem>
+          <strong>No Fix, No Fee:</strong> If we are unable to resolve your issue and it falls outside the scope of our services, no call-out fee will be charged.
+        </ListItem>
+        <ListItem>
+          In circumstances where time has been spent attempting a resolution, including diagnostics, system testing, or third-party coordination, a partial fee may apply to cover time invested, even if a full solution was not provided.
+        </ListItem>
+        <ListItem>
+          All quotes must be approved by the customer prior to work commencing. If an updated quote is required (e.g. for further diagnostics, part sourcing, or expanded work scope), it will be sent and must be accepted before further action is taken.
+        </ListItem>
       </UnorderedList>
       <Text>
         For direct deposit payments, please refer to your invoice for bank account details.

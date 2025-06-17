@@ -47,7 +47,7 @@ const services = [
     summary: 'Repair, replace or upgrade your hardware to boost performance.',
     bullets: [
       'RAM and storage upgrades',
-      'Laptop screen/keyboard repair',
+      'Laptop & PC repair',
       'Fan, power, and thermal troubleshooting',
     ],
     ideal: 'Great for slow, aging, or malfunctioning PCs/laptops.',
@@ -92,7 +92,8 @@ const services = [
     bullets: [
       'Printer and driver installations',
       'Wi-Fi printing & network setup',
-      'Peripheral troubleshooting',
+      'Device troubleshooting (Ipad/Iphone)',
+      
     ],
     ideal: "Anyone struggling with devices that won't connect.",
     icon: FiPrinter,
@@ -137,7 +138,7 @@ export default function ServicesPage() {
           Our Services
         </Heading>
         <Text fontSize="lg" color="gray.600" maxW="2xl">
-          Friendly, professional IT help delivered to your door.
+        Friendly, professional IT help delivered to your door — with clear, upfront pricing. We only charge a call-out fee once we’ve assessed the issue and you’ve approved the quote. Most problems can be resolved during the initial visit, but if further diagnostics, parts, or repairs are needed, an updated quote will be provided for your approval before any additional work is done.
         </Text>
       </VStack>
 

@@ -85,6 +85,28 @@ export default function Hero() {
             Helping Sydney homes stay connected with reliable in-home tech support – from Wi-Fi setup and device fixes to smart home installs and ongoing help when you need it.
           </MotionText>
 
+          <MotionText
+            fontSize={{ base: 'lg', sm: 'xl', md: '2xl' }}
+            fontWeight="bold"
+            color="brand.green"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            No Fix, No Fee.
+          </MotionText>
+
+          <MotionText
+            fontSize={{ base: 'md', sm: 'lg', md: 'xl' }}
+            color="gray.600"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            mb={8}
+          >
+            If we can't fix it, you won't pay the call out fee.
+          </MotionText>
+
           <MotionButton
             size="lg"
             bg="brand.gold"
