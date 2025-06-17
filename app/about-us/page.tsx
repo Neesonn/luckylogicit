@@ -17,10 +17,10 @@ import {
 } from '@chakra-ui/react';
 import { CheckCircleIcon } from '@chakra-ui/icons';
 import { motion } from 'framer-motion';
+import SEO from '../../components/SEO';
 import Lottie from 'lottie-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import SEO from '../../components/SEO';
 
 const MotionBox = motion(Box);
 const MotionHeading = motion(Heading);
@@ -28,16 +28,8 @@ const MotionText = motion(Text);
 const MotionButton = motion(Button);
 
 export default function AboutUsPage() {
-  const [animationData, setAnimationData] = useState(null);
   const isMobile = useBreakpointValue({ base: true, md: false });
   const router = useRouter();
-
-  useEffect(() => {
-    fetch('/about-animation.json')
-      .then((res) => res.json())
-      .then(setAnimationData)
-      .catch((err) => console.error('Failed to load animation:', err));
-  }, []);
 
   const handleViewServices = () => {
     router.push('/services');
@@ -54,16 +46,6 @@ export default function AboutUsPage() {
       <Box px={6} pt="100px" pb={{ base: 16, md: 24 }} maxW="7xl" mx="auto" color="gray.800">
         {/* Hero Section with Animation */}
         <VStack spacing={8} mb={{ base: 16, md: 24 }} py={{ base: 8, md: 16 }} bg="brand.green" borderRadius="xl" boxShadow="xl">
-          {animationData && (
-            <Box width={{ base: "200px", md: "320px" }} height={{ base: "200px", md: "320px" }}>
-              <Lottie
-                animationData={animationData}
-                loop
-                autoplay
-                style={{ width: '100%', height: '100%' }}
-              />
-            </Box>
-          )}
           
           <MotionHeading
             as="h1"
@@ -102,7 +84,7 @@ export default function AboutUsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              whileHover={{ translateY: -5, boxShadow: 'lg' }}
+              whileHover={{ translateY: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
             >
               <Heading as="h2" size="lg" color="brand.green" mb={4}>
                 Our Story
@@ -120,7 +102,7 @@ export default function AboutUsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              whileHover={{ translateY: -5, boxShadow: 'lg' }}
+              whileHover={{ translateY: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
             >
               <Heading as="h2" size="lg" color="brand.green" mb={4}>
                 What Makes Us Boutique?
@@ -142,7 +124,7 @@ export default function AboutUsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              whileHover={{ translateY: -5, boxShadow: 'lg' }}
+              whileHover={{ translateY: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
             >
               <Heading as="h2" size="lg" color="brand.green" mb={4}>
                 A Needed Solution
@@ -160,7 +142,7 @@ export default function AboutUsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              whileHover={{ translateY: -5, boxShadow: 'lg' }}
+              whileHover={{ translateY: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
             >
               <Heading as="h2" size="lg" color="brand.green" mb={4}>
                 Your Security, Our Priority
