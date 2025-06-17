@@ -13,6 +13,7 @@ import {
   useBreakpointValue,
   Container,
   Button,
+  Flex,
 } from '@chakra-ui/react';
 import { CheckCircleIcon } from '@chakra-ui/icons';
 import { motion } from 'framer-motion';
@@ -42,11 +43,11 @@ export default function AboutUsPage() {
   };
 
   return (
-    <Box px={6} pt="100px" pb={{ base: 16, md: 24 }} maxW="4xl" mx="auto" color="gray.800">
+    <Box px={6} pt="100px" pb={{ base: 16, md: 24 }} maxW="7xl" mx="auto" color="gray.800">
       {/* Hero Section with Animation */}
-      <VStack spacing={8} mb={16}>
+      <VStack spacing={8} mb={{ base: 16, md: 24 }} py={{ base: 8, md: 16 }} bg="linear-gradient(135deg, #e0f2f1 0%, #a7d9d1 100%)" borderRadius="xl" boxShadow="xl">
         {animationData && (
-          <Box width="320px" height="320px">
+          <Box width={{ base: "200px", md: "320px" }} height={{ base: "200px", md: "320px" }}>
             <Lottie
               animationData={animationData}
               loop
@@ -58,7 +59,7 @@ export default function AboutUsPage() {
         
         <MotionHeading
           as="h1"
-          size="2xl"
+          size={{ base: "xl", md: "3xl" }}
           color="brand.green"
           textAlign="center"
           initial={{ opacity: 0, y: 20 }}
@@ -67,16 +68,33 @@ export default function AboutUsPage() {
         >
           About Lucky Logic
         </MotionHeading>
+        <MotionText
+          fontSize={{ base: "md", md: "lg" }}
+          color="gray.700"
+          textAlign="center"
+          maxW="3xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          Your trusted partner for seamless residential IT solutions.
+        </MotionText>
       </VStack>
 
-      {/* Main Content */}
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
-        {/* Left Column */}
-        <VStack align="start" spacing={8}>
+      {/* Main Content Sections */}
+      <VStack spacing={{ base: 8, md: 12 }} mb={16} align="stretch">
+        {/* Row 1: Our Story & What Makes Us Boutique? */}
+        <Flex direction={{ base: "column", md: "row" }} gap={{ base: 8, md: 10 }}>
           <MotionBox
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+            flex="1"
+            p={6}
+            borderRadius="lg"
+            boxShadow="md"
+            bg="white"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            whileHover={{ translateY: -5, boxShadow: 'lg' }}
           >
             <Heading as="h2" size="lg" color="brand.green" mb={4}>
               Our Story
@@ -85,27 +103,16 @@ export default function AboutUsPage() {
               Lucky Logic was born from the passion and vision of our founder, who brings over 15 years of valuable experience working with and for some of Australia's leading IT companies. With a rich background spanning hardware and software sales, alongside hands-on technical support roles, this experience has uniquely shaped our approach to residential IT support, blending professional know-how with genuine care for everyday users.
             </Text>
           </MotionBox>
-
           <MotionBox
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <Heading as="h2" size="lg" color="brand.green" mb={4}>
-              A Needed Solution
-            </Heading>
-            <Text fontSize="lg" lineHeight="taller">
-              In 2024, after closely observing the IT landscape across Sydney, we realised there was a noticeable gap in dedicated residential IT services. While commercial IT solutions thrive in the business world, many households and home offices face challenges when seeking reliable, trustworthy and personalised IT assistance. That's where Lucky Logic steps in with boutique services designed exclusively for Sydney's residential customers.
-            </Text>
-          </MotionBox>
-        </VStack>
-
-        {/* Right Column */}
-        <VStack align="start" spacing={8}>
-          <MotionBox
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
+            flex="1"
+            p={6}
+            borderRadius="lg"
+            boxShadow="md"
+            bg="white"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
+            whileHover={{ translateY: -5, boxShadow: 'lg' }}
           >
             <Heading as="h2" size="lg" color="brand.green" mb={4}>
               What Makes Us Boutique?
@@ -114,11 +121,38 @@ export default function AboutUsPage() {
               We deliver tailored, personal service that's often missing from large, generic providers. We take the time to listen and understand your unique situation, whether it's on-site or remote assistance so you get solutions that truly fit. Boutique IT is about more than quick fixes; it's about lasting relationships built on trust, detail, and care.
             </Text>
           </MotionBox>
+        </Flex>
 
+        {/* Row 2: A Needed Solution & Your Security, Our Priority */}
+        <Flex direction={{ base: "column", md: "row" }} gap={{ base: 8, md: 10 }}>
           <MotionBox
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
+            flex="1"
+            p={6}
+            borderRadius="lg"
+            boxShadow="md"
+            bg="white"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            whileHover={{ translateY: -5, boxShadow: 'lg' }}
+          >
+            <Heading as="h2" size="lg" color="brand.green" mb={4}>
+              A Needed Solution
+            </Heading>
+            <Text fontSize="lg" lineHeight="taller">
+              In 2024, after closely observing the IT landscape across Sydney, we realised there was a noticeable gap in dedicated residential IT services. While commercial IT solutions thrive in the business world, many households and home offices face challenges when seeking reliable, trustworthy and personalised IT assistance. That's where Lucky Logic steps in with boutique services designed exclusively for Sydney's residential customers.
+            </Text>
+          </MotionBox>
+          <MotionBox
+            flex="1"
+            p={6}
+            borderRadius="lg"
+            boxShadow="md"
+            bg="white"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
+            whileHover={{ translateY: -5, boxShadow: 'lg' }}
           >
             <Heading as="h2" size="lg" color="brand.green" mb={4}>
               Your Security, Our Priority
@@ -127,8 +161,8 @@ export default function AboutUsPage() {
               In an age where cybersecurity threats are more sophisticated and prevalent than ever, we understand the concerns many people have about scams, phishing and online fraud. This makes personalised, face-to-face or trusted remote IT support more important than ever. At Lucky Logic, your security and peace of mind are our top priorities.
             </Text>
           </MotionBox>
-        </VStack>
-      </SimpleGrid>
+        </Flex>
+      </VStack>
 
       <Divider my={16} />
 
