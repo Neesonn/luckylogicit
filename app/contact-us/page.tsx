@@ -284,7 +284,7 @@ ${messageText}
           Email: <Link href="mailto:michael@luckylogic.com.au" color="brand.green">michael@luckylogic.com.au</Link>
         </Text>
         <Text fontSize="md">
-          Phone: <Link href="tel:+61413346507" color="brand.green">+61 413 346 507</Link>
+          Phone: <Link href="tel:+61426901209" color="brand.green">+61 426 901 209</Link>
         </Text>
         <Text fontSize="md">
           Address: 580 Princes Highway, Kirrawee 2232
