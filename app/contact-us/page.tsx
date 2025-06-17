@@ -45,6 +45,20 @@ function ContactForm() {
   const searchParams = useSearchParams();
   const showToast = searchParams.get('showToast');
 
+  const validateForm = () => {
+    if (!name || !email || !phone || !selectedTopic || !messageText) {
+      toast({
+        title: "Please complete all fields.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
+      return false;
+    }
+    return true;
+  };
+
   useEffect(() => {
     if (showToast === 'true') {
       toast({
@@ -99,6 +113,10 @@ function ContactForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!validateForm()) {
+      return; // Stop if validation fails
+    }
+
     // Create the message with all form data
     const whatsappMessage = `
 *New Enquiry from ${name}*
@@ -132,6 +150,9 @@ ${messageText}
   };
 
   const handleEmailSubmit = () => {
+    if (!validateForm()) {
+      return; // Stop if validation fails
+    }
     const subject = encodeURIComponent(`Enquiry from ${name} regarding ${selectedTopic}`);
     const body = encodeURIComponent(`
 New Enquiry from ${name}
@@ -160,7 +181,7 @@ ${messageText}
 
   return (
     <VStack as="form" spacing={6}>
-      <FormControl isRequired>
+      <FormControl isRequired isInvalid={!name && name !== ''}>
         <FormLabel>Your Name</FormLabel>
         <Input 
           placeholder="Enter your full name" 
@@ -169,7 +190,7 @@ ${messageText}
         />
       </FormControl>
 
-      <FormControl isRequired>
+      <FormControl isRequired isInvalid={!email && email !== ''}>
         <FormLabel>Email Address</FormLabel>
         <Input 
           type="email" 
@@ -179,7 +200,7 @@ ${messageText}
         />
       </FormControl>
 
-      <FormControl isRequired>
+      <FormControl isRequired isInvalid={!phone && phone !== ''}>
         <FormLabel>Phone Number</FormLabel>
         <Input 
           type="tel" 
@@ -189,7 +210,7 @@ ${messageText}
         />
       </FormControl>
 
-      <FormControl isRequired>
+      <FormControl isRequired isInvalid={!selectedTopic && selectedTopic !== ''}>
         <FormLabel>I want to enquire about</FormLabel>
         <Menu>
           <MenuButton as={Button} rightIcon={<ChevronDownIcon />} width="full">
@@ -209,7 +230,7 @@ ${messageText}
         </Menu>
       </FormControl>
 
-      <FormControl isRequired>
+      <FormControl isRequired isInvalid={!messageText && messageText !== ''}>
         <FormLabel>Tell us more about what you're specifically after</FormLabel>
         <Textarea
           placeholder="Please provide details about your enquiry..."
