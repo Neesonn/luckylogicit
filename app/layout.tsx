@@ -5,6 +5,7 @@ import Head from 'next/head';
 import theme from '../theme/theme';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -50,11 +51,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </Head>
       <body>
         <ChakraProvider theme={theme}>
-          <Navbar />
-          <Box pt="80px" minHeight="calc(100vh - 120px)" w="full">
-            {children}
-            <Footer />
-          </Box>
+          <ErrorBoundary>
+            <Navbar />
+            <Box pt="80px" minHeight="calc(100vh - 120px)" w="full">
+              {children}
+              <Footer />
+            </Box>
+          </ErrorBoundary>
         </ChakraProvider>
       </body>
     </html>

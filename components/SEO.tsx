@@ -8,6 +8,7 @@ interface SEOProps {
   keywords?: string;
   ogImage?: string;
   canonicalUrl?: string;
+  noindex?: boolean;
 }
 
 export default function SEO({
@@ -16,6 +17,7 @@ export default function SEO({
   keywords,
   ogImage = 'https://luckylogic.com.au/lucky-logic-logo.png',
   canonicalUrl,
+  noindex = false,
 }: SEOProps) {
   const fullTitle = `${title} | Lucky Logic IT`;
   const fullUrl = canonicalUrl || 'https://luckylogic.com.au';
@@ -25,6 +27,7 @@ export default function SEO({
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
       {keywords && <meta name="keywords" content={keywords} />}
+      <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
       
       {/* Open Graph / Facebook */}
       <meta property="og:type" content="website" />
