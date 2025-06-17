@@ -18,6 +18,7 @@ import {
   Text,
   HStack,
   Flex,
+  Link,
 } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
@@ -254,6 +255,20 @@ ${messageText}
           Send Enquiry via Email
         </Button>
       </Flex>
+
+      <VStack spacing={2} align="center" mt={10} textAlign="center">
+        <Text fontSize="lg" fontWeight="semibold" color="brand.green">Or reach us directly:</Text>
+        <Text fontSize="md">
+          Email: <Link href="mailto:michael@luckylogic.com.au" color="brand.green">michael@luckylogic.com.au</Link>
+        </Text>
+        <Text fontSize="md">
+          Phone: <Link href="tel:+61413346507" color="brand.green">+61 413 346 507</Link>
+        </Text>
+        <Text fontSize="md">
+          Address: 580 Princes Highway, Kirrawee 2232
+        </Text>
+      </VStack>
+
     </VStack>
   );
 }
