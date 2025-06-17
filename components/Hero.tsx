@@ -111,7 +111,7 @@ export default function Hero() {
           <MotionButton
             size="lg"
             bg="brand.gold"
-            color="white"
+            color="brand.green"
             width={{ base: '100%', md: 'auto' }}
             alignSelf={{ base: 'center', md: 'flex-start' }}
             _hover={{ bg: '#b38d1c' }}

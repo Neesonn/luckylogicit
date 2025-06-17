@@ -190,6 +190,10 @@ ${messageText}
           placeholder="Enter your full name" 
           value={name}
           onChange={(e) => setName(e.target.value)}
+          _focus={{
+            borderColor: 'brand.green',
+            boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)',
+          }}
         />
       </FormControl>
 
@@ -200,6 +204,10 @@ ${messageText}
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          _focus={{
+            borderColor: 'brand.green',
+            boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)',
+          }}
         />
       </FormControl>
 
@@ -210,13 +218,26 @@ ${messageText}
           placeholder="Enter your phone number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
+          _focus={{
+            borderColor: 'brand.green',
+            boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)',
+          }}
         />
       </FormControl>
 
       <FormControl isRequired isInvalid={!selectedTopic && selectedTopic !== ''}>
         <FormLabel>I want to enquire about</FormLabel>
         <Menu>
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon />} width="full" aria-label="Select enquiry topic">
+          <MenuButton 
+            as={Button} 
+            rightIcon={<ChevronDownIcon />} 
+            width="full" 
+            aria-label="Select enquiry topic"
+            _focus={{
+              borderColor: 'brand.green',
+              boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)',
+            }}
+          >
             {selectedTopic || 'Select a topic'}
           </MenuButton>
           <MenuList>
@@ -225,6 +246,12 @@ ${messageText}
                 key={label}
                 icon={<Icon as={icon} />}
                 onClick={() => setSelectedTopic(label)}
+                _focus={{
+                  bg: 'green.50',
+                  outline: '2px solid',
+                  outlineColor: 'brand.green',
+                  outlineOffset: '2px',
+                }}
               >
                 {label}
               </MenuItem>
@@ -234,52 +261,47 @@ ${messageText}
       </FormControl>
 
       <FormControl isRequired isInvalid={!messageText && messageText !== ''}>
-        <FormLabel>Tell us more about what you're specifically after</FormLabel>
+        <FormLabel>Your Message</FormLabel>
         <Textarea
-          placeholder="Please provide details about your enquiry..."
-          size="lg"
-          minH="150px"
-          resize="vertical"
+          placeholder="Tell us about your enquiry"
           value={messageText}
           onChange={(e) => setMessageText(e.target.value)}
+          _focus={{
+            borderColor: 'brand.green',
+            boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)',
+          }}
         />
       </FormControl>
 
-      <Flex
-        direction={{ base: 'column', md: 'row' }}
-        gap={4}
-        width={{ base: 'full', md: 'auto' }}
+      <Button
+        type="submit"
+        colorScheme="green"
+        size="lg"
+        width="full"
+        onClick={handleSubmit}
+        _focus={{
+          outline: '2px solid',
+          outlineColor: 'brand.green',
+          outlineOffset: '2px',
+        }}
       >
-        <Button
-          type="button"
-          size="lg"
-          bg="brand.green"
-          color="white"
-          width="full"
-          leftIcon={<FaWhatsapp />}
-          boxShadow="md"
-          _hover={{ bg: 'green.700', boxShadow: 'lg', transform: 'translateY(-2px)' }}
-          transition="all 0.2s"
-          mb={{ base: 4, md: 0 }}
-          onClick={handleSubmit}
-        >
-          Send Enquiry via WhatsApp
-        </Button>
-        <Button
-          type="button"
-          size="lg"
-          bg="brand.gold"
-          color="white"
-          width="full"
-          leftIcon={<FaEnvelope />}
-          onClick={handleEmailSubmit}
-          boxShadow="md"
-          _hover={{ bg: '#b38d1c', boxShadow: 'lg', transform: 'translateY(-2px)' }}
-          transition="all 0.2s"
-        >
-          Send Enquiry via Email
-        </Button>
-      </Flex>
+        Send via WhatsApp
+      </Button>
+
+      <Button
+        colorScheme="green"
+        variant="outline"
+        size="lg"
+        width="full"
+        onClick={handleEmailSubmit}
+        _focus={{
+          outline: '2px solid',
+          outlineColor: 'brand.green',
+          outlineOffset: '2px',
+        }}
+      >
+        Send via Email
+      </Button>
 
       <VStack spacing={2} align="center" mt={10} textAlign="center">
         <Text fontSize="lg" fontWeight="semibold" color="brand.green">Or reach us directly:</Text>

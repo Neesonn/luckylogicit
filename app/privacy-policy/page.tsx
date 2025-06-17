@@ -65,7 +65,7 @@ export default function PrivacyPolicyPage() {
       </Heading>
       <Text mb={6}>
         Our website uses cookies and similar technologies for analytics, performance, and personalised experiences. You can control cookies via your browser settings. For more details, please refer to our{' '}
-        <Link href="/cookie-policy" textDecoration="underline" color="brand.green" isExternal>
+        <Link href="/cookie-policy" textDecoration="underline" color="brand.green" isExternal rel="noopener noreferrer">
           Cookie Policy
         </Link>.
       </Text>
@@ -92,7 +92,7 @@ export default function PrivacyPolicyPage() {
       </Text>
 
       <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
-        9. Children’s Privacy
+        9. Children's Privacy
       </Heading>
       <Text mb={6}>
         Our services are not directed to children under 16, and we do not knowingly collect personal data from children without parental consent.

@@ -48,13 +48,13 @@ export default function CookiePolicyPage() {
       <UnorderedList mb={6} pl={6}>
         <ListItem>
           <strong>Google Analytics:</strong> Tracks anonymous usage data to help us understand website performance. Learn more or opt out at{' '}
-          <Link href="https://tools.google.com/dlpage/gaoptout" isExternal textDecoration="underline" color="brand.green">
+          <Link href="https://tools.google.com/dlpage/gaoptout" isExternal textDecoration="underline" color="brand.green" rel="noopener noreferrer">
             tools.google.com/dlpage/gaoptout
           </Link>.
         </ListItem>
         <ListItem>
-          <strong>Stripe:</strong> Our payment processor may use cookies to facilitate secure payment processing. Stripe’s cookie practices are governed by their own{' '}
-          <Link href="https://stripe.com/cookies-policy/legal" isExternal textDecoration="underline" color="brand.green">
+          <strong>Stripe:</strong> Our payment processor may use cookies to facilitate secure payment processing. Stripe's cookie practices are governed by their own{' '}
+          <Link href="https://stripe.com/cookies-policy/legal" isExternal textDecoration="underline" color="brand.green" rel="noopener noreferrer">
             Cookie Policy
           </Link>.
         </ListItem>
@@ -64,7 +64,7 @@ export default function CookiePolicyPage() {
         How You Can Control Cookies
       </Heading>
       <Text mb={6}>
-        You can manage or disable cookies via your browser settings. Please note that disabling essential cookies may impact the website’s core functionality, including login and checkout.
+        You can manage or disable cookies via your browser settings. Please note that disabling essential cookies may impact the website's core functionality, including login and checkout.
       </Text>
 
       <Text mb={6}>

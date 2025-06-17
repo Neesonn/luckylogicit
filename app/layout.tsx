@@ -69,13 +69,39 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="canonical" href="https://luckylogic.com.au/" />
       </Head>
       <body>
+        <a
+          href="#main-content"
+          style={{
+            position: 'absolute',
+            left: '-9999px',
+            top: 'auto',
+            width: '1px',
+            height: '1px',
+            overflow: 'hidden',
+            zIndex: -1,
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.position = 'static';
+            e.currentTarget.style.width = 'auto';
+            e.currentTarget.style.height = 'auto';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.position = 'absolute';
+            e.currentTarget.style.width = '1px';
+            e.currentTarget.style.height = '1px';
+          }}
+        >
+          Skip to main content
+        </a>
         <ChakraProvider theme={theme}>
           <ErrorBoundary>
-            <Navbar />
-            <Box pt="80px" minHeight="calc(100vh - 120px)" w="full">
-              {children}
+            <Flex direction="column" minH="100vh">
+              <Navbar />
+              <Box as="main" id="main-content" flex="1" pt="80px">
+                {children}
+              </Box>
               <Footer />
-            </Box>
+            </Flex>
           </ErrorBoundary>
         </ChakraProvider>
       </body>

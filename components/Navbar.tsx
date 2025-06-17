@@ -34,6 +34,12 @@ export default function Navbar() {
           display="block"
           cursor="pointer"
           onContextMenu={(e: React.MouseEvent) => e.preventDefault()}
+          tabIndex={0}
+          _focus={{
+            outline: '2px solid',
+            outlineColor: 'brand.green',
+            outlineOffset: '2px',
+          }}
         />
       </NextLink>
 
@@ -43,25 +49,69 @@ export default function Navbar() {
       {!isMobile ? (
         <HStack spacing={6} ml={6} align="center">
           <NextLink href="/" passHref legacyBehavior>
-            <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
+            <Text
+              as="a"
+              color="brand.green"
+              fontWeight="medium"
+              fontSize="md"
+              cursor="pointer"
+              _focus={{
+                outline: '2px solid',
+                outlineColor: 'brand.green',
+                outlineOffset: '2px',
+              }}
+            >
               Home
             </Text>
           </NextLink>
 
           <NextLink href="/about-us" passHref legacyBehavior>
-            <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
+            <Text
+              as="a"
+              color="brand.green"
+              fontWeight="medium"
+              fontSize="md"
+              cursor="pointer"
+              _focus={{
+                outline: '2px solid',
+                outlineColor: 'brand.green',
+                outlineOffset: '2px',
+              }}
+            >
               About Us
             </Text>
           </NextLink>
 
           <NextLink href="/services" passHref legacyBehavior>
-            <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
+            <Text
+              as="a"
+              color="brand.green"
+              fontWeight="medium"
+              fontSize="md"
+              cursor="pointer"
+              _focus={{
+                outline: '2px solid',
+                outlineColor: 'brand.green',
+                outlineOffset: '2px',
+              }}
+            >
               Services
             </Text>
           </NextLink>
 
           <NextLink href="/contact-us" passHref legacyBehavior>
-            <Text as="a" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer">
+            <Text
+              as="a"
+              color="brand.green"
+              fontWeight="medium"
+              fontSize="md"
+              cursor="pointer"
+              _focus={{
+                outline: '2px solid',
+                outlineColor: 'brand.green',
+                outlineOffset: '2px',
+              }}
+            >
               Contact Us
             </Text>
           </NextLink>
@@ -75,19 +125,60 @@ export default function Navbar() {
             variant="outline"
             size="lg"
             colorScheme="green"
+            _focus={{
+              outline: '2px solid',
+              outlineColor: 'brand.green',
+              outlineOffset: '2px',
+            }}
           />
           <MenuList>
             <NextLink href="/" passHref>
-              <MenuItem>Home</MenuItem>
+              <MenuItem
+                _focus={{
+                  bg: 'green.50',
+                  outline: '2px solid',
+                  outlineColor: 'brand.green',
+                  outlineOffset: '2px',
+                }}
+              >
+                Home
+              </MenuItem>
             </NextLink>
             <NextLink href="/about-us" passHref>
-              <MenuItem>About Us</MenuItem>
+              <MenuItem
+                _focus={{
+                  bg: 'green.50',
+                  outline: '2px solid',
+                  outlineColor: 'brand.green',
+                  outlineOffset: '2px',
+                }}
+              >
+                About Us
+              </MenuItem>
             </NextLink>
             <NextLink href="/services" passHref>
-              <MenuItem>Services</MenuItem>
+              <MenuItem
+                _focus={{
+                  bg: 'green.50',
+                  outline: '2px solid',
+                  outlineColor: 'brand.green',
+                  outlineOffset: '2px',
+                }}
+              >
+                Services
+              </MenuItem>
             </NextLink>
             <NextLink href="/contact-us" passHref>
-              <MenuItem>Contact Us</MenuItem>
+              <MenuItem
+                _focus={{
+                  bg: 'green.50',
+                  outline: '2px solid',
+                  outlineColor: 'brand.green',
+                  outlineOffset: '2px',
+                }}
+              >
+                Contact Us
+              </MenuItem>
             </NextLink>
           </MenuList>
         </Menu>
@@ -107,6 +198,12 @@ export default function Navbar() {
           fontSize="24px"
           variant="ghost"
           _hover={{ transform: 'scale(1.1)' }}
+          _focus={{
+            outline: '2px solid',
+            outlineColor: 'brand.green',
+            outlineOffset: '2px',
+            transform: 'scale(1.1)',
+          }}
           transition="transform 0.2s"
         />
         <IconButton
@@ -121,6 +218,12 @@ export default function Navbar() {
           fontSize="24px"
           variant="ghost"
           _hover={{ transform: 'scale(1.1)' }}
+          _focus={{
+            outline: '2px solid',
+            outlineColor: 'brand.green',
+            outlineOffset: '2px',
+            transform: 'scale(1.1)',
+          }}
           transition="transform 0.2s"
         />
         <IconButton
@@ -135,6 +238,12 @@ export default function Navbar() {
           fontSize="24px"
           variant="ghost"
           _hover={{ transform: 'scale(1.1)' }}
+          _focus={{
+            outline: '2px solid',
+            outlineColor: 'brand.green',
+            outlineOffset: '2px',
+            transform: 'scale(1.1)',
+          }}
           transition="transform 0.2s"
         />
       </HStack>

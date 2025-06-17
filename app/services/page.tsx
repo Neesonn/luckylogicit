@@ -245,7 +245,16 @@ export default function ServicesPage() {
             {services.map((service, idx) => (
               <AccordionItem key={idx} border="1px solid" borderColor="gray.200" borderRadius="xl" mb={4}>
                 <h2>
-                  <AccordionButton px={4} py={6} _expanded={{ bg: 'green.50' }}>
+                  <AccordionButton 
+                    px={4} 
+                    py={6} 
+                    _expanded={{ bg: 'green.50' }}
+                    _focus={{
+                      outline: '2px solid',
+                      outlineColor: 'brand.green',
+                      outlineOffset: '2px',
+                    }}
+                  >
                     <HStack spacing={4} flex="1" textAlign="left">
                       <Box p={2} bg={iconBg} borderRadius="full">
                         <Icon as={service.icon} boxSize={5} color="brand.green" />
@@ -274,6 +283,11 @@ export default function ServicesPage() {
                     mt={2}
                     onClick={handleContactClick}
                     aria-label={`Get in touch about ${service.title}`}
+                    _focus={{
+                      outline: '2px solid',
+                      outlineColor: 'brand.green',
+                      outlineOffset: '2px',
+                    }}
                   >
                     Get in touch
                   </Button>
@@ -293,7 +307,14 @@ export default function ServicesPage() {
                 borderColor="gray.200"
                 transition="all 0.2s"
                 _hover={{ boxShadow: 'md' }}
+                _focus={{
+                  outline: '2px solid',
+                  outlineColor: 'brand.green',
+                  outlineOffset: '2px',
+                  boxShadow: 'md',
+                }}
                 bg="white"
+                tabIndex={0}
               >
                 <HStack spacing={4} mb={3}>
                   <Box bg={iconBg} p={3} borderRadius="full">
