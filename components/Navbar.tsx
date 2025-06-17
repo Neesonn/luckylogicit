@@ -97,7 +97,7 @@ export default function Navbar() {
       <HStack spacing={2} ml={{ base: 4, md: 6 }}>
         <IconButton
           as="a"
-          href="https://wa.me/61413346507"
+          href="https://wa.me/61426901209"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Contact us on WhatsApp"
