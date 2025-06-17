@@ -8,6 +8,7 @@ import {
   Button,
   Flex,
   useBreakpointValue,
+  Spinner,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
@@ -136,28 +137,30 @@ export default function Hero() {
         )}
 
         {/* Right: Lottie Animation */}
-        {animationData && (
-          <Box
-            flex="1"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            pr={{ md: 10 }}
-            zIndex={1}
-            maxW={{ base: '300px', md: '500px' }}
-            maxH={{ base: '200px', md: '300px' }}
-            mt={{ base: '-10px', md: '-30px' }}
-            mx="auto"
-            order={{ base: 1, md: 3 }}
-          >
+        <Box
+          flex="1"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          pr={{ md: 10 }}
+          zIndex={1}
+          maxW={{ base: '300px', md: '500px' }}
+          maxH={{ base: '200px', md: '300px' }}
+          mt={{ base: '-10px', md: '-30px' }}
+          mx="auto"
+          order={{ base: 1, md: 3 }}
+        >
+          {!animationData ? (
+            <Spinner size="xl" color="brand.green" thickness="4px" speed="0.65s" aria-label="Loading animation" />
+          ) : (
             <Lottie
               animationData={animationData}
               loop
               autoplay
               style={{ width: '100%', height: 'auto' }}
             />
-          </Box>
-        )}
+          )}
+        </Box>
       </Flex>
 
       {/* Parallax Waves - Foreground */}

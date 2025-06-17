@@ -89,6 +89,7 @@ function ContactForm() {
               color="white"
               _hover={{ bg: 'whiteAlpha.200' }}
               onClick={() => toast.closeAll()}
+              aria-label="Close notification"
             >
               ✕
             </Button>
@@ -215,7 +216,7 @@ ${messageText}
       <FormControl isRequired isInvalid={!selectedTopic && selectedTopic !== ''}>
         <FormLabel>I want to enquire about</FormLabel>
         <Menu>
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon />} width="full">
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />} width="full" aria-label="Select enquiry topic">
             {selectedTopic || 'Select a topic'}
           </MenuButton>
           <MenuList>
@@ -283,10 +284,10 @@ ${messageText}
       <VStack spacing={2} align="center" mt={10} textAlign="center">
         <Text fontSize="lg" fontWeight="semibold" color="brand.green">Or reach us directly:</Text>
         <Text fontSize="md">
-          Email: <Link href="mailto:michael@luckylogic.com.au" color="brand.green">michael@luckylogic.com.au</Link>
+          Email: <Link href="mailto:michael@luckylogic.com.au" color="brand.green" rel="noopener noreferrer">michael@luckylogic.com.au</Link>
         </Text>
         <Text fontSize="md">
-          Phone: <Link href="tel:+61426901209" color="brand.green">+61 426 901 209</Link>
+          Phone: <Link href="tel:+61426901209" color="brand.green" rel="noopener noreferrer">+61 426 901 209</Link>
         </Text>
         <Text fontSize="md">
           Address: 580 Princes Highway, Kirrawee 2232

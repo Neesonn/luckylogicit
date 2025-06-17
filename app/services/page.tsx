@@ -273,6 +273,7 @@ export default function ServicesPage() {
                     width="full"
                     mt={2}
                     onClick={handleContactClick}
+                    aria-label={`Get in touch about ${service.title}`}
                   >
                     Get in touch
                   </Button>
@@ -324,6 +325,7 @@ export default function ServicesPage() {
                   variant="outline"
                   width="full"
                   onClick={handleContactClick}
+                  aria-label={`Get in touch about ${service.title}`}
                 >
                   Get in touch
                 </Button>

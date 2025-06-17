@@ -70,7 +70,7 @@ export default function Navbar() {
         <Menu>
           <MenuButton
             as={IconButton}
-            aria-label="Options"
+            aria-label="Open navigation menu"
             icon={<FaBars />}
             variant="outline"
             size="lg"
