@@ -96,3 +96,51 @@ If you need help or have questions, please reach out at support@luckylogic.com.a
 ## 📄 License
 
 This project is proprietary and confidential. All rights reserved.
+
+## 🔑 Environment Variables
+
+The following environment variables are required for the application to function properly. Create a `.env.local` file in the root directory and add these variables:
+
+```env
+# Google Maps API Key for location services
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+
+# Google Analytics ID for tracking
+NEXT_PUBLIC_GA_ID=your-ga-id
+
+# UptimeRobot API Key for monitoring
+UPTIMEROBOT_READONLY_API_KEY=your-uptimerobot-readonly-api-key
+```
+
+### Required Variables
+
+| Variable | Description | Required | Example |
+|----------|-------------|----------|---------|
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | API key for Google Maps integration | Yes | `AIza...` |
+| `NEXT_PUBLIC_GA_ID` | Google Analytics measurement ID | Yes | `G-XXXXXXXXXX` |
+| `UPTIMEROBOT_READONLY_API_KEY` | API key for UptimeRobot monitoring | Yes | `ur...` |
+
+### Development Setup
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. Fill in the required values in `.env.local`
+
+3. Never commit `.env.local` to version control
+
+### Production Setup
+
+For production deployment:
+1. Add these environment variables to your hosting platform (e.g., Vercel, Netlify)
+2. Ensure all required variables are set
+3. Keep API keys secure and rotate them periodically
+
+### Security Notes
+
+- All API keys should be kept secure and never exposed in client-side code
+- The `NEXT_PUBLIC_` prefix indicates variables that are exposed to the browser
+- Use appropriate API key restrictions in Google Cloud Console
+- Regularly rotate API keys and monitor for unauthorized usage
