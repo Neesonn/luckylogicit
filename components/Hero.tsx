@@ -82,9 +82,7 @@ export default function Hero() {
             transition={{ delay: 0.4 }}
             maxW={{ base: '100%', md: '80%' }}
           >
-            Delivering reliable in-home technology solutions from network
-            setup and device troubleshooting to smart home integration and
-            ongoing tech support.
+            Helping Sydney homes stay connected with reliable in-home tech support – from Wi-Fi setup and device fixes to smart home installs and ongoing help when you need it.
           </MotionText>
 
           <MotionButton

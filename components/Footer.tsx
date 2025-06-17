@@ -22,6 +22,7 @@ export default function Footer() {
           <Text fontSize="sm" color="white" mb={2}>
             ABN 68 522 123 312
           </Text>
+          
 
           <Text fontSize="sm" color="white">
             <Link href="/legal" textDecoration="underline" color="white">
