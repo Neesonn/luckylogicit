@@ -133,7 +133,7 @@ ${messageText}
     `.trim();
 
     // Create WhatsApp URL with the message
-    const whatsappURL = `https://wa.me/61413346507?text=${encodeURIComponent(whatsappMessage)}`;
+    const whatsappURL = `https://wa.me/61426901209?text=${encodeURIComponent(whatsappMessage)}`;
     
     // Open WhatsApp in a new tab
     window.open(whatsappURL, '_blank');
