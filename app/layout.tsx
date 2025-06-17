@@ -11,6 +11,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <Head>
+        {/* Content Security Policy */}
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content={`
+            default-src 'self';
+            script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com;
+            style-src 'self' 'unsafe-inline';
+            img-src 'self' data: https://luckylogic.com.au https://*.luckylogic.com.au;
+            font-src 'self';
+            connect-src 'self' https://www.google-analytics.com;
+            frame-src 'self';
+            object-src 'none';
+            base-uri 'self';
+            form-action 'self' https://wa.me mailto:;
+            frame-ancestors 'none';
+            upgrade-insecure-requests;
+          `.replace(/\s+/g, ' ').trim()}
+        />
+        
         {/* Favicon SVG for modern browsers */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         {/* Fallback ICO for older browsers */}
