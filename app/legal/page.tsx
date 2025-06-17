@@ -2,10 +2,31 @@
 
 import { Box, Heading, Text, VStack, Link } from '@chakra-ui/react';
 import NextLink from 'next/link';
+import { useEffect, useState } from 'react';
+import Lottie from 'lottie-react';
 
 export default function LegalPage() {
+  const [animationData, setAnimationData] = useState(null);
+
+  useEffect(() => {
+    fetch('/legal-animation.json')
+      .then((res) => res.json())
+      .then(setAnimationData)
+      .catch((err) => console.error('Failed to load legal animation:', err));
+  }, []);
+
   return (
     <Box px={6} py={{ base: 16, md: 24 }} maxW="3xl" mx="auto">
+      {animationData && (
+        <Box display="flex" justifyContent="center" alignItems="center" mb={8}>
+          <Lottie
+            animationData={animationData}
+            loop
+            autoplay
+            style={{ width: '320px', maxWidth: '100%', height: 'auto' }}
+          />
+        </Box>
+      )}
       <Heading as="h1" size="xl" mb={6} color="brand.green">
         Legal Information
       </Heading>
