@@ -164,7 +164,7 @@ Phone: ${phone}
 Enquiry Topic:
 ${selectedTopic}
 
-Message:
+Message:*
 ${messageText}
     `.trim());
     
@@ -248,7 +248,7 @@ ${messageText}
         width={{ base: 'full', md: 'auto' }}
       >
         <Button
-          type="submit"
+          type="button"
           size="lg"
           bg="brand.green"
           color="white"
@@ -258,6 +258,7 @@ ${messageText}
           _hover={{ bg: 'green.700', boxShadow: 'lg', transform: 'translateY(-2px)' }}
           transition="all 0.2s"
           mb={{ base: 4, md: 0 }}
+          onClick={handleSubmit}
         >
           Send Enquiry via WhatsApp
         </Button>
