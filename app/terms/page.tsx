@@ -58,7 +58,7 @@ export default function TermsPage() {
         <Link href="/privacy-policy" color="brand.green" textDecoration="underline">
           Privacy Policy
         </Link>
-        , which explains how we collect and manage your personal information.
+        , which explains how we collect and manage your personal information. Please note that all customer and payment data entered at checkout is handled securely by Stripe. Lucky Logic does not store or have access to your full card details.
       </Text>
 
       <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
@@ -78,9 +78,26 @@ export default function TermsPage() {
       <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
         8. Contact Us
       </Heading>
-      <Text>
+      <Text mb={6}>
         If you have any questions or concerns regarding these Terms & Conditions, please contact us at{' '}
-        <strong>support@luckylogic.com.au</strong>.
+        <strong>michael@luckylogic.com.au</strong>.
+      </Text>
+
+      <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
+        9. Billing, Payments & Refunds
+      </Heading>
+      <Text mb={6}>
+        Lucky Logic IT Services is operated by Michael Neeson, trading as a sole trader. Payments are processed securely via Stripe. The following terms apply to billing and refunds:
+      </Text>
+      <UnorderedList mb={6} pl={6}>
+        <ListItem>Invoices are issued with payment due upon receipt unless otherwise agreed.</ListItem>
+        <ListItem>Stripe fees may apply: 1.75% + $0.30 for Visa/Mastercard; 3.5% + $0.30 for AMEX.</ListItem>
+        <ListItem>Hardware and software purchases are non-refundable once installed or delivered.</ListItem>
+        <ListItem>A 14-day warranty applies to all services provided.</ListItem>
+        <ListItem>No GST has been charged. Lucky Logic is not currently registered for GST.</ListItem>
+      </UnorderedList>
+      <Text>
+        For direct deposit payments, please refer to your invoice for bank account details.
       </Text>
     </Box>
   );
