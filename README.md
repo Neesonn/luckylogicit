@@ -1,98 +1,98 @@
-# 💻 Lucky Logic Website
+# Lucky Logic - IT Support & Computer Services
 
-Lucky Logic is a boutique residential IT support service based in Sydney, Australia. This website showcases the company's offerings and facilitates customer contact.
-
-## 📑 Table of Contents
-- [Project Overview](#project-overview)
-- [Features](#features)
-- [Technologies](#technologies)
-- [Setup & Development](#setup--development)
-- [Environment Variables](#environment-variables)
-- [Deployment](#deployment)
-- [SEO & Analytics](#seo--analytics)
-- [Legal](#legal)
-- [Contributing](#contributing)
-- [License](#license)
+A modern, responsive website for Lucky Logic, a professional IT support and computer services company based in Australia. Built with Next.js 14, TypeScript, and Chakra UI.
 
 ## 🎯 Project Overview
-Lucky Logic was founded in 2024 to address a gap in residential IT services in Sydney. The site offers information about services, contact forms, privacy and terms policies, cookie consent, and analytics integrations — all styled using Chakra UI and Next.js 14.
 
-## ✨ Features
-- 🎨 Responsive homepage with animated hero section
-- 📄 About Us, Contact Us, Privacy Policy, Terms & Conditions, Cookie Policy pages
-- 🗺️ Google Maps static map showing office location
-- 🍪 Cookie consent banner with preference controls
-- 🔍 SEO optimized with Open Graph and Twitter meta tags
-- 📊 Google Analytics (GA4) integration
-- 🧭 Navigation bar with active links and logo
-- 📝 Easy contact form for customer inquiries
+Lucky Logic provides comprehensive IT support and computer services, including:
+- Network Setup & Troubleshooting
+- Computer Repairs & Maintenance
+- Smart Home Solutions
+- Business IT Support
 
-## 🛠️ Technologies
-- ⚛️ Next.js 14 (app router)
-- ⚡ React 18
-- 📘 TypeScript
-- 🎨 Chakra UI
-- 🎭 Framer Motion (animations)
-- 🎬 Lottie (animation player)
-- 🗺️ Google Maps Static API
-- 📊 Google Analytics (GA4)
-- 🚀 Netlify (hosting & CI/CD)
+## 🚀 Features
 
-## 🚀 Setup & Development
-1. Clone the repository:
+- **Modern Tech Stack**
+  - Next.js 14 with App Router
+  - TypeScript for type safety
+  - Chakra UI for beautiful, accessible components
+  - Jest & React Testing Library for unit testing
+
+- **Key Components**
+  - Responsive navigation with mobile menu
+  - Interactive service cards and accordions
+  - Contact form with WhatsApp integration
+  - Google Maps integration
+  - Cookie consent management
+  - SEO optimization with metadata
+  - Error boundaries and 404 handling
+
+- **Performance & SEO**
+  - Server-side rendering
+  - Optimized images and assets
+  - Structured data (JSON-LD)
+  - Sitemap generation
+  - Google Analytics integration
+
+## 🛠️ Development
+
+### Prerequisites
+- Node.js 18.17 or later
+- npm or yarn
+
+### Installation
 ```bash
-git clone https://github.com/Neesonn/luckylogicit.git
-cd luckylogicit
-```
+# Clone the repository
+git clone [repository-url]
 
-2. Install dependencies:
-```bash
+# Install dependencies
 npm install
-```
 
-3. Create a `.env.local` file in the root with necessary environment variables (see below).
-
-4. Run the development server:
-```bash
+# Start development server
 npm run dev
 ```
 
-Open http://localhost:3000 to view the site locally.
-
-## 🔑 Environment Variables
-Add the following to `.env.local`:
-
-```env
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
-NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+### Available Scripts
+```bash
+npm run dev        # Start development server
+npm run build      # Build for production
+npm run start      # Start production server
+npm run lint       # Run ESLint
+npm test          # Run unit tests
 ```
 
-Replace `your-google-maps-api-key` with your actual API key.
-Replace `G-XXXXXXXXXX` with your Google Analytics measurement ID.
+## 📁 Project Structure
 
-## 🚀 Deployment
-The site is deployed on Netlify using the following build commands:
+```
+├── app/                  # Next.js app directory
+│   ├── about-us/        # About page
+│   ├── contact-us/      # Contact page
+│   ├── services/        # Services page
+│   ├── privacy-policy/  # Privacy policy
+│   ├── cookie-policy/   # Cookie policy
+│   └── terms/          # Terms of service
+├── components/          # Reusable components
+│   ├── Navbar.tsx      # Navigation component
+│   ├── Hero.tsx        # Hero section
+│   ├── ContactForm.tsx # Contact form
+│   └── Footer.tsx      # Footer component
+├── theme/              # Chakra UI theme
+├── public/            # Static assets
+└── types/            # TypeScript types
+```
 
-- Build command: `npm run build`
-- Publish directory: `.next`
+## 🔒 Security & Privacy
 
-Make sure to add environment variables in the Netlify dashboard for Google Maps and Analytics.
-
-## 🔍 SEO & Analytics
-- 📝 Metadata set in `app/page.tsx` includes titles, descriptions, Open Graph and Twitter card data
-- 📊 Google Analytics GA4 tracking added in `app/layout.tsx`
-- 🗺️ Sitemap and robots.txt are configured for search engine indexing
-- 🍪 Cookie consent banner controls cookie preferences in compliance with GDPR and Australian regulations
-
-## ⚖️ Legal
-- 📜 Privacy Policy, Terms & Conditions, and Cookie Policy pages included with content tailored for Australian standards
-- 🍪 Cookie consent banner with accept/decline and preferences management
-
-## 🤝 Contributing
-Contributions are welcome! Please fork the repository and submit a pull request. For major changes, open an issue first to discuss what you'd like to change.
-
-## 📄 License
-This project is licensed under the MIT License.
+- Cookie consent management
+- Privacy policy
+- Terms of service
+- Secure form handling
+- GDPR compliance
 
 ## 📞 Support
+
 If you need help or have questions, please reach out at support@luckylogic.com.au.
+
+## 📄 License
+
+This project is proprietary and confidential. All rights reserved.
