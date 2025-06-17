@@ -34,6 +34,8 @@ import {
 import { FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import SEO from '../../components/SEO';
+import JsonLd from '../../components/JsonLd';
 
 function ContactForm() {
   const [name, setName] = useState('');
@@ -296,28 +298,63 @@ ${messageText}
 }
 
 export default function ContactUsPage() {
-  return (
-    <Box
-      px={{ base: 4, md: 8 }}
-      py={{ base: 16, md: 24 }}
-      maxW="4xl"
-      mx="auto"
-      color="gray.800"
-      minH="80vh"
-    >
-      <Heading
-        as="h1"
-        size="2xl"
-        mb={10}
-        color="brand.green"
-        textAlign="center"
-      >
-        Get in Touch
-      </Heading>
+  const contactData = {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: 'Contact Lucky Logic IT',
+    description: 'Get in touch with Lucky Logic IT for all your residential IT support needs in Sydney.',
+    mainEntity: {
+      '@type': 'Organization',
+      name: 'Lucky Logic IT',
+      contactPoint: {
+        '@type': 'ContactPoint',
+        telephone: '+61426901209',
+        contactType: 'customer service',
+        areaServed: 'Sydney',
+        availableLanguage: 'English'
+      },
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: '580 Princes Highway',
+        addressLocality: 'Kirrawee',
+        addressRegion: 'NSW',
+        postalCode: '2232',
+        addressCountry: 'AU'
+      }
+    }
+  };
 
-      <Suspense fallback={<div>Loading...</div>}>
-        <ContactForm />
-      </Suspense>
-    </Box>
+  return (
+    <>
+      <SEO
+        title="Contact Us"
+        description="Get in touch with Lucky Logic IT for all your residential IT support needs in Sydney. We're here to help with computer repairs, network setup, and more."
+        keywords="contact Lucky Logic, IT support contact, computer repair Sydney, tech support contact, IT help Sydney"
+        canonicalUrl="https://luckylogic.com.au/contact-us"
+      />
+      <JsonLd data={contactData} />
+      <Box
+        px={{ base: 4, md: 8 }}
+        py={{ base: 16, md: 24 }}
+        maxW="4xl"
+        mx="auto"
+        color="gray.800"
+        minH="80vh"
+      >
+        <Heading
+          as="h1"
+          size="2xl"
+          mb={10}
+          color="brand.green"
+          textAlign="center"
+        >
+          Get in Touch
+        </Heading>
+
+        <Suspense fallback={<div>Loading...</div>}>
+          <ContactForm />
+        </Suspense>
+      </Box>
+    </>
   );
 }

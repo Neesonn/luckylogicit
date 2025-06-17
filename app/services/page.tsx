@@ -29,6 +29,9 @@ import {
   FiHeadphones,
 } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
+import ServiceGrid from '../../components/ServiceGrid';
+import SEO from '../../components/SEO';
+import JsonLd from '../../components/JsonLd';
 
 const services = [
   {
@@ -131,41 +134,188 @@ export default function ServicesPage() {
     router.push('/contact-us');
   };
 
-  return (
-    <Box px={{ base: 4, md: 8 }} py={{ base: 16, md: 24 }} maxW="7xl" mx="auto" bg="white">
-      <VStack spacing={4} textAlign="center" mb={12}>
-        <Heading as="h1" size="2xl" fontWeight="bold" color="brand.green">
-          Our Services
-        </Heading>
-        <Text fontSize="lg" color="gray.600" maxW="2xl">
-        Friendly, professional IT help delivered to your door — with clear, upfront pricing. We only charge a call-out fee once we’ve assessed the issue and you’ve approved the quote. Most problems can be resolved during the initial visit, but if further diagnostics, parts, or repairs are needed, an updated quote will be provided for your approval before any additional work is done.
-        </Text>
-      </VStack>
+  const servicesData = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: [
+      {
+        '@type': 'Service',
+        position: 1,
+        name: 'Network Wi-Fi and Internet Setup & Troubleshooting',
+        description: 'Professional network setup and troubleshooting services for your home internet and Wi-Fi needs.',
+        provider: {
+          '@type': 'LocalBusiness',
+          name: 'Lucky Logic IT'
+        }
+      },
+      {
+        '@type': 'Service',
+        position: 2,
+        name: 'Computer Repairs & Upgrades',
+        description: 'Expert computer repair and upgrade services to keep your devices running smoothly.',
+        provider: {
+          '@type': 'LocalBusiness',
+          name: 'Lucky Logic IT'
+        }
+      },
+      {
+        '@type': 'Service',
+        position: 3,
+        name: 'Software Installation / Procurement',
+        description: 'Professional software installation and procurement services for all your digital needs.',
+        provider: {
+          '@type': 'LocalBusiness',
+          name: 'Lucky Logic IT'
+        }
+      },
+      {
+        '@type': 'Service',
+        position: 4,
+        name: 'Custom PC Build',
+        description: 'Custom PC building services tailored to your specific needs and requirements.',
+        provider: {
+          '@type': 'LocalBusiness',
+          name: 'Lucky Logic IT'
+        }
+      },
+      {
+        '@type': 'Service',
+        position: 5,
+        name: 'Smart Home Assistance',
+        description: 'Expert smart home setup and integration services for modern living.',
+        provider: {
+          '@type': 'LocalBusiness',
+          name: 'Lucky Logic IT'
+        }
+      },
+      {
+        '@type': 'Service',
+        position: 6,
+        name: 'Printer & Peripheral Support',
+        description: 'Comprehensive support for printers and other peripheral devices.',
+        provider: {
+          '@type': 'LocalBusiness',
+          name: 'Lucky Logic IT'
+        }
+      },
+      {
+        '@type': 'Service',
+        position: 7,
+        name: 'Virus and Malware Support',
+        description: 'Professional virus removal and malware protection services.',
+        provider: {
+          '@type': 'LocalBusiness',
+          name: 'Lucky Logic IT'
+        }
+      },
+      {
+        '@type': 'Service',
+        position: 8,
+        name: 'Mobile Device Support',
+        description: 'Expert support for all your mobile device needs.',
+        provider: {
+          '@type': 'LocalBusiness',
+          name: 'Lucky Logic IT'
+        }
+      }
+    ]
+  };
 
-      {isMobile ? (
-        <Accordion allowToggle>
-          {services.map((service, idx) => (
-            <AccordionItem key={idx} border="1px solid" borderColor="gray.200" borderRadius="xl" mb={4}>
-              <h2>
-                <AccordionButton px={4} py={6} _expanded={{ bg: 'green.50' }}>
-                  <HStack spacing={4} flex="1" textAlign="left">
-                    <Box p={2} bg={iconBg} borderRadius="full">
-                      <Icon as={service.icon} boxSize={5} color="brand.green" />
-                    </Box>
-                    <Text fontWeight="semibold">{service.title}</Text>
-                  </HStack>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel px={6} pb={6}>
-                <Text mb={2} fontSize="sm" color="gray.700">{service.summary}</Text>
-                <VStack align="start" spacing={1} fontSize="sm" color="gray.600" mb={3}>
+  return (
+    <>
+      <SEO
+        title="Our Services"
+        description="Explore Lucky Logic IT's comprehensive range of residential IT services in Sydney. From computer repairs to smart home setup, we've got you covered."
+        keywords="IT services Sydney, computer repairs, network setup, smart home, tech support, residential IT, computer maintenance, Sydney IT services"
+        canonicalUrl="https://luckylogic.com.au/services"
+      />
+      <JsonLd data={servicesData} />
+      <Box px={{ base: 4, md: 8 }} py={{ base: 16, md: 24 }} maxW="7xl" mx="auto" bg="white">
+        <VStack spacing={4} textAlign="center" mb={12}>
+          <Heading as="h1" size="2xl" fontWeight="bold" color="brand.green">
+            Our Services
+          </Heading>
+          <Text fontSize="lg" color="gray.600" maxW="2xl">
+          Friendly, professional IT help delivered to your door — with clear, upfront pricing. We only charge a call-out fee once we've assessed the issue and you've approved the quote. Most problems can be resolved during the initial visit, but if further diagnostics, parts, or repairs are needed, an updated quote will be provided for your approval before any additional work is done.
+          </Text>
+        </VStack>
+
+        {isMobile ? (
+          <Accordion allowToggle>
+            {services.map((service, idx) => (
+              <AccordionItem key={idx} border="1px solid" borderColor="gray.200" borderRadius="xl" mb={4}>
+                <h2>
+                  <AccordionButton px={4} py={6} _expanded={{ bg: 'green.50' }}>
+                    <HStack spacing={4} flex="1" textAlign="left">
+                      <Box p={2} bg={iconBg} borderRadius="full">
+                        <Icon as={service.icon} boxSize={5} color="brand.green" />
+                      </Box>
+                      <Text fontWeight="semibold">{service.title}</Text>
+                    </HStack>
+                    <AccordionIcon />
+                  </AccordionButton>
+                </h2>
+                <AccordionPanel px={6} pb={6}>
+                  <Text mb={2} fontSize="sm" color="gray.700">{service.summary}</Text>
+                  <VStack align="start" spacing={1} fontSize="sm" color="gray.600" mb={3}>
+                    {service.bullets.map((point, i) => (
+                      <Text key={i}>• {point}</Text>
+                    ))}
+                  </VStack>
+                  <Divider mb={2} />
+                  <Text fontSize="xs" color="gray.500" mb={3}>
+                    <strong>Ideal for:</strong> {service.ideal}
+                  </Text>
+                  <Button
+                    size="sm"
+                    colorScheme="green"
+                    variant="outline"
+                    width="full"
+                    mt={2}
+                    onClick={handleContactClick}
+                  >
+                    Get in touch
+                  </Button>
+                </AccordionPanel>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        ) : (
+          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
+            {services.map((service, idx) => (
+              <Box
+                key={idx}
+                p={6}
+                borderRadius="xl"
+                boxShadow="sm"
+                border="1px solid"
+                borderColor="gray.200"
+                transition="all 0.2s"
+                _hover={{ boxShadow: 'md' }}
+                bg="white"
+              >
+                <HStack spacing={4} mb={3}>
+                  <Box bg={iconBg} p={3} borderRadius="full">
+                    <Icon as={service.icon} boxSize={6} color="brand.green" />
+                  </Box>
+                  <Heading fontSize="lg" color="gray.800">
+                    {service.title}
+                  </Heading>
+                </HStack>
+
+                <Text fontSize="sm" color="gray.700" mb={2}>
+                  {service.summary}
+                </Text>
+
+                <VStack align="start" spacing={1} fontSize="sm" color="gray.600" mt={2}>
                   {service.bullets.map((point, i) => (
                     <Text key={i}>• {point}</Text>
                   ))}
                 </VStack>
-                <Divider mb={2} />
-                <Text fontSize="xs" color="gray.500" mb={3}>
+
+                <Divider my={4} />
+
+                <Text fontSize="sm" color="gray.500" fontStyle="italic" mb={3}>
                   <strong>Ideal for:</strong> {service.ideal}
                 </Text>
                 <Button
@@ -173,66 +323,15 @@ export default function ServicesPage() {
                   colorScheme="green"
                   variant="outline"
                   width="full"
-                  mt={2}
                   onClick={handleContactClick}
                 >
                   Get in touch
                 </Button>
-              </AccordionPanel>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      ) : (
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
-          {services.map((service, idx) => (
-            <Box
-              key={idx}
-              p={6}
-              borderRadius="xl"
-              boxShadow="sm"
-              border="1px solid"
-              borderColor="gray.200"
-              transition="all 0.2s"
-              _hover={{ boxShadow: 'md' }}
-              bg="white"
-            >
-              <HStack spacing={4} mb={3}>
-                <Box bg={iconBg} p={3} borderRadius="full">
-                  <Icon as={service.icon} boxSize={6} color="brand.green" />
-                </Box>
-                <Heading fontSize="lg" color="gray.800">
-                  {service.title}
-                </Heading>
-              </HStack>
-
-              <Text fontSize="sm" color="gray.700" mb={2}>
-                {service.summary}
-              </Text>
-
-              <VStack align="start" spacing={1} fontSize="sm" color="gray.600" mt={2}>
-                {service.bullets.map((point, i) => (
-                  <Text key={i}>• {point}</Text>
-                ))}
-              </VStack>
-
-              <Divider my={4} />
-
-              <Text fontSize="sm" color="gray.500" fontStyle="italic" mb={3}>
-                <strong>Ideal for:</strong> {service.ideal}
-              </Text>
-              <Button
-                size="sm"
-                colorScheme="green"
-                variant="outline"
-                width="full"
-                onClick={handleContactClick}
-              >
-                Get in touch
-              </Button>
-            </Box>
-          ))}
-        </SimpleGrid>
-      )}
-    </Box>
+              </Box>
+            ))}
+          </SimpleGrid>
+        )}
+      </Box>
+    </>
   );
 }
