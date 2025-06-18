@@ -88,7 +88,7 @@ export default function CookiePolicyPage() {
       </Heading>
       <Text>
         If you have any questions about this Cookie Policy or our privacy practices, please contact us at{' '}
-        <strong>michael@luckylogic.com.au</strong>.
+        <strong>support@luckylogic.com.au</strong>.
       </Text>
 
       <Text mt={8}>

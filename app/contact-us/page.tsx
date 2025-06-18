@@ -171,7 +171,7 @@ Message:*
 ${messageText}
     `.trim());
     
-    const mailtoLink = `mailto:michael@luckylogic.com.au?subject=${subject}&body=${body}`;
+    const mailtoLink = `mailto:support@luckylogic.com.au?subject=${subject}&body=${body}`;
     window.open(mailtoLink, '_blank');
 
     // Reset form (optional, depending on desired UX after email client opens)
@@ -306,7 +306,7 @@ ${messageText}
       <VStack spacing={2} align="center" mt={10} textAlign="center">
         <Text fontSize="lg" fontWeight="semibold" color="brand.green">Or reach us directly:</Text>
         <Text fontSize="md">
-          Email: <Link href="mailto:michael@luckylogic.com.au" color="brand.green" rel="noopener noreferrer">michael@luckylogic.com.au</Link>
+          Email: <Link href="mailto:support@luckylogic.com.au" color="brand.green" rel="noopener noreferrer">support@luckylogic.com.au</Link>
         </Text>
         <Text fontSize="md">
           Phone: <Link href="tel:+61426901209" color="brand.green" rel="noopener noreferrer">+61 426 901 209</Link>

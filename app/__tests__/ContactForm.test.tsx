@@ -98,7 +98,7 @@ describe('ContactForm', () => {
     
     // Check if mailto link was opened
     expect(mockOpen).toHaveBeenCalledWith(
-      expect.stringContaining('mailto:michael@luckylogic.com.au'),
+      expect.stringContaining('mailto:support@luckylogic.com.au'),
       '_blank'
     );
   });

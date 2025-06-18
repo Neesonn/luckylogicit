@@ -80,7 +80,7 @@ export default function TermsPage() {
       </Heading>
       <Text mb={6}>
         If you have any questions or concerns regarding these Terms & Conditions, please contact us at{' '}
-        <strong>michael@luckylogic.com.au</strong>.
+        <strong>support@luckylogic.com.au</strong>.
       </Text>
 
       <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">

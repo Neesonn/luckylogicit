@@ -110,7 +110,7 @@ export default function PrivacyPolicyPage() {
       </Heading>
       <Text mb={6}>
         For questions or concerns about privacy, please contact us at{' '}
-        <strong>michael@luckylogic.com.au</strong>.
+        <strong>support@luckylogic.com.au</strong>.
       </Text>
     </Box>
   );

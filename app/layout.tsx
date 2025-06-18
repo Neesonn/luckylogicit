@@ -96,11 +96,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ChakraProvider theme={theme}>
           <ErrorBoundary>
             <Flex direction="column" minH="100vh">
-              <Navbar />
+          <Navbar />
               <Box as="main" id="main-content" flex="1" pt="80px">
-                {children}
+            {children}
               </Box>
-              <Footer />
+            <Footer />
             </Flex>
           </ErrorBoundary>
         </ChakraProvider>
