@@ -67,7 +67,7 @@ export default function AboutUsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          Your trusted partner for seamless residential IT solutions.
+          Your trusted partner for seamless residential IT solutions
         </MotionText>
       </VStack>
 
