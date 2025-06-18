@@ -87,6 +87,7 @@ function ContactForm() {
     setIsLoading(true);
     try {
       const formspreeEndpoint = process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT;
+      console.log('Formspree endpoint:', formspreeEndpoint);
       if (!formspreeEndpoint) {
         throw new Error('Formspree endpoint is not defined in environment variables');
       }
