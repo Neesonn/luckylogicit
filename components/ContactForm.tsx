@@ -80,7 +80,7 @@ export default function ContactForm() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch('https://formspree.io/f/mqablbey', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,30 +88,28 @@ export default function ContactForm() {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      if (response.ok) {
+        toast({
+          title: 'Message sent!',
+          description: 'Thank you for your message. We will get back to you soon.',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong');
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          message: '',
+        });
+      } else {
+        throw new Error('Failed to send message');
       }
-
-      toast({
-        title: 'Message sent!',
-        description: data.message,
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
-
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        message: '',
-      });
     } catch (error) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Something went wrong',
+        description: 'Something went wrong. Please try again later.',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -134,6 +132,7 @@ export default function ContactForm() {
             placeholder="Your name"
             bg="white"
             _placeholder={{ color: 'gray.500' }}
+            required
           />
           <FormErrorMessage>{errors.name}</FormErrorMessage>
         </FormControl>
@@ -149,6 +148,7 @@ export default function ContactForm() {
             placeholder="your.email@example.com"
             bg="white"
             _placeholder={{ color: 'gray.500' }}
+            required
           />
           <FormErrorMessage>{errors.email}</FormErrorMessage>
         </FormControl>
@@ -164,6 +164,7 @@ export default function ContactForm() {
             rows={6}
             bg="white"
             _placeholder={{ color: 'gray.500' }}
+            required
           />
           <FormErrorMessage>{errors.message}</FormErrorMessage>
         </FormControl>

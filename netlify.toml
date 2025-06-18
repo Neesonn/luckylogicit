@@ -1,9 +1,22 @@
 [build]
   command = "npm run build"
-  publish = ".next"
+  publish = "out"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
   [plugins.inputs]
   # Add valid inputs here if needed
+
+# Netlify Forms configuration
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Handle form submissions
+[[redirects]]
+  from = "/"
+  to = "/"
+  status = 200
+  conditions = {Role = ["admin"]}
