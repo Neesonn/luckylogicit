@@ -86,7 +86,11 @@ function ContactForm() {
     if (!validateForm()) return;
     setIsLoading(true);
     try {
-      const response = await fetch('https://formspree.io/f/mqablbey', {
+      const formspreeEndpoint = process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT;
+      if (!formspreeEndpoint) {
+        throw new Error('Formspree endpoint is not defined in environment variables');
+      }
+      const response = await fetch(formspreeEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
