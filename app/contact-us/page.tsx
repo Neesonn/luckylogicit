@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   Box,
   Heading,
@@ -31,8 +32,6 @@ import {
   UnlockIcon,
   QuestionIcon,
 } from '@chakra-ui/icons';
-import { FaWhatsapp, FaEnvelope } from 'react-icons/fa';
-import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import SEO from '../../components/SEO';
 import JsonLd from '../../components/JsonLd';
@@ -43,63 +42,8 @@ function ContactForm() {
   const [phone, setPhone] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
   const [messageText, setMessageText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
-  const searchParams = useSearchParams();
-  const showToast = searchParams.get('showToast');
-
-  const validateForm = () => {
-    if (!name || !email || !phone || !selectedTopic || !messageText) {
-      toast({
-        title: "Please complete all fields.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-        position: "top",
-      });
-      return false;
-    }
-    return true;
-  };
-
-  useEffect(() => {
-    if (showToast === 'true') {
-      toast({
-        title: "Enquiry sent!",
-        description: "Your enquiry has been sent via WhatsApp. We'll get back to you soon.",
-        status: "success",
-        duration: null,
-        isClosable: true,
-        position: "top",
-        render: () => (
-          <Box
-            color="white"
-            p={3}
-            bg="green.500"
-            borderRadius="md"
-            boxShadow="lg"
-            position="relative"
-            minW="300px"
-          >
-            <Button
-              position="absolute"
-              top="8px"
-              right="8px"
-              size="sm"
-              variant="ghost"
-              color="white"
-              _hover={{ bg: 'whiteAlpha.200' }}
-              onClick={() => toast.closeAll()}
-              aria-label="Close notification"
-            >
-              ✕
-            </Button>
-            <Heading size="md" mb={2}>Enquiry sent!</Heading>
-            <Text>Your enquiry has been sent via WhatsApp. We'll get back to you soon.</Text>
-          </Box>
-        ),
-      });
-    }
-  }, [showToast, toast]);
 
   const topics = [
     { label: 'Network Wi-Fi and Internet Setup & Troubleshooting', icon: InfoIcon },
@@ -113,210 +57,155 @@ function ContactForm() {
     { label: 'Anything else', icon: QuestionIcon },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return; // Stop if validation fails
+  const validateForm = () => {
+    if (!name || !email || !phone || !selectedTopic || !messageText) {
+      toast({
+        title: 'Please complete all fields.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+      });
+      return false;
     }
-
-    // Create the message with all form data
-    const whatsappMessage = `
-*New Enquiry from ${name}*
-
-*Contact Details:*
-📧 Email: ${email}
-📱 Phone: ${phone}
-
-*Enquiry Topic:*
-${selectedTopic}
-
-*Message:*
-${messageText}
-    `.trim();
-
-    // Create WhatsApp URL with the message
-    const whatsappURL = `https://wa.me/61426901209?text=${encodeURIComponent(whatsappMessage)}`;
-    
-    // Open WhatsApp in a new tab
-    window.open(whatsappURL, '_blank');
-
-    // Reset form
-    setName('');
-    setEmail('');
-    setPhone('');
-    setSelectedTopic('');
-    setMessageText('');
-
-    // Redirect to the same page with a query parameter to show toast
-    window.location.href = '/contact-us?showToast=true';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast({
+        title: 'Please enter a valid email address.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+      });
+      return false;
+    }
+    return true;
   };
 
-  const handleEmailSubmit = () => {
-    if (!validateForm()) {
-      return; // Stop if validation fails
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch('https://formspree.io/f/mqablbey', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          topic: selectedTopic,
+          message: messageText,
+        }),
+      });
+      if (response.ok) {
+        toast({
+          title: 'Message sent!',
+          description: 'Thank you for your message. We will get back to you soon.',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
+        setName('');
+        setEmail('');
+        setPhone('');
+        setSelectedTopic('');
+        setMessageText('');
+      } else {
+        throw new Error('Failed to send message');
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Something went wrong. Please try again later.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
     }
-    const subject = encodeURIComponent(`Enquiry from ${name} regarding ${selectedTopic}`);
-    const body = encodeURIComponent(`
-New Enquiry from ${name}
-
-Contact Details:
-Email: ${email}
-Phone: ${phone}
-
-Enquiry Topic:
-${selectedTopic}
-
-Message:*
-${messageText}
-    `.trim());
-    
-    const mailtoLink = `mailto:support@luckylogic.com.au?subject=${subject}&body=${body}`;
-    window.open(mailtoLink, '_blank');
-
-    // Reset form (optional, depending on desired UX after email client opens)
-    setName('');
-    setEmail('');
-    setPhone('');
-    setSelectedTopic('');
-    setMessageText('');
   };
 
   return (
-    <VStack as="form" spacing={6}>
-      <FormControl isRequired isInvalid={!name && name !== ''}>
-        <FormLabel>Your Name</FormLabel>
-        <Input 
-          placeholder="Enter your full name" 
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          _focus={{
-            borderColor: 'brand.green',
-            boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)',
-          }}
-        />
-      </FormControl>
-
-      <FormControl isRequired isInvalid={!email && email !== ''}>
-        <FormLabel>Email Address</FormLabel>
-        <Input 
-          type="email" 
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          _focus={{
-            borderColor: 'brand.green',
-            boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)',
-          }}
-        />
-      </FormControl>
-
-      <FormControl isRequired isInvalid={!phone && phone !== ''}>
-        <FormLabel>Phone Number</FormLabel>
-        <Input 
-          type="tel" 
-          placeholder="Enter your phone number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          _focus={{
-            borderColor: 'brand.green',
-            boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)',
-          }}
-        />
-      </FormControl>
-
-      <FormControl isRequired isInvalid={!selectedTopic && selectedTopic !== ''}>
-        <FormLabel>I want to enquire about</FormLabel>
-        <Menu>
-          <MenuButton 
-            as={Button} 
-            rightIcon={<ChevronDownIcon />} 
-            width="full" 
-            aria-label="Select enquiry topic"
-            _focus={{
-              borderColor: 'brand.green',
-              boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)',
-            }}
-          >
-            {selectedTopic || 'Select a topic'}
-          </MenuButton>
-          <MenuList>
-            {topics.map(({ label, icon }) => (
-              <MenuItem
-                key={label}
-                icon={<Icon as={icon} />}
-                onClick={() => setSelectedTopic(label)}
-                _focus={{
-                  bg: 'green.50',
-                  outline: '2px solid',
-                  outlineColor: 'brand.green',
-                  outlineOffset: '2px',
-                }}
-              >
-                {label}
-              </MenuItem>
-            ))}
-          </MenuList>
-        </Menu>
-      </FormControl>
-
-      <FormControl isRequired isInvalid={!messageText && messageText !== ''}>
-        <FormLabel>Your Message</FormLabel>
-        <Textarea
-          placeholder="Tell us about your enquiry"
-          value={messageText}
-          onChange={(e) => setMessageText(e.target.value)}
-          _focus={{
-            borderColor: 'brand.green',
-            boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)',
-          }}
-        />
-      </FormControl>
-
-      <Button
-        type="submit"
-        colorScheme="green"
-        size="lg"
-        width="full"
-        onClick={handleSubmit}
-        _focus={{
-          outline: '2px solid',
-          outlineColor: 'brand.green',
-          outlineOffset: '2px',
-        }}
-      >
-        Send via WhatsApp
-      </Button>
-
-      <Button
-        colorScheme="green"
-        variant="outline"
-        size="lg"
-        width="full"
-        onClick={handleEmailSubmit}
-        _focus={{
-          outline: '2px solid',
-          outlineColor: 'brand.green',
-          outlineOffset: '2px',
-        }}
-      >
-        Send via Email
-      </Button>
-
-      <VStack spacing={2} align="center" mt={10} textAlign="center">
-        <Text fontSize="lg" fontWeight="semibold" color="brand.green">Or reach us directly:</Text>
-        <Text fontSize="md">
-          Email: <Link href="mailto:support@luckylogic.com.au" color="brand.green" rel="noopener noreferrer">support@luckylogic.com.au</Link>
-        </Text>
-        <Text fontSize="md">
-          Phone: <Link href="tel:+61426901209" color="brand.green" rel="noopener noreferrer">+61 426 901 209</Link>
-        </Text>
-        <Text fontSize="md">
-          Address: 580 Princes Highway, Kirrawee 2232
-        </Text>
+    <Box as="form" onSubmit={handleSubmit} w="full">
+      <VStack spacing={6}>
+        <FormControl isRequired>
+          <FormLabel>Your Name</FormLabel>
+          <Input
+            placeholder="Enter your full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+          />
+        </FormControl>
+        <FormControl isRequired>
+          <FormLabel>Email Address</FormLabel>
+          <Input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+          />
+        </FormControl>
+        <FormControl isRequired>
+          <FormLabel>Phone Number</FormLabel>
+          <Input
+            type="tel"
+            placeholder="Enter your phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+          />
+        </FormControl>
+        <FormControl isRequired>
+          <FormLabel>I want to enquire about</FormLabel>
+          <Menu>
+            <MenuButton
+              as={Button}
+              rightIcon={<ChevronDownIcon />}
+              width="full"
+              aria-label="Select enquiry topic"
+              _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+            >
+              {selectedTopic || 'Select a topic'}
+            </MenuButton>
+            <MenuList>
+              {topics.map(({ label, icon }) => (
+                <MenuItem
+                  key={label}
+                  icon={<Icon as={icon} />}
+                  onClick={() => setSelectedTopic(label)}
+                  _focus={{ bg: 'green.50', outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}
+                >
+                  {label}
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Menu>
+        </FormControl>
+        <FormControl isRequired>
+          <FormLabel>Your Message</FormLabel>
+          <Textarea
+            placeholder="Tell us about your enquiry"
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
+            _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+          />
+        </FormControl>
+        <Button
+          type="submit"
+          colorScheme="green"
+          size="lg"
+          width="full"
+          isLoading={isLoading}
+          loadingText="Sending..."
+          _focus={{ outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}
+        >
+          Send Message
+        </Button>
       </VStack>
-
-    </VStack>
+    </Box>
   );
 }
 
@@ -374,9 +263,21 @@ export default function ContactUsPage() {
           Get in Touch
         </Heading>
 
-        <Suspense fallback={<div>Loading...</div>}>
-          <ContactForm />
-        </Suspense>
+        <ContactForm />
+
+        <VStack spacing={2} align="center" mt={10} textAlign="center">
+          <Text fontSize="lg" fontWeight="semibold" color="brand.green">Or reach us directly:</Text>
+          <Text fontSize="md">
+            Email: <Link href="mailto:support@luckylogic.com.au" color="brand.green" rel="noopener noreferrer">support@luckylogic.com.au</Link>
+          </Text>
+          <Text fontSize="md">
+            Phone: <Link href="tel:+61426901209" color="brand.green" rel="noopener noreferrer">+61 426 901 209</Link>
+          </Text>
+          <Text fontSize="md">
+            Address: 580 Princes Highway, Kirrawee 2232
+          </Text>
+        </VStack>
+
       </Box>
     </>
   );
