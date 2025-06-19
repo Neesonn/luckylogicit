@@ -249,7 +249,7 @@ export default function ServicesPage() {
             Our Services
           </Heading>
           <Text fontSize="lg" color="gray.600" maxW="2xl">
-          Friendly, professional IT help delivered to your door — with clear, upfront pricing. We only charge a call-out fee once we've assessed the issue and you've approved the quote. Most problems can be resolved during the initial visit, but if further diagnostics, parts, or repairs are needed, an updated quote will be provided for your approval before any additional work is done.
+            Friendly, professional IT help delivered to your door with clear, upfront pricing. We only charge a call-out fee once we've assessed the issue and you've approved the quote. Most problems can be resolved during the initial visit, but if further diagnostics, parts, or repairs are needed, an updated quote will be provided for your approval before any additional work is done.
           </Text>
         </VStack>
 
