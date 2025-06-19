@@ -1,6 +1,6 @@
 import { Flex, Text, Box, HStack, Spacer, IconButton, useBreakpointValue, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
 import NextLink from 'next/link';
-import { FaWhatsapp, FaInstagram, FaFacebook, FaBars } from 'react-icons/fa';
+import { FaWhatsapp, FaInstagram, FaFacebook, FaBars, FaLinkedin } from 'react-icons/fa';
 import React from 'react';
 
 export default function Navbar() {
@@ -263,6 +263,26 @@ export default function Navbar() {
           aria-label="Follow us on Facebook"
           icon={<FaFacebook />}
           colorScheme="facebook"
+          size="lg"
+          fontSize="24px"
+          variant="ghost"
+          _hover={{ transform: 'scale(1.1)' }}
+          _focus={{
+            outline: '2px solid',
+            outlineColor: 'brand.green',
+            outlineOffset: '2px',
+            transform: 'scale(1.1)',
+          }}
+          transition="transform 0.2s"
+        />
+        <IconButton
+          as="a"
+          href="https://www.linkedin.com/company/lucky-logic-it"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Follow us on LinkedIn"
+          icon={<FaLinkedin />}
+          colorScheme="linkedin"
           size="lg"
           fontSize="24px"
           variant="ghost"
