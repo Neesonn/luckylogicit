@@ -6,6 +6,9 @@ export default function GoogleAnalytics() {
   const [hasConsent, setHasConsent] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('GA loaded? CookieConsent:', localStorage.getItem('cookieConsent'));
+    }
     const consent = localStorage.getItem('cookieConsent');
     if (consent === 'true') {
       setHasConsent(true);
