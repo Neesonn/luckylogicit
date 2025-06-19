@@ -14,6 +14,17 @@ export default function Footer() {
   return (
     <>
       <Box textAlign="center" py={6} bg="brand.green">
+        {/* Sitemap/Quick Links */}
+        <Box mb={4}>
+          <Stack direction={{ base: 'column', sm: 'row' }} spacing={4} justify="center" align="center">
+            <Link href="/" color="white" textDecoration="underline">Home</Link>
+            <Link href="/about-us" color="white" textDecoration="underline">About Us</Link>
+            <Link href="/services" color="white" textDecoration="underline">Services</Link>
+            <Link href="/faq" color="white" textDecoration="underline">FAQ</Link>
+            <Link href="/contact-us" color="white" textDecoration="underline">Contact Us</Link>
+          </Stack>
+        </Box>
+
         <Stack spacing={1} mb={3}>
           <Text fontSize="sm" color="white">
             © {new Date().getFullYear()} Lucky Logic. All rights reserved.
