@@ -99,6 +99,23 @@ export default function Navbar() {
             </Text>
           </NextLink>
 
+          <NextLink href="/faq" passHref legacyBehavior>
+            <Text
+              as="a"
+              color="brand.green"
+              fontWeight="medium"
+              fontSize="md"
+              cursor="pointer"
+              _focus={{
+                outline: '2px solid',
+                outlineColor: 'brand.green',
+                outlineOffset: '2px',
+              }}
+            >
+              FAQ
+            </Text>
+          </NextLink>
+
           <NextLink href="/contact-us" passHref legacyBehavior>
             <Text
               as="a"
@@ -166,6 +183,18 @@ export default function Navbar() {
                 }}
               >
                 Services
+              </MenuItem>
+            </NextLink>
+            <NextLink href="/faq" passHref>
+              <MenuItem
+                _focus={{
+                  bg: 'green.50',
+                  outline: '2px solid',
+                  outlineColor: 'brand.green',
+                  outlineOffset: '2px',
+                }}
+              >
+                FAQ
               </MenuItem>
             </NextLink>
             <NextLink href="/contact-us" passHref>
