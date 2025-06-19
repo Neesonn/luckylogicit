@@ -10,6 +10,7 @@ import {
   MdDevices,
   MdBugReport,
   MdSupportAgent,
+  MdPhone,
 } from 'react-icons/md';
 import GlassCard from './GlassCard';
 
@@ -22,6 +23,7 @@ const services = [
   { icon: MdSupportAgent, label: 'Printer & Peripheral Support' },
   { icon: MdBugReport, label: 'Virus & Malware Removal' },
   { icon: MdSecurity, label: 'Ongoing Tech Support' },
+  { icon: MdPhone, label: 'Phone & Tablet Troubleshooting' },
 ];
 
 export default function ServiceGrid() {

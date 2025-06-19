@@ -27,6 +27,7 @@ import {
   FiPrinter,
   FiShield,
   FiHeadphones,
+  FiPhone,
 } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
 import ServiceGrid from '../../components/ServiceGrid';
@@ -122,6 +123,18 @@ const services = [
     ],
     ideal: 'Elderly, busy professionals, or families needing tech help.',
     icon: FiHeadphones,
+  },
+  {
+    title: 'Phone & Tablet Troubleshooting',
+    summary: 'Expert help for iPhone, Android, iPad, and tablet issues—setup, sync, app problems, and more.',
+    bullets: [
+      'Device setup and configuration',
+      'App installation and troubleshooting',
+      'Syncing email, contacts, and cloud accounts',
+      'Screen, charging, and connectivity issues',
+    ],
+    ideal: 'Anyone struggling with their mobile or tablet device.',
+    icon: FiPhone,
   },
 ];
 

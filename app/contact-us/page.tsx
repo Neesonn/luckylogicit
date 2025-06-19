@@ -199,11 +199,13 @@ function ContactForm() {
         </FormControl>
         <Button
           type="submit"
-          colorScheme="green"
           size="lg"
           width="full"
           isLoading={isLoading}
           loadingText="Sending..."
+          bg="#003f2d"
+          color="white"
+          _hover={{ bg: '#14543a' }}
           _focus={{ outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}
         >
           Send Message
