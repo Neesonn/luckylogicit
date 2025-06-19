@@ -1,19 +1,48 @@
 'use client';
 
 import { Box, Text, Link, Stack, Button } from '@chakra-ui/react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import CookieBanner from './CookieBanner';
+import { FaWrench } from 'react-icons/fa';
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, Input, useDisclosure, FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/react';
+import { useRouter } from 'next/navigation';
 
 export default function Footer() {
   const cookieBannerRef = useRef<{ openBanner: () => void }>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
+  const ADMIN_PASSWORD = 'changeme'; // TODO: Replace with your real password
 
   const handleChangePreferences = () => {
     cookieBannerRef.current?.openBanner();
   };
 
+  const handleAdminAccess = async () => {
+    setError('');
+    try {
+      const res = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPassword('');
+        onClose();
+        router.push('/admin');
+      } else {
+        setError('Incorrect password');
+      }
+    } catch (err) {
+      setError('Something went wrong.');
+    }
+  };
+
   return (
     <>
-      <Box textAlign="center" py={6} bg="brand.green">
+      <Box textAlign="center" py={6} bg="brand.green" position="relative">
         {/* Sitemap/Quick Links */}
         <Box mb={4}>
           <Stack direction={{ base: 'column', sm: 'row' }} spacing={4} justify="center" align="center">
@@ -51,7 +80,49 @@ export default function Footer() {
         >
           Change Cookie Preferences
         </Button>
+        {/* Golden wrench icon button to open admin modal */}
+        <Button
+          position="absolute"
+          right={4}
+          top={4}
+          aria-label="Admin Panel"
+          bg="transparent"
+          _hover={{ bg: 'rgba(255, 215, 0, 0.1)' }}
+          onClick={onOpen}
+          p={0}
+          minW={0}
+        >
+          <FaWrench size={22} color="#FFD700" style={{ verticalAlign: 'middle' }} />
+        </Button>
       </Box>
+
+      {/* Admin password modal */}
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Admin Login</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl isInvalid={!!error}>
+              <FormLabel>Password</FormLabel>
+              <Input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleAdminAccess(); }}
+                autoFocus
+              />
+              {error && <FormErrorMessage>{error}</FormErrorMessage>}
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="green" mr={3} onClick={handleAdminAccess}>
+              Login
+            </Button>
+            <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       <CookieBanner ref={cookieBannerRef} />
     </>
