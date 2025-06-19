@@ -14,7 +14,10 @@ export async function POST(req: NextRequest) {
       name,
       email,
       phone,
-      address,
+      address: {
+        ...address,
+        line2: address?.line2 || undefined,
+      },
     });
     return NextResponse.json({ success: true, customer });
   } catch (error: any) {

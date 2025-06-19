@@ -8,19 +8,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export async function POST(req: NextRequest) {
-  const { name, email, phone, address } = await req.json();
-
+  const { id } = await req.json();
   try {
-    const customer = await stripe.customers.create({
-      name,
-      email,
-      phone,
-      address: {
-        ...address,
-        line2: address?.line2 || undefined,
-      },
-    });
-    return NextResponse.json({ success: true, customer });
+    await stripe.customers.del(id);
+    return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }

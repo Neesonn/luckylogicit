@@ -1,7 +1,9 @@
 'use client';
-import { Box, Heading, Text, Button, FormControl, FormLabel, Input, VStack, Alert, AlertIcon, Spinner, Select } from '@chakra-ui/react';
+import { Box, Heading, Text, Button, FormControl, FormLabel, Input, VStack, Alert, AlertIcon, Spinner, Select, HStack } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Link from 'next/link';
+import { ArrowBackIcon } from '@chakra-ui/icons';
 
 export default function CreateCustomerPage() {
   const router = useRouter();
@@ -11,6 +13,7 @@ export default function CreateCustomerPage() {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [line1, setLine1] = useState('');
+  const [line2, setLine2] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [postalCode, setPostalCode] = useState('');
@@ -23,6 +26,17 @@ export default function CreateCustomerPage() {
     { code: 'US', name: 'United States' },
     { code: 'GB', name: 'United Kingdom' },
     // ...add more as needed
+  ];
+
+  const australianStates = [
+    'Australian Capital Territory',
+    'New South Wales',
+    'Northern Territory',
+    'Queensland',
+    'South Australia',
+    'Tasmania',
+    'Victoria',
+    'Western Australia',
   ];
 
   const handleLogout = async () => {
@@ -45,6 +59,7 @@ export default function CreateCustomerPage() {
           phone,
           address: {
             line1,
+            line2,
             city,
             state,
             postal_code: postalCode,
@@ -58,6 +73,7 @@ export default function CreateCustomerPage() {
         setName('');
         setEmail('');
         setLine1('');
+        setLine2('');
         setCity('');
         setState('');
         setPostalCode('');
@@ -75,10 +91,10 @@ export default function CreateCustomerPage() {
 
   return (
     <Box minH="100vh" display="flex" flexDirection="column" alignItems="center" justifyContent="center" bg="gray.50" px={4}>
-      <Heading as="h1" size="2xl" mb={4} color="brand.green">
+      <Heading as="h1" size="2xl" mb={8} color="brand.green">
         Create New Customer
       </Heading>
-      <VStack as="form" spacing={4} w="100%" maxW="400px" onSubmit={handleSubmit} mb={6}>
+      <VStack as="form" spacing={6} w="100%" maxW="420px" bg="white" p={8} borderRadius="lg" boxShadow="lg" align="stretch" onSubmit={handleSubmit} mb={6}>
         <FormControl isRequired>
           <FormLabel>Name</FormLabel>
           <Input value={name} onChange={e => setName(e.target.value)} placeholder="Full Name" />
@@ -88,20 +104,28 @@ export default function CreateCustomerPage() {
           <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@example.com" />
         </FormControl>
         <FormControl>
-          <FormLabel>Phone Number</FormLabel>
-          <Input value={phone} onChange={e => setPhone(e.target.value)} placeholder="Phone Number" />
+          <FormLabel>Mobile number</FormLabel>
+          <Input value={phone} onChange={e => setPhone(e.target.value)} placeholder="Mobile number" />
         </FormControl>
         <FormControl>
           <FormLabel>Address Line 1</FormLabel>
           <Input value={line1} onChange={e => setLine1(e.target.value)} placeholder="123 Main St" />
         </FormControl>
         <FormControl>
-          <FormLabel>City</FormLabel>
-          <Input value={city} onChange={e => setCity(e.target.value)} placeholder="City" />
+          <FormLabel>Address Line 2</FormLabel>
+          <Input value={line2} onChange={e => setLine2(e.target.value)} placeholder="Apartment, suite, etc. (optional)" />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Suburb / City</FormLabel>
+          <Input value={city} onChange={e => setCity(e.target.value)} placeholder="Suburb / City" />
         </FormControl>
         <FormControl>
           <FormLabel>State</FormLabel>
-          <Input value={state} onChange={e => setState(e.target.value)} placeholder="State" />
+          <Select value={state} onChange={e => setState(e.target.value)} placeholder="Select a state">
+            {australianStates.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </Select>
         </FormControl>
         <FormControl>
           <FormLabel>Postal Code</FormLabel>
@@ -109,13 +133,13 @@ export default function CreateCustomerPage() {
         </FormControl>
         <FormControl>
           <FormLabel>Country</FormLabel>
-          <Select value={country} onChange={e => setCountry(e.target.value)} required>
+          <Select value={country} onChange={e => setCountry(e.target.value)} required placeholder="Select a country">
             {countries.map(c => (
               <option key={c.code} value={c.code}>{c.name}</option>
             ))}
           </Select>
         </FormControl>
-        <Button type="submit" colorScheme="green" isLoading={loading} w="full">
+        <Button type="submit" colorScheme="green" isLoading={loading} w="full" size="lg">
           {loading ? <Spinner size="sm" /> : 'Create Customer'}
         </Button>
         {success && <Alert status="success"><AlertIcon />{success}</Alert>}
@@ -123,6 +147,9 @@ export default function CreateCustomerPage() {
       </VStack>
       <Button onClick={handleLogout} colorScheme="red" variant="outline" mt={6}>
         Logout
+      </Button>
+      <Button as={Link} href="/admin" leftIcon={<ArrowBackIcon />} colorScheme="red" variant="outline" mt={4}>
+        Back
       </Button>
     </Box>
   );

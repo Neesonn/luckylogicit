@@ -2,7 +2,9 @@
 import { useEffect, useState } from 'react';
 import { Box, Heading, Text, Spinner, Alert, AlertIcon, Table, Thead, Tbody, Tr, Th, Td, Button, Input, Select, IconButton, VStack, HStack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, FormControl, FormLabel } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
-import { EditIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons';
+import { EditIcon, CheckIcon, CloseIcon, ArrowBackIcon, DeleteIcon } from '@chakra-ui/icons';
+import Link from 'next/link';
+import NextLink from 'next/link';
 
 export default function ViewCustomersPage() {
   const [customers, setCustomers] = useState<any[]>([]);
@@ -13,6 +15,9 @@ export default function ViewCustomersPage() {
   const [editData, setEditData] = useState<any>({});
   const [saving, setSaving] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const countries = [
     { code: '', name: 'Choose a country...' },
@@ -100,11 +105,43 @@ export default function ViewCustomersPage() {
     }
   };
 
+  const startDelete = (id: string) => {
+    setDeleteId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const cancelDelete = () => {
+    setDeleteId(null);
+    setIsDeleteModalOpen(false);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
+    setError('');
+    try {
+      const res = await fetch('/api/delete-stripe-customer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: deleteId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCustomers((prev) => prev.filter((c) => c.id !== deleteId));
+        setDeleteId(null);
+        setIsDeleteModalOpen(false);
+      } else {
+        setError(data.error || 'Failed to delete customer.');
+      }
+    } catch (err) {
+      setError('Something went wrong.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <Box minH="100vh" bg="gray.50" px={4} py={10} display="flex" flexDirection="column" alignItems="center">
-      <Heading as="h1" size="xl" mb={8} color="brand.green">
-        Stripe Customers
-      </Heading>
       {loading ? (
         <Spinner size="xl" />
       ) : error ? (
@@ -125,7 +162,11 @@ export default function ViewCustomersPage() {
             <Tbody>
               {customers.map((c) => (
                 <Tr key={c.id}>
-                  <Td>{c.id}</Td>
+                  <Td>
+                    <NextLink href={`https://dashboard.stripe.com/customers/${c.id}`} target="_blank" rel="noopener noreferrer" style={{ color: '#003f2d', textDecoration: 'underline', fontWeight: 500 }}>
+                      {c.id}
+                    </NextLink>
+                  </Td>
                   <Td>
                     {editId === c.id ? (
                       <Input size="sm" value={editData.name} onChange={e => handleEditChange('name', e.target.value)} />
@@ -145,6 +186,7 @@ export default function ViewCustomersPage() {
                     {editId === c.id ? (
                       <VStack align="start" spacing={1}>
                         <Input size="sm" placeholder="Line 1" value={editData.address?.line1} onChange={e => handleEditAddressChange('line1', e.target.value)} />
+                        <Input size="sm" placeholder="Line 2" value={editData.address?.line2 || ''} onChange={e => handleEditAddressChange('line2', e.target.value)} />
                         <Input size="sm" placeholder="City" value={editData.address?.city} onChange={e => handleEditAddressChange('city', e.target.value)} />
                         <Input size="sm" placeholder="State" value={editData.address?.state} onChange={e => handleEditAddressChange('state', e.target.value)} />
                         <Input size="sm" placeholder="Postal Code" value={editData.address?.postal_code} onChange={e => handleEditAddressChange('postal_code', e.target.value)} />
@@ -156,14 +198,15 @@ export default function ViewCustomersPage() {
                       </VStack>
                     ) : c.address ? (
                       <span>
-                        {[c.address.line1, c.address.city, c.address.state, c.address.country, c.address.postal_code]
+                        {[c.address.line1, c.address.line2, c.address.city, c.address.state, c.address.country, c.address.postal_code]
                           .filter(Boolean)
                           .join(', ') || <Text color="gray.400">(No address)</Text>}
                       </span>
                     ) : <Text color="gray.400">(No address)</Text>}
                   </Td>
                   <Td>
-                    <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" onClick={() => startEdit(c)} />
+                    <IconButton aria-label="Edit" icon={<EditIcon color="#fff" />} size="sm" onClick={() => startEdit(c)} mr={2} bg="#003f2d" _hover={{ bg: '#14543a' }} />
+                    <IconButton aria-label="Delete" icon={<DeleteIcon />} size="sm" colorScheme="red" onClick={() => startDelete(c.id)} />
                   </Td>
                 </Tr>
               ))}
@@ -171,8 +214,11 @@ export default function ViewCustomersPage() {
           </Table>
         </Box>
       )}
-      <Button onClick={handleLogout} colorScheme="red" variant="outline">
+      <Button onClick={handleLogout} colorScheme="red" variant="outline" mt={6}>
         Logout
+      </Button>
+      <Button as={Link} href="/admin" leftIcon={<ArrowBackIcon />} colorScheme="red" variant="outline" mt={4}>
+        Back
       </Button>
       <Modal isOpen={isEditModalOpen} onClose={cancelEdit} isCentered>
         <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(8px)" />
@@ -190,7 +236,7 @@ export default function ViewCustomersPage() {
                 <Input value={editData.email} onChange={e => handleEditChange('email', e.target.value)} />
               </FormControl>
               <FormControl>
-                <FormLabel>Phone Number</FormLabel>
+                <FormLabel>Mobile number</FormLabel>
                 <Input value={editData.phone} onChange={e => handleEditChange('phone', e.target.value)} />
               </FormControl>
               <FormControl>
@@ -198,7 +244,11 @@ export default function ViewCustomersPage() {
                 <Input value={editData.address?.line1} onChange={e => handleEditAddressChange('line1', e.target.value)} />
               </FormControl>
               <FormControl>
-                <FormLabel>City</FormLabel>
+                <FormLabel>Address Line 2</FormLabel>
+                <Input value={editData.address?.line2 || ''} onChange={e => handleEditAddressChange('line2', e.target.value)} />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Suburb / City</FormLabel>
                 <Input value={editData.address?.city} onChange={e => handleEditAddressChange('city', e.target.value)} />
               </FormControl>
               <FormControl>
@@ -225,6 +275,25 @@ export default function ViewCustomersPage() {
               Save
             </Button>
             <Button variant="ghost" onClick={cancelEdit}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isDeleteModalOpen} onClose={cancelDelete} isCentered>
+        <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(8px)" />
+        <ModalContent>
+          <ModalHeader>Delete Customer</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Alert status="warning" mb={4} borderRadius="md">
+              <AlertIcon />
+              This will permanently remove the customer's billing information and immediately cancel any current subscriptions. Past payments or invoices associated with the customer will still remain. This action cannot be undone.
+            </Alert>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="red" mr={3} isLoading={deleting} onClick={confirmDelete}>
+              Delete
+            </Button>
+            <Button variant="ghost" onClick={cancelDelete}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

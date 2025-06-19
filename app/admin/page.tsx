@@ -1,5 +1,5 @@
 'use client';
-import { Box, Heading, Text, Button } from '@chakra-ui/react';
+import { Box, Heading, Text, Button, HStack } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -18,14 +18,14 @@ export default function AdminDashboard() {
       <Text fontSize="lg" color="gray.600" textAlign="center" mb={6}>
         Welcome to the admin panel. Here you can manage and monitor your site.
       </Text>
-      <Box>
-        <Button as={Link} href="/admin/create-customer" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} size="lg" mb={4}>
+      <HStack spacing={6} mb={6}>
+        <Button as={Link} href="/admin/create-customer" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} size="lg">
           Create new Customer
         </Button>
         <Button as={Link} href="/admin/view-customers" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} size="lg">
           View Customers
         </Button>
-      </Box>
+      </HStack>
       <Button onClick={handleLogout} colorScheme="red" variant="outline" mt={6}>
         Logout
       </Button>
