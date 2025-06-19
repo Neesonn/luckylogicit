@@ -19,8 +19,11 @@ export default function AdminDashboard() {
         Welcome to the admin panel. Here you can manage and monitor your site.
       </Text>
       <Box>
-        <Button as={Link} href="/admin/create-customer" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} size="lg">
+        <Button as={Link} href="/admin/create-customer" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} size="lg" mb={4}>
           Create new Customer
+        </Button>
+        <Button as={Link} href="/admin/view-customers" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} size="lg">
+          View Customers
         </Button>
       </Box>
       <Button onClick={handleLogout} colorScheme="red" variant="outline" mt={6}>
