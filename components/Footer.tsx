@@ -87,12 +87,12 @@ export default function Footer() {
           top={4}
           aria-label="Admin Panel"
           bg="transparent"
-          _hover={{ bg: 'rgba(255, 215, 0, 0.1)' }}
+          _hover={{ bg: 'rgba(0, 63, 45, 0.1)' }}
           onClick={onOpen}
           p={0}
           minW={0}
         >
-          <FaWrench size={22} color="#FFD700" style={{ verticalAlign: 'middle' }} />
+          <FaWrench size={22} color="#003f2d" style={{ verticalAlign: 'middle' }} />
         </Button>
       </Box>
 
