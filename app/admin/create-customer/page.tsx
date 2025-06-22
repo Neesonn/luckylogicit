@@ -142,6 +142,13 @@ export default function CreateCustomerPage() {
         <Button type="submit" colorScheme="green" isLoading={loading} w="full" size="lg">
           {loading ? <Spinner size="sm" /> : 'Create Customer'}
         </Button>
+        <Text fontSize="xs" color="gray.500" textAlign="center" mt={2}>
+          By creating a customer account, you acknowledge that you have read and agree to the{' '}
+          <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#003f2d', textDecoration: 'underline' }}>Terms and Conditions</a>
+          {' '}and the{' '}
+          <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: '#003f2d', textDecoration: 'underline' }}>Privacy Policy</a>.
+          {' '}From time to time, Lucky Logic may contact you with offers, promotions, or other communications. If you prefer not to receive these messages, you may unsubscribe at any time by emailing us at <a href="mailto:support@luckylogic.com.au" style={{ color: '#003f2d', textDecoration: 'underline' }}>support@luckylogic.com.au</a>.
+        </Text>
         {success && <Alert status="success"><AlertIcon />{success}</Alert>}
         {error && <Alert status="error"><AlertIcon />{error}</Alert>}
       </VStack>
