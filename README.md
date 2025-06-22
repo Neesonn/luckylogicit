@@ -257,3 +257,69 @@ This project is proprietary and confidential. All rights reserved by Lucky Logic
 **Status**: 🟢 **PRODUCTION READY** - Live at https://www.luckylogic.com.au
 
 For technical support or questions about this website, contact support@luckylogic.com.au
+
+# Lucky Logic Admin Dashboard
+
+## Features
+
+- **Admin Dashboard**: Secure admin area accessible via a hidden spanner icon in the footer (top right). Requires password authentication.
+- **Authentication**: Password-protected admin area using a secure, server-side session cookie. Password is set via environment variable.
+- **Customer Management**:
+  - Create new Stripe customers with full address and mobile number fields.
+  - View all Stripe customers in a searchable, editable table.
+  - Edit customer details (name, email, mobile, address, etc.) via a modal popup.
+  - Delete customers with a confirmation modal and warning.
+  - Customer ID links directly to the Stripe dashboard profile.
+- **UI/UX**: Modern, clean Chakra UI design with accessibility and responsive layout.
+
+## Environment Variables
+
+Create a `.env.local` file in the project root with the following:
+
+```
+ADMIN_PASSWORD=yourStrongAdminPassword
+STRIPE_SECRET_KEY=sk_live_...
+```
+- `ADMIN_PASSWORD`: Password for admin login (never exposed to the frontend).
+- `STRIPE_SECRET_KEY`: Your Stripe secret key for API access.
+
+## Local Development
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+2. **Set up environment variables:**
+   - See above for `.env.local`.
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+4. **Access the site:**
+   - Visit `http://localhost:3000`.
+   - Click the spanner icon in the footer to access the admin dashboard.
+
+## Deployment
+
+- Deploy to [Vercel](https://vercel.com/) for full serverless support (API routes, middleware, etc.).
+- Set the same environment variables (`ADMIN_PASSWORD`, `STRIPE_SECRET_KEY`) in your Vercel project settings.
+- Do **not** use static export (`output: 'export'`) as this disables API routes and authentication.
+
+## Security Notes
+
+- The admin password and Stripe secret key are never exposed to the frontend.
+- All sensitive actions (create, update, delete customers) are performed via secure API routes.
+- Only authenticated admins can access the admin dashboard and customer management features.
+
+## Customization
+
+- Update the list of Australian states or countries in `app/admin/create-customer/page.tsx` as needed.
+- Adjust the Chakra UI theme in `theme/theme.ts` for branding.
+
+## Support
+
+For questions or support, email [support@luckylogic.com.au](mailto:support@luckylogic.com.au)
