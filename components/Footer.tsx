@@ -1,11 +1,12 @@
 'use client';
 
-import { Box, Text, Link, Stack, Button } from '@chakra-ui/react';
+import { Box, Text, Link, Stack, Button, InputGroup, InputRightElement } from '@chakra-ui/react';
 import { useRef, useState } from 'react';
 import CookieBanner from './CookieBanner';
 import { FaWrench } from 'react-icons/fa';
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, Input, useDisclosure, FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 
 export default function Footer() {
   const cookieBannerRef = useRef<{ openBanner: () => void }>(null);
@@ -14,6 +15,7 @@ export default function Footer() {
   const [error, setError] = useState('');
   const router = useRouter();
   const ADMIN_PASSWORD = 'changeme'; // TODO: Replace with your real password
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChangePreferences = () => {
     cookieBannerRef.current?.openBanner();
@@ -105,13 +107,27 @@ export default function Footer() {
           <ModalBody>
             <FormControl isInvalid={!!error}>
               <FormLabel>Password</FormLabel>
-              <Input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleAdminAccess(); }}
-                autoFocus
-              />
+              <InputGroup>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleAdminAccess(); }}
+                  autoFocus
+                />
+                <InputRightElement width="3rem">
+                  <Button
+                    h="1.75rem"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setShowPassword((v) => !v)}
+                    tabIndex={-1}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
               {error && <FormErrorMessage>{error}</FormErrorMessage>}
             </FormControl>
           </ModalBody>
