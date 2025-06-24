@@ -1,7 +1,7 @@
 'use client';
 
 import { ChakraProvider, Box, Flex } from '@chakra-ui/react';
-import Head from 'next/head';
+import Script from 'next/script';
 import theme from '../theme/theme';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -11,26 +11,7 @@ import GoogleAnalytics from '../components/GoogleAnalytics';
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <Head>
-        {/* Content Security Policy */}
-        <meta
-          httpEquiv="Content-Security-Policy"
-          content={`
-            default-src 'self';
-            script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com;
-            style-src 'self' 'unsafe-inline';
-            img-src 'self' data: https://luckylogic.com.au https://*.luckylogic.com.au;
-            font-src 'self';
-            connect-src 'self' https://www.google-analytics.com;
-            frame-src 'self';
-            object-src 'none';
-            base-uri 'self';
-            form-action 'self' https://wa.me mailto:;
-            frame-ancestors 'none';
-            upgrade-insecure-requests;
-          `.replace(/\s+/g, ' ').trim()}
-        />
-        
+      <head>
         {/* Favicon SVG for modern browsers */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         {/* Fallback ICO for older browsers */}
@@ -68,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         
         {/* Canonical URL */}
         <link rel="canonical" href="https://luckylogic.com.au/" />
-      </Head>
+      </head>
       <body>
         <a
           href="#main-content"
@@ -106,6 +87,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ErrorBoundary>
         </ChakraProvider>
         <GoogleAnalytics />
+        <Script
+          id="crisp-chat"
+          strategy="lazyOnload"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.$crisp = [];
+              window.CRISP_WEBSITE_ID = "331a4420-a843-44e0-976c-fc2feddf2b0d";
+              (function() {
+                var d = document;
+                var s = d.createElement("script");
+                s.src = "https://client.crisp.chat/l.js";
+                s.async = 1;
+                d.getElementsByTagName("head")[0].appendChild(s);
+              })();
+            `,
+          }}
+        />
       </body>
     </html>
   );
