@@ -59,7 +59,6 @@ export default function Footer() {
             <Link href="/services" color="white" textDecoration="underline">Services</Link>
             <Link href="/troubleshoot" color="white" textDecoration="underline">Troubleshoot</Link>
             <Link href="/faq" color="white" textDecoration="underline">FAQ</Link>
-            <Link href="/troubleshoot" color="white" textDecoration="underline">Troubleshoot</Link>
             <Link href="/contact-us" color="white" textDecoration="underline">Contact Us</Link>
           </Stack>
         </Box>
