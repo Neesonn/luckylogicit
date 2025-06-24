@@ -75,7 +75,7 @@ export default function Footer() {
         var d = document;
         var s = d.createElement("script");
         s.src = "https://client.crisp.chat/l.js";
-        s.async = 1;
+        s.async = true;
         d.getElementsByTagName("head")[0].appendChild(s);
       })();
       setIsLoadingChat(true);
