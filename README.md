@@ -49,6 +49,43 @@ Lucky Logic provides comprehensive residential IT support and computer services 
 - **Cookie Policy** - Transparent cookie usage and management
 - **GDPR Compliance** - User consent management and data protection
 
+## 💬 Crisp Chat Integration & Accessibility
+
+### **Features**
+- **Live Chat Support**: Crisp chatbox integrated for instant customer support.
+- **Branding**: Chatbox color and welcome message match Lucky Logic's brand.
+- **Online Status**: Shows when an operator is online and ready to help.
+- **Custom Launcher**: Accessible chat launcher button in the footer with ARIA label and keyboard support.
+
+### **Accessibility**
+- **Keyboard Navigation**: Chatbox and launcher are fully keyboard accessible.
+- **Screen Reader Support**: ARIA labels and roles for custom launcher.
+- **Custom Launcher Example**:
+  ```jsx
+  <button
+    aria-label="Open live chat"
+    onClick={() => window.$crisp?.push(['do', 'chat:open'])}
+  >
+    Chat with us
+  </button>
+  ```
+
+### **GDPR & Privacy Compliance**
+- **Cookie Consent**: Crisp only loads after user accepts cookies via the CookieBanner.
+- **Privacy Policy Link**: Chatbox includes a direct link to the site's privacy policy.
+- **Data Handling**: No chat data is stored on Lucky Logic servers; all chat data is managed by Crisp.
+- **Privacy Policy Text Example**:
+  > We use Crisp live chat to provide instant support. When you use the chat, your messages and information may be stored and processed by Crisp in accordance with their [Privacy Policy](https://crisp.chat/en/privacy/).
+
+### **Customization**
+- **Color & Welcome Message**: Set via Crisp dashboard under Chatbox Appearance.
+- **Online/Offline Text**: Customizable in Crisp dashboard under Chatbox Texts.
+- **Proactive Triggers**: Welcome messages and proactive support can be set up in the Crisp dashboard.
+
+### **Advanced**
+- **Show Online Status Elsewhere**: Use the Crisp JS API to display online status outside the chatbox if needed.
+- **Further Customization**: See Crisp's [official documentation](https://help.crisp.chat/en/) for more options.
+
 ## 🛠️ Development
 
 ### **Prerequisites**
