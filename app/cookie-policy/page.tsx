@@ -43,7 +43,8 @@ export default function CookiePolicyPage() {
             <strong>Functional Cookies:</strong> Remember your preferences, such as display settings, to provide a smoother experience.
           </ListItem>
           <ListItem>
-            <strong>Chat Cookies:</strong> Enable live chat support via Crisp (only after you consent via our cookie banner).
+            <strong>Chat Cookies:</strong> Enable live chat support via Crisp (only after you consent via our cookie banner). 
+            Chat cookies are required for the chatbox to function. Any information you provide in the chat is subject to Crisp's <Link href="https://crisp.chat/en/privacy/" isExternal textDecoration="underline" color="brand.green" rel="noopener noreferrer">Privacy Policy</Link>.
           </ListItem>
           <ListItem>
             <strong>Form Cookies:</strong> Our contact forms are powered by Formspree, which may set cookies to facilitate secure form submissions.

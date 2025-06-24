@@ -303,7 +303,19 @@ export default function Footer() {
                 </Text>
               </ModalBody>
               <ModalFooter display="flex" flexDirection="column" gap={2}>
-                <Button colorScheme="green" w="100%" size="lg" type="submit" borderRadius="lg" isLoading={isLoadingChat} loadingText="Loading chat...">
+                <Button
+                  w="100%"
+                  size="lg"
+                  type="submit"
+                  borderRadius="lg"
+                  isLoading={isLoadingChat}
+                  loadingText="Loading chat..."
+                  bg="brand.green"
+                  color="white"
+                  _hover={{ bg: '#14543a', boxShadow: 'md' }}
+                  _active={{ bg: '#003f2d' }}
+                  _focus={{ boxShadow: '0 0 0 2px #c9a227' }}
+                >
                   Start Chat
                 </Button>
                 <Button variant="ghost" onClick={onChatClose} w="100%" size="lg" borderRadius="lg" isDisabled={isLoadingChat}>Cancel</Button>

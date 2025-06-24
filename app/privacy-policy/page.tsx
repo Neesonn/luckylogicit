@@ -50,6 +50,10 @@ export default function PrivacyPolicyPage() {
           <ListItem>Send marketing communications if you have consented (you may opt out at any time)</ListItem>
         </UnorderedList>
 
+        <Text mb={6}>
+          <strong>Live Chat Notice:</strong> When you use our live chat feature, any information you provide (such as your name, email, and chat content) is stored and processed by our chat provider, Crisp. Lucky Logic does not store chat transcripts on its own servers. Your chat interactions are subject to <Link href="https://crisp.chat/en/privacy/" color="brand.green" textDecoration="underline" isExternal rel="noopener noreferrer">Crisp's Privacy Policy</Link>.
+        </Text>
+
         <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
           3. Disclosure of Your Information
         </Heading>

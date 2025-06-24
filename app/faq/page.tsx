@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Box,
   Heading,
@@ -46,6 +48,28 @@ export default function FAQPage() {
         </HStack>
 
         <Accordion allowMultiple>
+          <AccordionItem>
+            <h2>
+              <AccordionButton>
+                <Box flex="1" textAlign="left" fontWeight="bold" color="brand.green">
+                  How do I enable and use Live Chat?
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+            </h2>
+            <AccordionPanel pb={4}>
+              To use our Live Chat feature, you'll need to enable cookies for this website. If you previously declined cookies, you can update your preference at any time by clicking the <strong>Change Cookie Preferences</strong> button in the footer, or by <Button variant="link" color="brand.green" onClick={() => {
+                const btn = document && document.querySelector && document.querySelector('[aria-label="Change Cookie Preferences"]');
+                if (btn && typeof (btn as HTMLButtonElement).click === 'function') {
+                  (btn as HTMLButtonElement).click();
+                }
+              }}>clicking here</Button> which will cause the cookie banner to popup.
+
+              <br /><br />
+              Once cookies are accepted, simply refresh the page and the Live Chat will become available. You'll then be able to connect instantly with our team.
+            </AccordionPanel>
+          </AccordionItem>
+
           <AccordionItem>
             <h2>
               <AccordionButton>

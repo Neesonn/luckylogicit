@@ -148,6 +148,22 @@ export default function TermsPage() {
         <Text>
           For direct deposit payments, please refer to your invoice for bank account details.
         </Text>
+
+        <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
+          10. Live Chat Usage
+        </Heading>
+        <Text mb={4}>
+          Our website offers a live chat feature to provide instant support and answer your questions. By using the live chat, you agree to communicate respectfully and lawfully with our team. The live chat is intended solely for genuine customer enquiries and support related to our services.
+        </Text>
+        <UnorderedList mb={6} pl={6}>
+          <ListItem>Do not use the chat to send spam, advertisements, or irrelevant content</ListItem>
+          <ListItem>Do not use abusive, offensive, or threatening language</ListItem>
+          <ListItem>Do not attempt to harass, impersonate, or mislead our staff or other users</ListItem>
+          <ListItem>Do not attempt to exploit, hack, or disrupt the chat system</ListItem>
+        </UnorderedList>
+        <Text mb={6}>
+          Any misuse of the live chat, including but not limited to the behaviors listed above, will result in immediate restriction or permanent ban from the chat feature and may result in being banned from accessing our website and services. We reserve the right to report unlawful behavior to the relevant authorities. All chat interactions are subject to our <Link href="/privacy-policy" color="brand.green" textDecoration="underline">Privacy Policy</Link>.
+        </Text>
       </Box>
     </>
   );
