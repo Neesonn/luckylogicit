@@ -73,6 +73,9 @@ export default function Footer() {
       const savedEmail = localStorage.getItem('crispEmail');
       if (savedName) setChatName(savedName);
       if (savedEmail) setChatEmail(savedEmail);
+      if (savedName && savedEmail) {
+        loadCrisp(savedName, savedEmail);
+      }
     }
   }, []);
 
