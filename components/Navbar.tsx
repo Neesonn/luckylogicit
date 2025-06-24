@@ -132,6 +132,23 @@ export default function Navbar() {
               Contact Us
             </Text>
           </NextLink>
+
+          <NextLink href="/troubleshoot" passHref legacyBehavior>
+            <Text
+              as="a"
+              color="brand.green"
+              fontWeight="medium"
+              fontSize="md"
+              cursor="pointer"
+              _focus={{
+                outline: '2px solid',
+                outlineColor: 'brand.green',
+                outlineOffset: '2px',
+              }}
+            >
+              Troubleshoot
+            </Text>
+          </NextLink>
         </HStack>
       ) : (
         <Menu>
@@ -207,6 +224,18 @@ export default function Navbar() {
                 }}
               >
                 Contact Us
+              </MenuItem>
+            </NextLink>
+            <NextLink href="/troubleshoot" passHref>
+              <MenuItem
+                _focus={{
+                  bg: 'green.50',
+                  outline: '2px solid',
+                  outlineColor: 'brand.green',
+                  outlineOffset: '2px',
+                }}
+              >
+                Troubleshoot
               </MenuItem>
             </NextLink>
           </MenuList>
