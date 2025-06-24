@@ -9,7 +9,7 @@ export default function PrivacyPolicyPage() {
       </Heading>
 
       <Text mb={6}>
-        Lucky Logic IT Services ("we", "us", "our"), operated by Michael Neeson trading as a sole trader, respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and manage your personal data in compliance with the Australian Privacy Act 1988 and Australian Privacy Principles (APPs).
+        Lucky Logic IT Services ("we", "us", "our") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and manage your personal data in compliance with the Australian Privacy Act 1988 and Australian Privacy Principles (APPs).
       </Text>
 
       <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
