@@ -99,6 +99,23 @@ export default function Navbar() {
             </Text>
           </NextLink>
 
+          <NextLink href="/troubleshoot" passHref legacyBehavior>
+            <Text
+              as="a"
+              color="brand.green"
+              fontWeight="medium"
+              fontSize="md"
+              cursor="pointer"
+              _focus={{
+                outline: '2px solid',
+                outlineColor: 'brand.green',
+                outlineOffset: '2px',
+              }}
+            >
+              Troubleshoot
+            </Text>
+          </NextLink>
+
           <NextLink href="/faq" passHref legacyBehavior>
             <Text
               as="a"
@@ -130,23 +147,6 @@ export default function Navbar() {
               }}
             >
               Contact Us
-            </Text>
-          </NextLink>
-
-          <NextLink href="/troubleshoot" passHref legacyBehavior>
-            <Text
-              as="a"
-              color="brand.green"
-              fontWeight="medium"
-              fontSize="md"
-              cursor="pointer"
-              _focus={{
-                outline: '2px solid',
-                outlineColor: 'brand.green',
-                outlineOffset: '2px',
-              }}
-            >
-              Troubleshoot
             </Text>
           </NextLink>
         </HStack>
@@ -202,6 +202,18 @@ export default function Navbar() {
                 Services
               </MenuItem>
             </NextLink>
+            <NextLink href="/troubleshoot" passHref>
+              <MenuItem
+                _focus={{
+                  bg: 'green.50',
+                  outline: '2px solid',
+                  outlineColor: 'brand.green',
+                  outlineOffset: '2px',
+                }}
+              >
+                Troubleshoot
+              </MenuItem>
+            </NextLink>
             <NextLink href="/faq" passHref>
               <MenuItem
                 _focus={{
@@ -224,18 +236,6 @@ export default function Navbar() {
                 }}
               >
                 Contact Us
-              </MenuItem>
-            </NextLink>
-            <NextLink href="/troubleshoot" passHref>
-              <MenuItem
-                _focus={{
-                  bg: 'green.50',
-                  outline: '2px solid',
-                  outlineColor: 'brand.green',
-                  outlineOffset: '2px',
-                }}
-              >
-                Troubleshoot
               </MenuItem>
             </NextLink>
           </MenuList>
