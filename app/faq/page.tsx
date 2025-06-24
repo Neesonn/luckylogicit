@@ -8,7 +8,9 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
-  Link
+  Link,
+  Button,
+  HStack
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import SEO from '../../components/SEO';
@@ -34,6 +36,14 @@ export default function FAQPage() {
           </Link>
           .
         </Text>
+        <HStack justify="center" spacing={4} mb={8}>
+          <Button as={NextLink} href="/services" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+            Our Services
+          </Button>
+          <Button as={NextLink} href="/troubleshoot" variant="outline" size="md" color="#003f2d" borderColor="#003f2d" _hover={{ bg: '#e9f5f1' }}>
+            Troubleshooting Guide
+          </Button>
+        </HStack>
 
         <Accordion allowMultiple>
           <AccordionItem>

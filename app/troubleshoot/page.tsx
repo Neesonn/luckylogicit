@@ -523,19 +523,20 @@ export default function TroubleshootPage() {
           }) }}
         />
       </Head>
-      <Heading as="h1" size="2xl" mb={6} color="brand.green" textAlign="center" fontWeight="extrabold" textTransform="capitalize">
+      <Heading as="h1" size="2xl" mb={6} color="brand.green" textAlign="center">
         Troubleshooting Guide
       </Heading>
-      <Text fontSize="lg" color="gray.600" textAlign="center" mb={8}>
-        Find solutions to common tech issues. Select a category and issue for step-by-step help.<br />
-        <Text as="span" display="block" mt={2}>
-          Still struggling? <NextLink href="/contact-us" passHref legacyBehavior>
-            <Link color="brand.green" fontWeight="bold" textDecoration="underline" _hover={{ color: 'green.600' }} aria-label="Contact us for further help">
-              Send us a message
-            </Link>
-          </NextLink> and our team will be happy to assist you.
-        </Text>
+      <Text fontSize="lg" color="gray.700" textAlign="center" maxW="2xl" mx="auto" mb={10}>
+        Step-by-step solutions for common tech issues. If you need further help, you can always contact us or book a service.
       </Text>
+      <HStack justify="center" spacing={4} mb={8}>
+        <Button as={NextLink} href="/services" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+          Our Services
+        </Button>
+        <Button as={NextLink} href="/faq" variant="outline" size="md" color="#003f2d" borderColor="#003f2d" _hover={{ bg: '#e9f5f1' }}>
+          FAQ
+        </Button>
+      </HStack>
       {/* Pills for mobile category selection */}
       {isMobile && (
         <Wrap spacing={3} mb={6} justify="center">
