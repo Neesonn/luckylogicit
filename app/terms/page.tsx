@@ -53,10 +53,19 @@ export default function TermsPage() {
       </Text>
 
       <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
-        4. Third-Party Links
+        4. Third-Party Links & Services
       </Heading>
       <Text mb={6}>
-        This website may contain links to third-party websites for your convenience. Lucky Logic does not endorse and is not responsible for the content or practices of these external sites.
+        This website may contain links to third-party websites for your convenience. Lucky Logic does not endorse and is not responsible for the content or practices of these external sites. We also use third-party services to operate our website, including:
+      </Text>
+      <UnorderedList mb={6} pl={6}>
+        <ListItem><strong>Stripe</strong> for secure payment processing and customer management</ListItem>
+        <ListItem><strong>Formspree</strong> for contact form submissions</ListItem>
+        <ListItem><strong>Google Analytics</strong> for website analytics (only after you consent via our cookie banner)</ListItem>
+        <ListItem><strong>Crisp</strong> for live chat support (only after you consent via our cookie banner)</ListItem>
+      </UnorderedList>
+      <Text mb={6}>
+        These services may process your data outside Australia. Please review our <Link href="/privacy-policy" color="brand.green" textDecoration="underline">Privacy Policy</Link> and <Link href="/cookie-policy" color="brand.green" textDecoration="underline">Cookie Policy</Link> for more information about how your data is handled and your rights.
       </Text>
 
       <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
@@ -67,7 +76,11 @@ export default function TermsPage() {
         <Link href="/privacy-policy" color="brand.green" textDecoration="underline">
           Privacy Policy
         </Link>
-        , which explains how we collect and manage your personal information. Please note that all customer and payment data entered at checkout is handled securely by Stripe. Lucky Logic does not store or have access to your full card details.
+        {' '}and our{' '}
+        <Link href="/cookie-policy" color="brand.green" textDecoration="underline">
+          Cookie Policy
+        </Link>
+        , which explain how we collect, manage, and protect your personal information. Please note that all customer and payment data entered at checkout is handled securely by Stripe. Lucky Logic does not store or have access to your full card details. Analytics and chat services are only loaded after you provide consent via our cookie banner.
       </Text>
 
       <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
@@ -96,7 +109,7 @@ export default function TermsPage() {
         9. Billing, Payments & Refunds
       </Heading>
       <Text mb={6}>
-        Lucky Logic IT Services is operated by Michael Neeson, trading as a sole trader. Payments are processed securely via Stripe. The following terms apply to billing, payments, and refunds:
+        Payments are processed securely via Stripe. The following terms apply to billing, payments, and refunds:
       </Text>
       <UnorderedList mb={6} pl={6}>
         <ListItem>

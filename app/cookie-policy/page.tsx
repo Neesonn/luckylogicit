@@ -11,7 +11,7 @@ export default function CookiePolicyPage() {
       </Heading>
 
       <Text mb={6}>
-        This Cookie Policy explains how Lucky Logic IT Services ("we", "us", "our"), operated by Michael Neeson trading as a sole trader, uses cookies and similar tracking technologies on our website.
+        This Cookie Policy explains how Lucky Logic IT Services ("we", "us", "our") uses cookies and similar tracking technologies on our website.
       </Text>
 
       <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
@@ -29,10 +29,16 @@ export default function CookiePolicyPage() {
           <strong>Essential Cookies:</strong> Required for core site functionality, such as secure logins and Stripe payment processing.
         </ListItem>
         <ListItem>
-          <strong>Analytics Cookies:</strong> Help us understand how visitors use our site so we can improve performance. We use tools like Google Analytics.
+          <strong>Analytics Cookies:</strong> Help us understand how visitors use our site so we can improve performance. We use tools like Google Analytics (only after you consent via our cookie banner).
         </ListItem>
         <ListItem>
           <strong>Functional Cookies:</strong> Remember your preferences, such as display settings, to provide a smoother experience.
+        </ListItem>
+        <ListItem>
+          <strong>Chat Cookies:</strong> Enable live chat support via Crisp (only after you consent via our cookie banner).
+        </ListItem>
+        <ListItem>
+          <strong>Form Cookies:</strong> Our contact forms are powered by Formspree, which may set cookies to facilitate secure form submissions.
         </ListItem>
         <ListItem>
           <strong>Marketing Cookies:</strong> We currently do not use any marketing or advertising cookies on our site.
@@ -40,14 +46,14 @@ export default function CookiePolicyPage() {
       </UnorderedList>
 
       <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
-        Third-Party Cookies
+        Third-Party Cookies & International Transfers
       </Heading>
       <Text mb={6}>
-        We use a limited number of third-party services that may place cookies on your device:
+        We use a limited number of third-party services that may place cookies on your device and may process your data outside Australia:
       </Text>
       <UnorderedList mb={6} pl={6}>
         <ListItem>
-          <strong>Google Analytics:</strong> Tracks anonymous usage data to help us understand website performance. Learn more or opt out at{' '}
+          <strong>Google Analytics:</strong> Tracks anonymous usage data to help us understand website performance. Only loaded after you consent via our cookie banner. Learn more or opt out at{' '}
           <Link href="https://tools.google.com/dlpage/gaoptout" isExternal textDecoration="underline" color="brand.green" rel="noopener noreferrer">
             tools.google.com/dlpage/gaoptout
           </Link>.
@@ -58,13 +64,19 @@ export default function CookiePolicyPage() {
             Cookie Policy
           </Link>.
         </ListItem>
+        <ListItem>
+          <strong>Crisp:</strong> Our live chat provider may set cookies to enable chat functionality. Crisp's privacy practices are governed by their own <Link href="https://crisp.chat/en/privacy/" isExternal textDecoration="underline" color="brand.green" rel="noopener noreferrer">Privacy Policy</Link>.
+        </ListItem>
+        <ListItem>
+          <strong>Formspree:</strong> Our contact form provider may set cookies to facilitate secure form submissions. Formspree's privacy practices are governed by their own <Link href="https://formspree.io/legal/privacy-policy" isExternal textDecoration="underline" color="brand.green" rel="noopener noreferrer">Privacy Policy</Link>.
+        </ListItem>
       </UnorderedList>
 
       <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
         How You Can Control Cookies
       </Heading>
       <Text mb={6}>
-        You can manage or disable cookies via your browser settings. Please note that disabling essential cookies may impact the website's core functionality, including login and checkout.
+        Cookies for analytics and chat are only set after you provide consent via our cookie banner. You can manage or disable cookies via your browser settings. Please note that disabling essential cookies may impact the website's core functionality, including login and checkout.
       </Text>
 
       <Text mb={6}>
