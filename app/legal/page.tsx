@@ -4,9 +4,17 @@ import { Box, Heading, Text, VStack, Link } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { useEffect, useState } from 'react';
 import Lottie from 'lottie-react';
+import JsonLd from '../../components/JsonLd';
 
 export default function LegalPage() {
   const [animationData, setAnimationData] = useState(null);
+
+  const legalData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    'name': 'Legal Information',
+    'description': "Legal information and documents for Lucky Logic IT, including privacy policy, terms & conditions, and cookie policy."
+  };
 
   useEffect(() => {
     fetch('/legal-animation.json')
@@ -17,6 +25,7 @@ export default function LegalPage() {
 
   return (
     <Box px={6} py={{ base: 16, md: 24 }} maxW="3xl" mx="auto">
+      <JsonLd data={legalData} />
       {animationData && (
         <Box display="flex" justifyContent="center" alignItems="center" mb={8}>
           <Lottie

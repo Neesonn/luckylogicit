@@ -30,6 +30,7 @@ import GlassCard from '../../components/GlassCard';
 import Head from 'next/head';
 import { Tooltip, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
 import SEO from '../../components/SEO';
+import JsonLd from '../../components/JsonLd';
 
 type TroubleshootStep = string;
 
@@ -492,14 +493,21 @@ export default function TroubleshootPage() {
     ? filteredCategories.filter((cat) => cat.key === selectedCategory)
     : filteredCategories;
 
+  const troubleshootData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    'name': 'Troubleshooting Guide',
+    'description': 'Step-by-step troubleshooting guide for common IT issues, provided by Lucky Logic IT.'
+  };
+
   return (
     <>
       <SEO
         title="Troubleshooting Guide"
-        description="Step-by-step solutions for common tech issues. Find answers to your IT problems or contact Lucky Logic IT for expert help."
-        keywords="IT troubleshooting, tech support, computer help, Sydney IT, Lucky Logic"
+        description="Step-by-step troubleshooting guide for common IT issues, provided by Lucky Logic IT."
         canonicalUrl="https://luckylogic.com.au/troubleshoot"
       />
+      <JsonLd data={troubleshootData} />
       <Container maxW="3xl" py={{ base: 8, md: 16 }} style={{ userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}>
         <Head>
           <script

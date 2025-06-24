@@ -1,8 +1,16 @@
 'use client';
 import { Box, Heading, Text, UnorderedList, ListItem, Link } from '@chakra-ui/react';
 import SEO from '../../components/SEO';
+import JsonLd from '../../components/JsonLd';
 
 export default function PrivacyPolicyPage() {
+  const privacyData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    'name': 'Privacy Policy',
+    'description': 'Learn how Lucky Logic IT collects, uses, and protects your personal information. Read our privacy practices and your rights.'
+  };
+
   return (
     <>
       <SEO
@@ -11,6 +19,7 @@ export default function PrivacyPolicyPage() {
         keywords="privacy policy, data protection, Lucky Logic IT, Sydney IT services"
         canonicalUrl="https://luckylogic.com.au/privacy-policy"
       />
+      <JsonLd data={privacyData} />
       <Box px={6} py={{ base: 16, md: 24 }} maxW="3xl" mx="auto">
         <Heading as="h1" size="xl" mb={6} color="brand.green">
           Privacy Policy

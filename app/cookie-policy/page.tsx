@@ -3,8 +3,16 @@
 import NextLink from 'next/link';
 import { Box, Heading, Text, UnorderedList, ListItem, Link } from '@chakra-ui/react';
 import SEO from '../../components/SEO';
+import JsonLd from '../../components/JsonLd';
 
 export default function CookiePolicyPage() {
+  const cookieData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    'name': 'Cookie Policy',
+    'description': 'Learn how Lucky Logic IT uses cookies and similar technologies to enhance your experience. Read about our cookie practices and your choices.'
+  };
+
   return (
     <>
       <SEO
@@ -13,6 +21,7 @@ export default function CookiePolicyPage() {
         keywords="cookie policy, cookies, privacy, Lucky Logic IT, Sydney IT services"
         canonicalUrl="https://luckylogic.com.au/cookie-policy"
       />
+      <JsonLd data={cookieData} />
       <Box px={6} py={{ base: 16, md: 24 }} maxW="3xl" mx="auto">
         <Heading as="h1" size="xl" mb={6} color="brand.green">
           Cookie Policy

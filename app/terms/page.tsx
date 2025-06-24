@@ -1,8 +1,16 @@
 'use client';
 import { Box, Heading, Text, UnorderedList, ListItem, Link, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
 import SEO from '../../components/SEO';
+import JsonLd from '../../components/JsonLd';
 
 export default function TermsPage() {
+  const termsData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    'name': 'Terms & Conditions',
+    'description': "Read the terms and conditions for using Lucky Logic IT's website and services. Learn about your rights, responsibilities, and our legal policies."
+  };
+
   return (
     <>
       <SEO
@@ -11,6 +19,7 @@ export default function TermsPage() {
         keywords="terms, conditions, legal, Lucky Logic IT, Sydney IT services"
         canonicalUrl="https://luckylogic.com.au/terms"
       />
+      <JsonLd data={termsData} />
       <Box px={6} py={{ base: 16, md: 24 }} maxW="3xl" mx="auto">
         <Text mb={2} fontSize="sm" color="gray.500" textAlign="right">
           Last updated: 25/06/2025

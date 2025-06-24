@@ -24,6 +24,7 @@ import {
   FiTarget,
   FiList,
 } from 'react-icons/fi';
+import JsonLd from '../../components/JsonLd';
 
 const MotionBox = motion(Box);
 const MotionHeading = motion(Heading);
@@ -74,6 +75,34 @@ export default function AboutUsPage() {
     </MotionBox>
   );
 
+  const aboutData = {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    'name': 'About Lucky Logic IT',
+    'description': "Learn about Lucky Logic IT, Sydney's trusted residential IT support service.",
+    'mainEntity': {
+      '@type': 'Organization',
+      'name': 'Lucky Logic IT',
+      'url': 'https://luckylogic.com.au',
+      'logo': 'https://luckylogic.com.au/lucky-logic-logo.png',
+      'contactPoint': {
+        '@type': 'ContactPoint',
+        'telephone': '+61426901209',
+        'contactType': 'customer service',
+        'areaServed': 'Sydney',
+        'availableLanguage': 'English'
+      },
+      'address': {
+        '@type': 'PostalAddress',
+        'streetAddress': '580 Princes Highway',
+        'addressLocality': 'Kirrawee',
+        'addressRegion': 'NSW',
+        'postalCode': '2232',
+        'addressCountry': 'AU'
+      }
+    }
+  };
+
   return (
     <>
       <SEO
@@ -82,6 +111,7 @@ export default function AboutUsPage() {
         keywords="IT support Sydney, computer repairs, tech support, residential IT services"
         canonicalUrl="https://luckylogic.com.au/about-us"
       />
+      <JsonLd data={aboutData} />
       <Box px={6} pt="100px" pb={{ base: 16, md: 24 }} maxW="7xl" mx="auto" color="gray.800">
         {/* Hero Section */}
         <VStack
