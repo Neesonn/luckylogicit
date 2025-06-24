@@ -8,6 +8,12 @@ import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter,
 import { useRouter } from 'next/navigation';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 
+declare global {
+  interface Window {
+    $crisp?: any;
+  }
+}
+
 export default function Footer() {
   const cookieBannerRef = useRef<{ openBanner: () => void }>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -52,6 +58,7 @@ export default function Footer() {
             <Link href="/about-us" color="white" textDecoration="underline">About Us</Link>
             <Link href="/services" color="white" textDecoration="underline">Services</Link>
             <Link href="/faq" color="white" textDecoration="underline">FAQ</Link>
+            <Link href="/troubleshoot" color="white" textDecoration="underline">Troubleshoot</Link>
             <Link href="/contact-us" color="white" textDecoration="underline">Contact Us</Link>
           </Stack>
         </Box>
@@ -95,6 +102,25 @@ export default function Footer() {
           minW={0}
         >
           <FaWrench size={22} color="#003f2d" style={{ verticalAlign: 'middle' }} />
+        </Button>
+        {/* Accessible chat launcher button */}
+        <Button
+          position="absolute"
+          left={4}
+          top={4}
+          aria-label="Open live chat"
+          bg="brand.gold"
+          color="brand.green"
+          _hover={{ bg: '#b38d1c' }}
+          onClick={() => window.$crisp?.push(["do", "chat:open"])}
+          p={0}
+          minW={0}
+          tabIndex={0}
+        >
+          {/* You can use a chat icon here, e.g. from react-icons */}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 15.5C21 16.3284 20.3284 17 19.5 17H7.41421L3.70711 20.7071C3.07714 21.3371 2 20.8906 2 20.0001V4.5C2 3.67157 2.67157 3 3.5 3H19.5C20.3284 3 21 3.67157 21 4.5V15.5Z" stroke="#1A3D36" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </Button>
       </Box>
 

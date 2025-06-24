@@ -1,5 +1,5 @@
 'use client';
-import { Box, Heading, Text, UnorderedList, ListItem, Link } from '@chakra-ui/react';
+import { Box, Heading, Text, UnorderedList, ListItem, Link, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
 
 export default function TermsPage() {
   return (
@@ -25,6 +25,15 @@ export default function TermsPage() {
         <ListItem>Upload or transmit harmful, offensive, or illegal content</ListItem>
         <ListItem>Attempt to gain unauthorized access to any part of the website</ListItem>
       </UnorderedList>
+      <Alert status="warning" variant="left-accent" mb={6} borderRadius="md">
+        <AlertIcon />
+        <Box>
+          <AlertTitle fontSize="md">Important Disclaimer</AlertTitle>
+          <AlertDescription fontSize="sm">
+            The troubleshooting guides provided on this site are for informational purposes only. Lucky Logic is not responsible for any issues, data loss, or damages that may occur as a result of following these instructions. Please proceed carefully and consult a professional if you are unsure.
+          </AlertDescription>
+        </Box>
+      </Alert>
 
       <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
         2. Intellectual Property Rights

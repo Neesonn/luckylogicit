@@ -41,6 +41,7 @@ Lucky Logic provides comprehensive residential IT support and computer services 
 - **Loading States** - Smooth loading indicators and skeleton screens
 - **Error Boundaries** - Graceful error handling with custom 404/500 pages
 - **Cookie Consent** - GDPR-compliant cookie management
+- **Troubleshooting Guide** - Accessible, swipeable on mobile, contextual tips, and robust search/filter
 
 ### **Security & Compliance**
 - **Content Security Policy** - Comprehensive CSP headers
@@ -48,6 +49,8 @@ Lucky Logic provides comprehensive residential IT support and computer services 
 - **Terms of Service** - Clear terms and conditions
 - **Cookie Policy** - Transparent cookie usage and management
 - **GDPR Compliance** - User consent management and data protection
+- **Cookie Consent** - Banner links to Privacy Policy, Cookie Policy, and Terms & Conditions
+- **Troubleshooting Disclaimer** - See Terms & Conditions ('Use of Website') for liability statement
 
 ## 💬 Crisp Chat Integration & Accessibility
 
@@ -288,6 +291,9 @@ This project is proprietary and confidential. All rights reserved by Lucky Logic
 - **Error Handling**: Comprehensive error boundaries
 - **Performance**: Optimized images and assets
 - **Security**: Enhanced CSP and privacy features
+- **Troubleshooting Guide**: Modern, accessible, and mobile-friendly. Includes robust search, swipeable accordion on mobile, contextual tips, and step completion with ARIA/keyboard support. Legal disclaimer is now in the Terms under 'Use of Website'.
+- **Cookie Banner**: Now links to Privacy Policy, Cookie Policy, and Terms & Conditions for full compliance.
+- **Legal**: Disclaimer about troubleshooting guides is clearly stated in the Terms & Conditions (see 'Use of Website' section).
 
 ---
 

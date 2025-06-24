@@ -9,6 +9,12 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 
+declare global {
+  interface Window {
+    loadCrisp?: () => void;
+  }
+}
+
 const CookieBanner = forwardRef((props, ref) => {
   const [isVisible, setIsVisible] = useState(false);
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -27,6 +33,9 @@ const CookieBanner = forwardRef((props, ref) => {
   const handleAccept = () => {
     localStorage.setItem('cookieConsent', 'true');
     setIsVisible(false);
+    if (typeof window !== 'undefined' && typeof window.loadCrisp === 'function') {
+      window.loadCrisp();
+    }
   };
 
   const handleDecline = () => {
@@ -56,6 +65,14 @@ const CookieBanner = forwardRef((props, ref) => {
         We use cookies to improve your experience. By using this site, you agree to our{' '}
         <a href="/privacy-policy" style={{ textDecoration: 'underline' }}>
           Privacy Policy
+        </a>
+        {', '}
+        <a href="/cookie-policy" style={{ textDecoration: 'underline' }}>
+          Cookie Policy
+        </a>
+        {' and '}
+        <a href="/terms" style={{ textDecoration: 'underline' }}>
+          Terms & Conditions
         </a>.
       </Text>
       <Stack direction="row" spacing={4} justify="center" flexWrap="wrap">
