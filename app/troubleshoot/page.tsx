@@ -29,6 +29,7 @@ import NextLink from 'next/link';
 import GlassCard from '../../components/GlassCard';
 import Head from 'next/head';
 import { Tooltip, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
+import SEO from '../../components/SEO';
 
 type TroubleshootStep = string;
 
@@ -492,396 +493,404 @@ export default function TroubleshootPage() {
     : filteredCategories;
 
   return (
-    <Container maxW="3xl" py={{ base: 8, md: 16 }} style={{ userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}>
-      <Head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": categories.flatMap(cat =>
-              cat.issues.map(issue => ({
-                "@type": "Question",
-                "name": issue.label,
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": (issue.steps || []).join('<br/>')
-                }
-              }))
-            )
-          }) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.luckylogic.com.au/" },
-              { "@type": "ListItem", "position": 2, "name": "Troubleshooting Guide", "item": "https://www.luckylogic.com.au/troubleshoot" }
-            ]
-          }) }}
-        />
-      </Head>
-      <Heading as="h1" size="2xl" mb={6} color="brand.green" textAlign="center">
-        Troubleshooting Guide
-      </Heading>
-      <Text fontSize="lg" color="gray.700" textAlign="center" maxW="2xl" mx="auto" mb={10}>
-        Step-by-step solutions for common tech issues. If you need further help, you can always contact us or book a service.
-      </Text>
-      <HStack justify="center" spacing={4} mb={8}>
-        <Button as={NextLink} href="/services" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
-          Our Services
-        </Button>
-        <Button as={NextLink} href="/faq" variant="outline" size="md" color="#003f2d" borderColor="#003f2d" _hover={{ bg: '#e9f5f1' }}>
-          FAQ
-        </Button>
-      </HStack>
-      {/* Pills for mobile category selection */}
-      {isMobile && (
-        <Wrap spacing={3} mb={6} justify="center">
-          {filteredCategories.map((cat) => (
-            <WrapItem key={cat.key}>
-              <Button
-                variant={selectedCategory === cat.key ? 'solid' : 'outline'}
-                colorScheme="green"
-                leftIcon={<Icon as={cat.icon} />}
-                borderRadius="full"
-                px={5}
-                py={2}
-                fontWeight="bold"
-                fontSize="md"
-                onClick={() => setSelectedCategory(cat.key)}
-                _active={{ transform: 'scale(0.97)' }}
-                _focus={{ boxShadow: 'outline' }}
-              >
-                {cat.label}
-              </Button>
-            </WrapItem>
-          ))}
-          {selectedCategory && (
-            <WrapItem>
-              <Button
-                variant="ghost"
-                colorScheme="gray"
-                borderRadius="full"
-                px={4}
-                py={2}
-                fontWeight="bold"
-                fontSize="md"
-                onClick={() => setSelectedCategory(null)}
-              >
-                Show All
-              </Button>
-            </WrapItem>
-          )}
-        </Wrap>
-      )}
-      <Box
-        borderRadius="2xl"
-        px={{ base: 4, md: 8 }}
-        py={{ base: 6, md: 10 }}
-        bgGradient="linear(to-br, brand.lightGreen, white)"
-        boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.10)"
-        mb={8}
-      >
-        <Accordion allowMultiple defaultIndex={[0]}>
-          {categoriesToShow.length === 0 && (
-            <Text color="red.400" textAlign="center" py={10}>
-              <Icon as={FiAlertTriangle} mr={2} /> No issues found. Try a different search.
-            </Text>
-          )}
-          {categoriesToShow.map((cat) => (
-            <GlassCard key={cat.key} mb={10}>
-              <AccordionItem borderColor={border}>
-                <h2>
-                  <AccordionButton _expanded={{ bg: 'brand.green', color: 'white' }} aria-label={`Expand/collapse issue: ${cat.label}`}>
-                    <HStack spacing={5}>
-                      <Icon as={cat.icon} />
-                      <Box flex="1" textAlign="left" fontWeight="extrabold" fontSize="2xl" textTransform="capitalize" letterSpacing="wide">
-                        {cat.label}
-                      </Box>
-                    </HStack>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  <Accordion allowMultiple>
-                    {cat.issues.map((issue) => (
-                      <AccordionItem key={issue.key} borderColor={border}>
-                        <h3>
-                          <AccordionButton _expanded={{ bg: 'gray.100', color: 'brand.green' }} aria-label={`Expand/collapse issue: ${issue.label}`}>
-                            <HStack spacing={4} w="100%">
-                              <Box flex="1" textAlign="left" fontWeight="bold" fontSize="xl" textTransform="capitalize" letterSpacing="wide">
-                                {issue.label}
-                              </Box>
-                            </HStack>
-                            <AccordionIcon />
-                          </AccordionButton>
-                        </h3>
-                        <AccordionPanel pb={2}>
-                          {/* If issue has subIssues, render a nested Accordion */}
-                          {Array.isArray(issue.subIssues) && issue.subIssues.length > 0 && (
-                            <Accordion allowMultiple>
-                              {issue.subIssues?.map((sub) => {
-                                // Interactive step completion state for each sub-issue
-                                const subCompleted: boolean[] = Array.isArray(completedSteps[sub.key]) ? completedSteps[sub.key] : Array(sub.steps?.length || 0).fill(false);
-                                const handleSubStepClick = (idx: number) => {
-                                  setCompletedSteps((prev) => {
-                                    const arr = prev[sub.key] ? [...prev[sub.key]] : Array(sub.steps?.length || 0).fill(false);
-                                    arr[idx] = !arr[idx];
-                                    return { ...prev, [sub.key]: arr };
-                                  });
-                                };
-                                return (
-                                  <AccordionItem key={sub.key} borderColor={border}>
-                                    <h4>
-                                      <AccordionButton _expanded={{ bg: 'gray.50', color: 'brand.green' }} aria-label={`Expand/collapse issue: ${sub.label}`}>
-                                        <Box flex="1" textAlign="left">
-                                          <Text fontWeight="semibold" mr={2}>
-                                            {sub.label}
-                                          </Text>
-                                        </Box>
-                                        <AccordionIcon />
-                                      </AccordionButton>
-                                    </h4>
-                                    <AccordionPanel pb={2}>
-                                      {sub.steps?.length > 0 && (
-                                        <MotionBox
-                                          initial={{ opacity: 0, y: 10 }}
-                                          animate={{ opacity: 1, y: 0 }}
-                                          transition={{ duration: 0.3 }}
-                                          p={4}
-                                          bg={bg}
-                                          borderRadius="lg"
-                                          borderWidth={1}
-                                          borderColor={border}
-                                          boxShadow="md"
-                                        >
-                                          <VStack align="start" spacing={6} w="100%">
-                                            <Text fontWeight="bold" color="brand.green" fontSize="xl" mb={2}>
-                                              {sub.label} Troubleshooting Steps
-                                            </Text>
-                                            {sub.steps?.map((step, idx) => {
-                                              const [title, ...detailsArr] = step.split('\n');
-                                              const details = detailsArr.join('\n');
-                                              const showContactButton = typeof sub.showContactButtonAfterStep === 'number' && idx === sub.showContactButtonAfterStep;
-                                              // Get completed state for this issue/step
-                                              const completedArr: boolean[] = Array.isArray(completedSteps[issue.key]) ? completedSteps[issue.key] : Array(issue.steps?.length || 0).fill(false);
-                                              const completed = completedArr[idx];
-                                              const handleStepClick = () => {
-                                                setCompletedSteps((prev) => {
-                                                  const arr = prev[issue.key] ? [...prev[issue.key]] : Array(issue.steps?.length || 0).fill(false);
-                                                  arr[idx] = !arr[idx];
-                                                  return { ...prev, [issue.key]: arr };
-                                                });
-                                              };
-                                              return (
-                                                <Box
-                                                  key={idx}
-                                                  w="100%"
-                                                  bg={subCompleted[idx] ? completedStepBg : defaultStepBg}
-                                                  borderRadius="lg"
-                                                  boxShadow="sm"
-                                                  p={4}
-                                                  borderLeftWidth={4}
-                                                  borderLeftColor={subCompleted[idx] ? 'green.400' : 'brand.green'}
-                                                  mb={2}
-                                                  cursor="pointer"
-                                                  transition="background 0.2s, border-color 0.2s"
-                                                  onClick={() => handleSubStepClick(idx)}
-                                                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') handleSubStepClick(idx); }}
-                                                  role="button"
-                                                  aria-pressed={subCompleted[idx]}
-                                                  aria-label={`Mark step ${idx + 1} as ${subCompleted[idx] ? 'incomplete' : 'complete'}: ${title}`}
-                                                  aria-describedby={`step-desc-${sub.key}-${idx}`}
-                                                  tabIndex={0}
-                                                  _hover={{ bg: hoverStepBg }}
-                                                >
-                                                  <VisuallyHidden id={`step-desc-${sub.key}-${idx}`}>
-                                                    {subCompleted[idx] ? 'Step completed' : 'Step not completed'}
-                                                  </VisuallyHidden>
-                                                  <HStack align="center" spacing={2} mb={1}>
-                                                    <Text
-                                                      fontWeight="semibold"
-                                                      color={subCompleted[idx] ? 'green.600' : 'brand.green'}
-                                                      fontSize="md"
-                                                      textDecoration={subCompleted[idx] ? 'line-through' : 'none'}
-                                                    >
-                                                      {title}
-                                                    </Text>
-                                                    {subCompleted[idx] && <Icon as={FiCheckCircle} color="green.400" boxSize={5} ml={2} />}
-                                                  </HStack>
-                                                  <Text
-                                                    color={subCompleted[idx] ? completedTextColor : defaultTextColor}
-                                                    fontSize="md"
-                                                    whiteSpace="pre-line"
-                                                    textDecoration={subCompleted[idx] ? 'line-through' : 'none'}
-                                                    opacity={subCompleted[idx] ? 0.7 : 1}
-                                                    mb={showContactButton ? 4 : 0}
-                                                  >
-                                                    {details}
-                                                  </Text>
-                                                  {showContactButton && (
-                                                    <Button
-                                                      as={NextLink}
-                                                      href="/contact-us"
-                                                      prefetch
-                                                      bg="#003f2d"
-                                                      color="white"
-                                                      size="lg"
-                                                      fontWeight="bold"
-                                                      borderRadius="xl"
-                                                      px={8}
-                                                      py={6}
-                                                      boxShadow="md"
-                                                      _hover={{ bg: '#00291d', color: 'white' }}
-                                                      _focus={{ boxShadow: 'outline', bg: '#003f2d' }}
-                                                    >
-                                                      Contact us
-                                                    </Button>
-                                                  )}
-                                                </Box>
-                                              );
-                                            })}
-                                          </VStack>
-                                        </MotionBox>
-                                      )}
-                                    </AccordionPanel>
-                                  </AccordionItem>
-                                );
-                              })}
-                            </Accordion>
-                          )}
-                          {/* If issue has steps and no subIssues, render steps here */}
-                          {issue.steps && !issue.subIssues && issue.steps?.length > 0 && (
-                            <MotionBox
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.3 }}
-                              p={{ base: 2, md: 6 }}
-                              bg={useColorModeValue('gray.50', 'gray.700')}
-                              borderRadius="xl"
-                              borderWidth={1}
-                              borderColor={border}
-                              boxShadow="lg"
-                            >
-                              <VStack align="start" spacing={6} w="100%">
-                                <Text fontWeight="bold" color="brand.green" fontSize="xl" mb={2}>
-                                  {issue.label} Troubleshooting Steps
-                                </Text>
-                                {issue.steps?.map((step: string, idx: number) => {
-                                  const [title, ...detailsArr] = step.split('\n');
-                                  let details = detailsArr.join('\n');
-                                  let showContactButton = false;
-                                  if (idx === 7) {
-                                    const contactText = 'Contact your Internet Service Provider.';
-                                    if (details.includes(contactText)) {
-                                      details = details.replace(contactText, '');
-                                      showContactButton = true;
-                                    }
-                                  }
-                                  let StepIcon = null;
-                                  if (idx === 0) StepIcon = FiWifi;
-                                  if (idx === 1) StepIcon = FiServer;
-                                  if (idx === 2) StepIcon = FiPower;
-                                  if (idx === 3) StepIcon = FiHelpCircle;
-                                  if (idx === 4) StepIcon = FiShare2;
-                                  if (idx === 5) StepIcon = FiCommand;
-                                  if (idx === 6) StepIcon = FiGlobe;
-                                  if (idx === 7) StepIcon = FiHelpCircle;
-                                  // Get completed state for this issue/step
-                                  const completedArr: boolean[] = Array.isArray(completedSteps[issue.key]) ? completedSteps[issue.key] : Array(issue.steps?.length || 0).fill(false);
-                                  const completed = completedArr[idx];
-                                  const handleStepClick = () => {
+    <>
+      <SEO
+        title="Troubleshooting Guide"
+        description="Step-by-step solutions for common tech issues. Find answers to your IT problems or contact Lucky Logic IT for expert help."
+        keywords="IT troubleshooting, tech support, computer help, Sydney IT, Lucky Logic"
+        canonicalUrl="https://luckylogic.com.au/troubleshoot"
+      />
+      <Container maxW="3xl" py={{ base: 8, md: 16 }} style={{ userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}>
+        <Head>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": categories.flatMap(cat =>
+                cat.issues.map(issue => ({
+                  "@type": "Question",
+                  "name": issue.label,
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": (issue.steps || []).join('<br/>')
+                  }
+                }))
+              )
+            }) }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.luckylogic.com.au/" },
+                { "@type": "ListItem", "position": 2, "name": "Troubleshooting Guide", "item": "https://www.luckylogic.com.au/troubleshoot" }
+              ]
+            }) }}
+          />
+        </Head>
+        <Heading as="h1" size="2xl" mb={6} color="brand.green" textAlign="center">
+          Troubleshooting Guide
+        </Heading>
+        <Text fontSize="lg" color="gray.700" textAlign="center" maxW="2xl" mx="auto" mb={10}>
+          Step-by-step solutions for common tech issues. If you need further help, you can always contact us or book a service.
+        </Text>
+        <HStack justify="center" spacing={4} mb={8}>
+          <Button as={NextLink} href="/services" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+            Our Services
+          </Button>
+          <Button as={NextLink} href="/faq" variant="outline" size="md" color="#003f2d" borderColor="#003f2d" _hover={{ bg: '#e9f5f1' }}>
+            FAQ
+          </Button>
+        </HStack>
+        {/* Pills for mobile category selection */}
+        {isMobile && (
+          <Wrap spacing={3} mb={6} justify="center">
+            {filteredCategories.map((cat) => (
+              <WrapItem key={cat.key}>
+                <Button
+                  variant={selectedCategory === cat.key ? 'solid' : 'outline'}
+                  colorScheme="green"
+                  leftIcon={<Icon as={cat.icon} />}
+                  borderRadius="full"
+                  px={5}
+                  py={2}
+                  fontWeight="bold"
+                  fontSize="md"
+                  onClick={() => setSelectedCategory(cat.key)}
+                  _active={{ transform: 'scale(0.97)' }}
+                  _focus={{ boxShadow: 'outline' }}
+                >
+                  {cat.label}
+                </Button>
+              </WrapItem>
+            ))}
+            {selectedCategory && (
+              <WrapItem>
+                <Button
+                  variant="ghost"
+                  colorScheme="gray"
+                  borderRadius="full"
+                  px={4}
+                  py={2}
+                  fontWeight="bold"
+                  fontSize="md"
+                  onClick={() => setSelectedCategory(null)}
+                >
+                  Show All
+                </Button>
+              </WrapItem>
+            )}
+          </Wrap>
+        )}
+        <Box
+          borderRadius="2xl"
+          px={{ base: 4, md: 8 }}
+          py={{ base: 6, md: 10 }}
+          bgGradient="linear(to-br, brand.lightGreen, white)"
+          boxShadow="0 8px 32px 0 rgba(31, 38, 135, 0.10)"
+          mb={8}
+        >
+          <Accordion allowMultiple defaultIndex={[0]}>
+            {categoriesToShow.length === 0 && (
+              <Text color="red.400" textAlign="center" py={10}>
+                <Icon as={FiAlertTriangle} mr={2} /> No issues found. Try a different search.
+              </Text>
+            )}
+            {categoriesToShow.map((cat) => (
+              <GlassCard key={cat.key} mb={10}>
+                <AccordionItem borderColor={border}>
+                  <h2>
+                    <AccordionButton _expanded={{ bg: 'brand.green', color: 'white' }} aria-label={`Expand/collapse issue: ${cat.label}`}>
+                      <HStack spacing={5}>
+                        <Icon as={cat.icon} />
+                        <Box flex="1" textAlign="left" fontWeight="extrabold" fontSize="2xl" textTransform="capitalize" letterSpacing="wide">
+                          {cat.label}
+                        </Box>
+                      </HStack>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    <Accordion allowMultiple>
+                      {cat.issues.map((issue) => (
+                        <AccordionItem key={issue.key} borderColor={border}>
+                          <h3>
+                            <AccordionButton _expanded={{ bg: 'gray.100', color: 'brand.green' }} aria-label={`Expand/collapse issue: ${issue.label}`}>
+                              <HStack spacing={4} w="100%">
+                                <Box flex="1" textAlign="left" fontWeight="bold" fontSize="xl" textTransform="capitalize" letterSpacing="wide">
+                                  {issue.label}
+                                </Box>
+                              </HStack>
+                              <AccordionIcon />
+                            </AccordionButton>
+                          </h3>
+                          <AccordionPanel pb={2}>
+                            {/* If issue has subIssues, render a nested Accordion */}
+                            {Array.isArray(issue.subIssues) && issue.subIssues.length > 0 && (
+                              <Accordion allowMultiple>
+                                {issue.subIssues?.map((sub) => {
+                                  // Interactive step completion state for each sub-issue
+                                  const subCompleted: boolean[] = Array.isArray(completedSteps[sub.key]) ? completedSteps[sub.key] : Array(sub.steps?.length || 0).fill(false);
+                                  const handleSubStepClick = (idx: number) => {
                                     setCompletedSteps((prev) => {
-                                      const arr = prev[issue.key] ? [...prev[issue.key]] : Array(issue.steps?.length || 0).fill(false);
+                                      const arr = prev[sub.key] ? [...prev[sub.key]] : Array(sub.steps?.length || 0).fill(false);
                                       arr[idx] = !arr[idx];
-                                      return { ...prev, [issue.key]: arr };
+                                      return { ...prev, [sub.key]: arr };
                                     });
                                   };
                                   return (
-                                    <Box
-                                      key={idx}
-                                      w="100%"
-                                      bg={completed ? completedStepBg : defaultStepBg}
-                                      borderRadius="lg"
-                                      boxShadow="sm"
-                                      p={4}
-                                      borderLeftWidth={4}
-                                      borderLeftColor={completed ? 'green.400' : 'brand.green'}
-                                      mb={2}
-                                      cursor="pointer"
-                                      transition="background 0.2s, border-color 0.2s"
-                                      onClick={handleStepClick}
-                                      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') handleStepClick(); }}
-                                      role="button"
-                                      aria-pressed={completed}
-                                      aria-label={`Mark step ${idx + 1} as ${completed ? 'incomplete' : 'complete'}: ${title}`}
-                                      aria-describedby={`step-desc-${issue.key}-${idx}`}
-                                      tabIndex={0}
-                                      _hover={{ bg: hoverStepBg }}
-                                    >
-                                      <VisuallyHidden id={`step-desc-${issue.key}-${idx}`}>
-                                        {completed ? 'Step completed' : 'Step not completed'}
-                                      </VisuallyHidden>
-                                      <HStack align="center" spacing={2} mb={1}>
-                                        {StepIcon && <Icon as={StepIcon} color={completed ? 'green.400' : 'brand.green'} boxSize={5} />}
-                                        <Text
-                                          fontWeight="semibold"
-                                          color={completed ? 'green.600' : 'brand.green'}
-                                          fontSize="md"
-                                          textDecoration={completed ? 'line-through' : 'none'}
-                                        >
-                                          {title}
-                                        </Text>
-                                        {completed && <Icon as={FiCheckCircle} color="green.400" boxSize={5} ml={2} />}
-                                      </HStack>
-                                      <Text
-                                        color={completed ? completedTextColor : defaultTextColor}
-                                        fontSize="md"
-                                        whiteSpace="pre-line"
-                                        textDecoration={completed ? 'line-through' : 'none'}
-                                        opacity={completed ? 0.7 : 1}
-                                        mb={showContactButton ? 4 : 0}
-                                      >
-                                        {details}
-                                      </Text>
-                                      {showContactButton && (
-                                        <Button
-                                          as={NextLink}
-                                          href="/contact-us"
-                                          prefetch
-                                          bg="#003f2d"
-                                          color="white"
-                                          size="lg"
-                                          fontWeight="bold"
-                                          borderRadius="xl"
-                                          px={8}
-                                          py={6}
-                                          boxShadow="md"
-                                          _hover={{ bg: '#00291d', color: 'white' }}
-                                          _focus={{ boxShadow: 'outline', bg: '#003f2d' }}
-                                        >
-                                          Contact us
-                                        </Button>
-                                      )}
-                                    </Box>
+                                    <AccordionItem key={sub.key} borderColor={border}>
+                                      <h4>
+                                        <AccordionButton _expanded={{ bg: 'gray.50', color: 'brand.green' }} aria-label={`Expand/collapse issue: ${sub.label}`}>
+                                          <Box flex="1" textAlign="left">
+                                            <Text fontWeight="semibold" mr={2}>
+                                              {sub.label}
+                                            </Text>
+                                          </Box>
+                                          <AccordionIcon />
+                                        </AccordionButton>
+                                      </h4>
+                                      <AccordionPanel pb={2}>
+                                        {sub.steps?.length > 0 && (
+                                          <MotionBox
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.3 }}
+                                            p={4}
+                                            bg={bg}
+                                            borderRadius="lg"
+                                            borderWidth={1}
+                                            borderColor={border}
+                                            boxShadow="md"
+                                          >
+                                            <VStack align="start" spacing={6} w="100%">
+                                              <Text fontWeight="bold" color="brand.green" fontSize="xl" mb={2}>
+                                                {sub.label} Troubleshooting Steps
+                                              </Text>
+                                              {sub.steps?.map((step, idx) => {
+                                                const [title, ...detailsArr] = step.split('\n');
+                                                const details = detailsArr.join('\n');
+                                                const showContactButton = typeof sub.showContactButtonAfterStep === 'number' && idx === sub.showContactButtonAfterStep;
+                                                // Get completed state for this issue/step
+                                                const completedArr: boolean[] = Array.isArray(completedSteps[issue.key]) ? completedSteps[issue.key] : Array(issue.steps?.length || 0).fill(false);
+                                                const completed = completedArr[idx];
+                                                const handleStepClick = () => {
+                                                  setCompletedSteps((prev) => {
+                                                    const arr = prev[issue.key] ? [...prev[issue.key]] : Array(issue.steps?.length || 0).fill(false);
+                                                    arr[idx] = !arr[idx];
+                                                    return { ...prev, [issue.key]: arr };
+                                                  });
+                                                };
+                                                return (
+                                                  <Box
+                                                    key={idx}
+                                                    w="100%"
+                                                    bg={subCompleted[idx] ? completedStepBg : defaultStepBg}
+                                                    borderRadius="lg"
+                                                    boxShadow="sm"
+                                                    p={4}
+                                                    borderLeftWidth={4}
+                                                    borderLeftColor={subCompleted[idx] ? 'green.400' : 'brand.green'}
+                                                    mb={2}
+                                                    cursor="pointer"
+                                                    transition="background 0.2s, border-color 0.2s"
+                                                    onClick={() => handleSubStepClick(idx)}
+                                                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') handleSubStepClick(idx); }}
+                                                    role="button"
+                                                    aria-pressed={subCompleted[idx]}
+                                                    aria-label={`Mark step ${idx + 1} as ${subCompleted[idx] ? 'incomplete' : 'complete'}: ${title}`}
+                                                    aria-describedby={`step-desc-${sub.key}-${idx}`}
+                                                    tabIndex={0}
+                                                    _hover={{ bg: hoverStepBg }}
+                                                  >
+                                                    <VisuallyHidden id={`step-desc-${sub.key}-${idx}`}>
+                                                      {subCompleted[idx] ? 'Step completed' : 'Step not completed'}
+                                                    </VisuallyHidden>
+                                                    <HStack align="center" spacing={2} mb={1}>
+                                                      <Text
+                                                        fontWeight="semibold"
+                                                        color={subCompleted[idx] ? 'green.600' : 'brand.green'}
+                                                        fontSize="md"
+                                                        textDecoration={subCompleted[idx] ? 'line-through' : 'none'}
+                                                      >
+                                                        {title}
+                                                      </Text>
+                                                      {subCompleted[idx] && <Icon as={FiCheckCircle} color="green.400" boxSize={5} ml={2} />}
+                                                    </HStack>
+                                                    <Text
+                                                      color={subCompleted[idx] ? completedTextColor : defaultTextColor}
+                                                      fontSize="md"
+                                                      whiteSpace="pre-line"
+                                                      textDecoration={subCompleted[idx] ? 'line-through' : 'none'}
+                                                      opacity={subCompleted[idx] ? 0.7 : 1}
+                                                      mb={showContactButton ? 4 : 0}
+                                                    >
+                                                      {details}
+                                                    </Text>
+                                                    {showContactButton && (
+                                                      <Button
+                                                        as={NextLink}
+                                                        href="/contact-us"
+                                                        prefetch
+                                                        bg="#003f2d"
+                                                        color="white"
+                                                        size="lg"
+                                                        fontWeight="bold"
+                                                        borderRadius="xl"
+                                                        px={8}
+                                                        py={6}
+                                                        boxShadow="md"
+                                                        _hover={{ bg: '#00291d', color: 'white' }}
+                                                        _focus={{ boxShadow: 'outline', bg: '#003f2d' }}
+                                                      >
+                                                        Contact us
+                                                      </Button>
+                                                    )}
+                                                  </Box>
+                                                );
+                                              })}
+                                            </VStack>
+                                          </MotionBox>
+                                        )}
+                                      </AccordionPanel>
+                                    </AccordionItem>
                                   );
                                 })}
-                              </VStack>
-                            </MotionBox>
-                          )}
-                        </AccordionPanel>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </AccordionPanel>
-              </AccordionItem>
-            </GlassCard>
-          ))}
-        </Accordion>
-      </Box>
-    </Container>
+                              </Accordion>
+                            )}
+                            {/* If issue has steps and no subIssues, render steps here */}
+                            {issue.steps && !issue.subIssues && issue.steps?.length > 0 && (
+                              <MotionBox
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3 }}
+                                p={{ base: 2, md: 6 }}
+                                bg={useColorModeValue('gray.50', 'gray.700')}
+                                borderRadius="xl"
+                                borderWidth={1}
+                                borderColor={border}
+                                boxShadow="lg"
+                              >
+                                <VStack align="start" spacing={6} w="100%">
+                                  <Text fontWeight="bold" color="brand.green" fontSize="xl" mb={2}>
+                                    {issue.label} Troubleshooting Steps
+                                  </Text>
+                                  {issue.steps?.map((step: string, idx: number) => {
+                                    const [title, ...detailsArr] = step.split('\n');
+                                    let details = detailsArr.join('\n');
+                                    let showContactButton = false;
+                                    if (idx === 7) {
+                                      const contactText = 'Contact your Internet Service Provider.';
+                                      if (details.includes(contactText)) {
+                                        details = details.replace(contactText, '');
+                                        showContactButton = true;
+                                      }
+                                    }
+                                    let StepIcon = null;
+                                    if (idx === 0) StepIcon = FiWifi;
+                                    if (idx === 1) StepIcon = FiServer;
+                                    if (idx === 2) StepIcon = FiPower;
+                                    if (idx === 3) StepIcon = FiHelpCircle;
+                                    if (idx === 4) StepIcon = FiShare2;
+                                    if (idx === 5) StepIcon = FiCommand;
+                                    if (idx === 6) StepIcon = FiGlobe;
+                                    if (idx === 7) StepIcon = FiHelpCircle;
+                                    // Get completed state for this issue/step
+                                    const completedArr: boolean[] = Array.isArray(completedSteps[issue.key]) ? completedSteps[issue.key] : Array(issue.steps?.length || 0).fill(false);
+                                    const completed = completedArr[idx];
+                                    const handleStepClick = () => {
+                                      setCompletedSteps((prev) => {
+                                        const arr = prev[issue.key] ? [...prev[issue.key]] : Array(issue.steps?.length || 0).fill(false);
+                                        arr[idx] = !arr[idx];
+                                        return { ...prev, [issue.key]: arr };
+                                      });
+                                    };
+                                    return (
+                                      <Box
+                                        key={idx}
+                                        w="100%"
+                                        bg={completed ? completedStepBg : defaultStepBg}
+                                        borderRadius="lg"
+                                        boxShadow="sm"
+                                        p={4}
+                                        borderLeftWidth={4}
+                                        borderLeftColor={completed ? 'green.400' : 'brand.green'}
+                                        mb={2}
+                                        cursor="pointer"
+                                        transition="background 0.2s, border-color 0.2s"
+                                        onClick={handleStepClick}
+                                        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') handleStepClick(); }}
+                                        role="button"
+                                        aria-pressed={completed}
+                                        aria-label={`Mark step ${idx + 1} as ${completed ? 'incomplete' : 'complete'}: ${title}`}
+                                        aria-describedby={`step-desc-${issue.key}-${idx}`}
+                                        tabIndex={0}
+                                        _hover={{ bg: hoverStepBg }}
+                                      >
+                                        <VisuallyHidden id={`step-desc-${issue.key}-${idx}`}>
+                                          {completed ? 'Step completed' : 'Step not completed'}
+                                        </VisuallyHidden>
+                                        <HStack align="center" spacing={2} mb={1}>
+                                          {StepIcon && <Icon as={StepIcon} color={completed ? 'green.400' : 'brand.green'} boxSize={5} />}
+                                          <Text
+                                            fontWeight="semibold"
+                                            color={completed ? 'green.600' : 'brand.green'}
+                                            fontSize="md"
+                                            textDecoration={completed ? 'line-through' : 'none'}
+                                          >
+                                            {title}
+                                          </Text>
+                                          {completed && <Icon as={FiCheckCircle} color="green.400" boxSize={5} ml={2} />}
+                                        </HStack>
+                                        <Text
+                                          color={completed ? completedTextColor : defaultTextColor}
+                                          fontSize="md"
+                                          whiteSpace="pre-line"
+                                          textDecoration={completed ? 'line-through' : 'none'}
+                                          opacity={completed ? 0.7 : 1}
+                                          mb={showContactButton ? 4 : 0}
+                                        >
+                                          {details}
+                                        </Text>
+                                        {showContactButton && (
+                                          <Button
+                                            as={NextLink}
+                                            href="/contact-us"
+                                            prefetch
+                                            bg="#003f2d"
+                                            color="white"
+                                            size="lg"
+                                            fontWeight="bold"
+                                            borderRadius="xl"
+                                            px={8}
+                                            py={6}
+                                            boxShadow="md"
+                                            _hover={{ bg: '#00291d', color: 'white' }}
+                                            _focus={{ boxShadow: 'outline', bg: '#003f2d' }}
+                                          >
+                                            Contact us
+                                          </Button>
+                                        )}
+                                      </Box>
+                                    );
+                                  })}
+                                </VStack>
+                              </MotionBox>
+                            )}
+                          </AccordionPanel>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </AccordionPanel>
+                </AccordionItem>
+              </GlassCard>
+            ))}
+          </Accordion>
+        </Box>
+      </Container>
+    </>
   );
 } 
