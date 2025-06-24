@@ -5,22 +5,25 @@ import {
   Text,
   VStack,
   Divider,
-  Image,
   List,
   ListItem,
   ListIcon,
-  SimpleGrid,
   useBreakpointValue,
-  Container,
   Button,
   Flex,
+  Icon,
 } from '@chakra-ui/react';
 import { CheckCircleIcon } from '@chakra-ui/icons';
 import { motion } from 'framer-motion';
 import SEO from '../../components/SEO';
-import Lottie from 'lottie-react';
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  FiBookOpen,
+  FiUserCheck,
+  FiShield,
+  FiTarget,
+  FiList,
+} from 'react-icons/fi';
 
 const MotionBox = motion(Box);
 const MotionHeading = motion(Heading);
@@ -31,195 +34,174 @@ export default function AboutUsPage() {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const router = useRouter();
 
-  const handleViewServices = () => {
-    router.push('/services');
-  };
+  const handleViewServices = () => router.push('/services');
+
+  const Section = ({
+    icon,
+    title,
+    content,
+  }: {
+    icon: any;
+    title: string;
+    content: string;
+  }) => (
+    <MotionBox
+      p={8}
+      borderRadius="2xl"
+      boxShadow="lg"
+      bg="whiteAlpha.800"
+      backdropFilter="blur(12px)"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      whileHover={{ translateY: -4, boxShadow: 'xl' }}
+    >
+      <Heading
+        as="h2"
+        size="lg"
+        color="brand.green"
+        mb={4}
+        textTransform="capitalize"
+        display="flex"
+        alignItems="center"
+        gap={3}
+      >
+        <Icon as={icon} boxSize={6} /> {title}
+      </Heading>
+      <Text fontSize="lg" fontWeight="medium" color="gray.800" lineHeight="taller">
+        {content}
+      </Text>
+    </MotionBox>
+  );
 
   return (
     <>
       <SEO
         title="About Us"
-        description="Learn about Lucky Logic IT, Sydney's trusted residential IT support service. We provide professional, reliable, and affordable IT solutions for your home."
-        keywords="IT support Sydney, computer repairs, tech support, residential IT services, about Lucky Logic, IT company Sydney"
+        description="Learn about Lucky Logic IT, Sydney's trusted residential IT support service."
+        keywords="IT support Sydney, computer repairs, tech support, residential IT services"
         canonicalUrl="https://luckylogic.com.au/about-us"
       />
-    <Box px={6} pt="100px" pb={{ base: 16, md: 24 }} maxW="7xl" mx="auto" color="gray.800">
-      {/* Hero Section with Animation */}
-      <VStack spacing={8} mb={{ base: 16, md: 24 }} py={{ base: 8, md: 16 }} bg="brand.green" borderRadius="xl" boxShadow="xl">
-        
-        <MotionHeading
-          as="h1"
-          size={{ base: "xl", md: "3xl" }}
-          color="white"
+      <Box px={6} pt="100px" pb={{ base: 16, md: 24 }} maxW="7xl" mx="auto" color="gray.800">
+        {/* Hero Section */}
+        <VStack
+          spacing={6}
+          mb={{ base: 16, md: 20 }}
+          py={{ base: 10, md: 20 }}
+          borderRadius="2xl"
+          boxShadow="2xl"
+          bg="brand.green"
           textAlign="center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
         >
-          About Lucky Logic
-        </MotionHeading>
-        <MotionText
-          fontSize={{ base: "md", md: "lg" }}
-          color="white"
-          textAlign="center"
-          maxW="3xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          Your trusted partner for seamless residential IT solutions
-        </MotionText>
-      </VStack>
-
-      {/* Main Content Sections */}
-      <VStack spacing={{ base: 8, md: 12 }} mb={16} align="stretch">
-        {/* Row 1: Our Story & What Makes Us Boutique? */}
-        <Flex direction={{ base: "column", md: "row" }} gap={{ base: 8, md: 10 }}>
-          <MotionBox
-            flex="1"
-            p={6}
-            borderRadius="lg"
-            boxShadow="md"
-            bg="white"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-              whileHover={{ translateY: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
-          >
-            <Heading as="h2" size="lg" color="brand.green" mb={4}>
-              Our Story
-            </Heading>
-            <Text fontSize="lg" lineHeight="taller">
-              Lucky Logic was born from the passion and vision of our founder, who brings over 15 years of valuable experience working with and for some of Australia's leading IT companies. With a rich background spanning hardware and software sales, alongside hands-on technical support roles, this experience has uniquely shaped our approach to residential IT support, blending professional know-how with genuine care for everyday users.
-            </Text>
-          </MotionBox>
-          <MotionBox
-            flex="1"
-            p={6}
-            borderRadius="lg"
-            boxShadow="md"
-            bg="white"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-              whileHover={{ translateY: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
-          >
-            <Heading as="h2" size="lg" color="brand.green" mb={4}>
-              What Makes Us Boutique?
-            </Heading>
-            <Text fontSize="lg" lineHeight="taller">
-              We deliver tailored, personal service that's often missing from large, generic providers. We take the time to listen and understand your unique situation, whether it's on-site or remote assistance so you get solutions that truly fit. Boutique IT is about more than quick fixes; it's about lasting relationships built on trust, detail, and care.
-            </Text>
-          </MotionBox>
-        </Flex>
-
-        {/* Row 2: A Needed Solution & Your Security, Our Priority */}
-        <Flex direction={{ base: "column", md: "row" }} gap={{ base: 8, md: 10 }}>
-          <MotionBox
-            flex="1"
-            p={6}
-            borderRadius="lg"
-            boxShadow="md"
-            bg="white"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-              whileHover={{ translateY: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
-          >
-            <Heading as="h2" size="lg" color="brand.green" mb={4}>
-              A Needed Solution
-            </Heading>
-            <Text fontSize="lg" lineHeight="taller">
-              In 2024, after closely observing the IT landscape across Sydney, we realised there was a noticeable gap in dedicated residential IT services. While commercial IT solutions thrive in the business world, many households and home offices face challenges when seeking reliable, trustworthy and personalised IT assistance. That's where Lucky Logic steps in with boutique services designed exclusively for Sydney's residential customers.
-            </Text>
-          </MotionBox>
-          <MotionBox
-            flex="1"
-            p={6}
-            borderRadius="lg"
-            boxShadow="md"
-            bg="white"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-              whileHover={{ translateY: -5, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}
-          >
-            <Heading as="h2" size="lg" color="brand.green" mb={4}>
-              Your Security, Our Priority
-            </Heading>
-            <Text fontSize="lg" lineHeight="taller">
-              In an age where cybersecurity threats are more sophisticated and prevalent than ever, we understand the concerns many people have about scams, phishing and online fraud. This makes personalised, face-to-face or trusted remote IT support more important than ever. At Lucky Logic, your security and peace of mind are our top priorities.
-            </Text>
-          </MotionBox>
-        </Flex>
-      </VStack>
-
-      <Divider my={16} />
-
-      {/* Services Section */}
-      <MotionBox
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.6 }}
-      >
-        <Heading as="h2" size="lg" mb={6} color="brand.green" textAlign="center">
-          Our Services
-        </Heading>
-        <Text fontSize="lg" lineHeight="taller" mb={8} textAlign="center">
-          We provide complete home tech solutions designed to simplify and secure your digital life:
-        </Text>
-        <List spacing={4} mb={8}>
-          <ListItem>
-            <ListIcon as={CheckCircleIcon} color="brand.green" />
-            Network setup and optimisation, including router configuration, troubleshooting with internet providers, and improving Wi-Fi coverage for your whole home.
-          </ListItem>
-          <ListItem>
-            <ListIcon as={CheckCircleIcon} color="brand.green" />
-            Expert PC and laptop repairs, custom-built computers, and sourcing quality parts tailored to your needs.
-          </ListItem>
-          <ListItem>
-            <ListIcon as={CheckCircleIcon} color="brand.green" />
-            Windows operating system installations, virus and malware removal, plus ongoing software troubleshooting to keep your devices running smoothly.
-          </ListItem>
-          <ListItem>
-            <ListIcon as={CheckCircleIcon} color="brand.green" />
-            Assistance with smart home devices and home automation, helping you get the most out of your connected lifestyle. Please note this service is offered within a limited scope.
-          </ListItem>
-        </List>
-        <Box textAlign="center">
-          <MotionButton
-            size="lg"
-            bg="brand.green"
+          <MotionHeading
+            as="h1"
+            size={{ base: '2xl', md: '3xl' }}
             color="white"
-            onClick={handleViewServices}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-            _hover={{ bg: 'green.700', boxShadow: 'lg', transform: 'translateY(-2px)' }}
-            style={{ transition: 'all 0.2s' }}
+            transition={{ duration: 0.5 }}
           >
-            View All Services
-          </MotionButton>
-        </Box>
-      </MotionBox>
+            About Lucky Logic
+          </MotionHeading>
+          <MotionText
+            fontSize={{ base: 'md', md: 'xl' }}
+            color="white"
+            fontWeight="medium"
+            maxW="2xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            Your trusted partner for seamless residential IT solutions in Sydney's Sutherland Shire.
+          </MotionText>
+        </VStack>
 
-      <Divider my={16} />
-
-      {/* Final Message */}
-      <MotionBox
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.7 }}
-        textAlign="center"
-      >
-        <Heading as="h2" size="lg" mb={4} color="brand.green">
-          Why Choose Lucky Logic?
-        </Heading>
-        <Text fontSize="lg" lineHeight="taller">
-          Choosing Lucky Logic means partnering with a team who genuinely cares about your digital wellbeing. We understand the intricacies of your home IT environment and are dedicated to ensuring your technology supports your lifestyle smoothly, securely and stress-free.
-        </Text>
-      </MotionBox>
-    </Box>
+        <VStack spacing={12} align="stretch">
+          <Section
+            icon={FiBookOpen}
+            title="Our Story"
+            content="Lucky Logic was founded out of a genuine passion for technology and a desire to help people get the most from their digital lives. Our founder has over 15 years of experience working with some of Australia's leading IT companies, gaining expertise in both hardware and software, as well as hands-on technical support. This extensive background has shaped our unique approach to residential IT. We combine professional knowledge with a personal touch, ensuring that every client receives solutions tailored to their needs. Our story is one of continuous learning, dedication, and a commitment to making technology accessible and stress-free for everyone."
+          />
+          <Divider />
+          <Section
+            icon={FiUserCheck}
+            title="What Makes Us Boutique?"
+            content="What sets Lucky Logic apart is our boutique approach to IT support. Unlike large, impersonal providers, we take the time to listen to your concerns and understand your unique situation. Whether you need help on-site or remotely, we tailor our solutions to fit your specific requirements. Our goal is to build lasting relationships with our clients, founded on trust, attention to detail, and genuine care. We believe that great service means being available when you need us, communicating clearly, and always putting your needs first."
+          />
+          <Divider />
+          <Section
+            icon={FiTarget}
+            title="A Needed Solution"
+            content="In 2024, we identified a significant gap in the market for high-quality residential IT support. While businesses often have access to dedicated IT teams, many households and home offices struggle to find reliable and trustworthy help. Lucky Logic was created to fill this void. Our services are designed specifically for Sydney homes, providing expert assistance for everything from network setup to device troubleshooting. We understand the unique challenges faced by residential clients and are committed to delivering solutions that are both effective and easy to understand."
+          />
+          <Divider />
+          <Section
+            icon={FiShield}
+            title="Your Security, Our Priority"
+            content="Your security is at the heart of everything we do. In today's digital world, threats like scams, phishing, and online fraud are more prevalent than ever. We take these concerns seriously and make your safety our top priority. Whether we are assisting you in person or providing remote support, we use best practices to protect your data and privacy. We stay up to date with the latest security trends and ensure that you are informed and empowered to keep your technology safe. Our commitment is to give you peace of mind, knowing that your digital life is in good hands."
+          />
+          <Divider />
+          <MotionBox
+            p={8}
+            borderRadius="2xl"
+            boxShadow="lg"
+            bg="whiteAlpha.800"
+            backdropFilter="blur(12px)"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Heading
+              as="h2"
+              size="lg"
+              mb={6}
+              color="brand.green"
+              textAlign="center"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              gap={2}
+            >
+              <Icon as={FiList} boxSize={6} /> Our Services
+            </Heading>
+            <Text fontSize="lg" fontWeight="medium" color="gray.800" mb={8} textAlign="center">
+              We offer a comprehensive range of home technology services to simplify, secure, and enhance your digital experience. Our team is dedicated to providing clear, effective solutions for every aspect of your home IT needs:
+            </Text>
+            <List spacing={4} mb={8} fontWeight="semibold">
+              <ListItem>
+                <ListIcon as={CheckCircleIcon} color="brand.green" />
+                Wi-Fi setup and optimisation, including router configuration and troubleshooting with your internet provider. We help ensure strong, reliable coverage throughout your home.
+              </ListItem>
+              <ListItem>
+                <ListIcon as={CheckCircleIcon} color="brand.green" />
+                Laptop and desktop repairs, custom computer builds, and sourcing of quality parts tailored to your needs. We keep your devices running smoothly and efficiently.
+              </ListItem>
+              <ListItem>
+                <ListIcon as={CheckCircleIcon} color="brand.green" />
+                Windows operating system installation, virus and malware removal, and ongoing software troubleshooting. We make sure your systems are secure and up to date.
+              </ListItem>
+              <ListItem>
+                <ListIcon as={CheckCircleIcon} color="brand.green" />
+                Support for smart home devices and home automation, helping you get the most out of your connected lifestyle. Please note this service is offered within a limited scope, but we are happy to advise on compatibility and setup.
+              </ListItem>
+            </List>
+            <Box textAlign="center">
+              <MotionButton
+                size="lg"
+                bg="brand.green"
+                color="white"
+                onClick={handleViewServices}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                _hover={{ bg: 'green.700', boxShadow: 'lg', transform: 'translateY(-2px)' }}
+              >
+                View Our Services
+              </MotionButton>
+            </Box>
+          </MotionBox>
+        </VStack>
+      </Box>
     </>
   );
 }
