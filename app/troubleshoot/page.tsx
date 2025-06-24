@@ -492,7 +492,7 @@ export default function TroubleshootPage() {
     : filteredCategories;
 
   return (
-    <Container maxW="3xl" py={{ base: 8, md: 16 }}>
+    <Container maxW="3xl" py={{ base: 8, md: 16 }} style={{ userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}>
       <Head>
         <script
           type="application/ld+json"
