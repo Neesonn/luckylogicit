@@ -67,6 +67,15 @@ export default function Footer() {
     }
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedName = localStorage.getItem('crispName');
+      const savedEmail = localStorage.getItem('crispEmail');
+      if (savedName) setChatName(savedName);
+      if (savedEmail) setChatEmail(savedEmail);
+    }
+  }, []);
+
   const loadCrisp = (name: string, email: string) => {
     if (typeof window !== 'undefined' && !window.$crisp) {
       window.$crisp = [];
@@ -109,8 +118,8 @@ export default function Footer() {
       return;
     }
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem('crispName', chatName);
-      sessionStorage.setItem('crispEmail', chatEmail);
+      localStorage.setItem('crispName', chatName);
+      localStorage.setItem('crispEmail', chatEmail);
       loadCrisp(chatName, chatEmail);
     }
   };
