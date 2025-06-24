@@ -1,16 +1,19 @@
 'use client';
 
-import { Box, Text, Link, Stack, Button, InputGroup, InputRightElement } from '@chakra-ui/react';
-import { useRef, useState } from 'react';
+import { Box, Text, Link, Stack, Button, InputGroup, InputRightElement, Spinner, Center } from '@chakra-ui/react';
+import { useRef, useState, useEffect } from 'react';
 import CookieBanner from './CookieBanner';
 import { FaWrench } from 'react-icons/fa';
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, Input, useDisclosure, FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import { FiMessageCircle } from 'react-icons/fi';
+import { Tooltip } from '@chakra-ui/react';
 
 declare global {
   interface Window {
     $crisp?: any;
+    loadCrispWithUser?: (name: string, email: string) => void;
   }
 }
 
@@ -22,6 +25,12 @@ export default function Footer() {
   const router = useRouter();
   const ADMIN_PASSWORD = 'changeme'; // TODO: Replace with your real password
   const [showPassword, setShowPassword] = useState(false);
+  const { isOpen: isChatOpen, onOpen: onChatOpen, onClose: onChatClose } = useDisclosure();
+  const [chatName, setChatName] = useState('');
+  const [chatEmail, setChatEmail] = useState('');
+  const [chatError, setChatError] = useState('');
+  const [crispLoaded, setCrispLoaded] = useState(false);
+  const [isLoadingChat, setIsLoadingChat] = useState(false);
 
   const handleChangePreferences = () => {
     cookieBannerRef.current?.openBanner();
@@ -45,6 +54,64 @@ export default function Footer() {
       }
     } catch (err) {
       setError('Something went wrong.');
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const name = sessionStorage.getItem('crispName');
+      const email = sessionStorage.getItem('crispEmail');
+      if (name && email && window.$crisp) {
+        setCrispLoaded(true);
+      }
+    }
+  }, []);
+
+  const loadCrisp = (name: string, email: string) => {
+    if (typeof window !== 'undefined' && !window.$crisp) {
+      window.$crisp = [];
+      (window as any).CRISP_WEBSITE_ID = "331a4420-a843-44e0-976c-fc2feddf2b0d";
+      (function() {
+        var d = document;
+        var s = d.createElement("script");
+        s.src = "https://client.crisp.chat/l.js";
+        s.async = 1;
+        d.getElementsByTagName("head")[0].appendChild(s);
+      })();
+      setIsLoadingChat(true);
+      var checkLoaded = setInterval(function() {
+        if (window.$crisp && window.$crisp.is) {
+          window.$crisp.push(["set", "user:email", email]);
+          window.$crisp.push(["set", "user:nickname", name]);
+          window.$crisp.push(["do", "chat:open"]);
+          clearInterval(checkLoaded);
+          setCrispLoaded(true);
+          setIsLoadingChat(false);
+          onChatClose();
+        }
+      }, 200);
+    }
+  };
+
+  const handleChatButton = () => {
+    onChatOpen();
+  };
+
+  const handleChatSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setChatError('');
+    if (!chatName.trim() || !chatEmail.trim()) {
+      setChatError('Please enter your name and email.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(chatEmail)) {
+      setChatError('Please enter a valid email address.');
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('crispName', chatName);
+      sessionStorage.setItem('crispEmail', chatEmail);
+      loadCrisp(chatName, chatEmail);
     }
   };
 
@@ -103,25 +170,6 @@ export default function Footer() {
         >
           <FaWrench size={22} color="#003f2d" style={{ verticalAlign: 'middle' }} />
         </Button>
-        {/* Accessible chat launcher button */}
-        <Button
-          position="absolute"
-          left={4}
-          top={4}
-          aria-label="Open live chat"
-          bg="brand.gold"
-          color="brand.green"
-          _hover={{ bg: '#b38d1c' }}
-          onClick={() => window.$crisp?.push(["do", "chat:open"])}
-          p={0}
-          minW={0}
-          tabIndex={0}
-        >
-          {/* You can use a chat icon here, e.g. from react-icons */}
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 15.5C21 16.3284 20.3284 17 19.5 17H7.41421L3.70711 20.7071C3.07714 21.3371 2 20.8906 2 20.0001V4.5C2 3.67157 2.67157 3 3.5 3H19.5C20.3284 3 21 3.67157 21 4.5V15.5Z" stroke="#1A3D36" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </Button>
       </Box>
 
       {/* Admin password modal */}
@@ -163,6 +211,105 @@ export default function Footer() {
             </Button>
             <Button variant="ghost" onClick={onClose}>Cancel</Button>
           </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Floating chat button (bottom right) */}
+      {!crispLoaded && (
+        <Tooltip label="Chat with us" placement="left" hasArrow>
+          <Button
+            position="fixed"
+            right={6}
+            bottom={6}
+            zIndex={1000}
+            aria-label="Open live chat"
+            bgGradient="linear(to-br, #38A169, #276749)"
+            color="white"
+            _hover={{
+              transform: 'scale(1.08)',
+              boxShadow: '0 8px 24px rgba(56,161,105,0.25)',
+              bgGradient: 'linear(to-br, #276749, #38A169)'
+            }}
+            _active={{
+              transform: 'scale(0.98)',
+              boxShadow: '0 4px 12px rgba(56,161,105,0.18)'
+            }}
+            transition="all 0.18s cubic-bezier(.4,0,.2,1)"
+            boxShadow="0 4px 16px rgba(56,161,105,0.18)"
+            onClick={handleChatButton}
+            p={0}
+            minW={0}
+            borderRadius="full"
+            width="60px"
+            height="60px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <FiMessageCircle size={32} />
+          </Button>
+        </Tooltip>
+      )}
+      {/* Chat Name/Email modal */}
+      <Modal isOpen={isChatOpen} onClose={onChatClose} isCentered size="md">
+        <ModalOverlay />
+        <ModalContent borderRadius="2xl" boxShadow="2xl" p={2}>
+          <ModalHeader textAlign="center" fontSize="2xl" fontWeight="bold" color="brand.green" pb={0}>
+            Start Live Chat
+          </ModalHeader>
+          <Text textAlign="center" color="gray.600" fontSize="md" mt={1} mb={4}>
+            Enter your details to connect instantly with our team.
+          </Text>
+          <ModalCloseButton disabled={isLoadingChat} />
+          {isLoadingChat ? (
+            <Center py={10} flexDirection="column">
+              <Spinner size="xl" color="brand.green" mb={4} thickness="4px" speed="0.7s" />
+              <Text color="gray.600" fontWeight="medium">Loading chat...</Text>
+            </Center>
+          ) : (
+            <form onSubmit={handleChatSubmit}>
+              <ModalBody pb={2}>
+                <FormControl isRequired mb={4} isDisabled={isLoadingChat}>
+                  <FormLabel>Name</FormLabel>
+                  <Input
+                    value={chatName}
+                    onChange={e => setChatName(e.target.value)}
+                    placeholder="Your name"
+                    size="lg"
+                    borderRadius="lg"
+                    bg="gray.50"
+                    _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                  />
+                </FormControl>
+                <FormControl isRequired mb={2} isInvalid={!!chatError} isDisabled={isLoadingChat}>
+                  <FormLabel>Email</FormLabel>
+                  <Input
+                    type="email"
+                    value={chatEmail}
+                    onChange={e => setChatEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    size="lg"
+                    borderRadius="lg"
+                    bg="gray.50"
+                    _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                  />
+                  {chatError && <FormErrorMessage>{chatError}</FormErrorMessage>}
+                </FormControl>
+                <Text fontSize="xs" color="gray.500" mt={3} mb={1} textAlign="center">
+                  By using this live chat, you accept our{' '}
+                  <Link href="/privacy-policy" color="brand.green" textDecoration="underline" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>
+                  {' '}and{' '}
+                  <Link href="/terms" color="brand.green" textDecoration="underline" target="_blank" rel="noopener noreferrer">Terms & Conditions</Link>.
+                </Text>
+              </ModalBody>
+              <ModalFooter display="flex" flexDirection="column" gap={2}>
+                <Button colorScheme="green" w="100%" size="lg" type="submit" borderRadius="lg" isLoading={isLoadingChat} loadingText="Loading chat...">
+                  Start Chat
+                </Button>
+                <Button variant="ghost" onClick={onChatClose} w="100%" size="lg" borderRadius="lg" isDisabled={isLoadingChat}>Cancel</Button>
+              </ModalFooter>
+            </form>
+          )}
         </ModalContent>
       </Modal>
 

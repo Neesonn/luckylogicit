@@ -87,32 +87,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ErrorBoundary>
         </ChakraProvider>
         <GoogleAnalytics />
-        <Script
-          id="crisp-chat"
-          strategy="lazyOnload"
-          dangerouslySetInnerHTML={{
-            __html: `
-              function loadCrisp() {
-                window.$crisp = [];
-                window.CRISP_WEBSITE_ID = "331a4420-a843-44e0-976c-fc2feddf2b0d";
-                window.$crisp.push(["config", "privacy:url", "https://luckylogic.com.au/legal"]);
-                (function() {
-                  var d = document;
-                  var s = d.createElement("script");
-                  s.src = "https://client.crisp.chat/l.js";
-                  s.async = 1;
-                  d.getElementsByTagName("head")[0].appendChild(s);
-                })();
-              }
-              // Only load Crisp if consent is already given
-              try {
-                if (localStorage.getItem('cookieConsent') === 'true') {
-                  loadCrisp();
-                }
-              } catch (e) {}
-            `,
-          }}
-        />
       </body>
     </html>
   );
