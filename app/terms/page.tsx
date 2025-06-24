@@ -12,6 +12,9 @@ export default function TermsPage() {
         canonicalUrl="https://luckylogic.com.au/terms"
       />
       <Box px={6} py={{ base: 16, md: 24 }} maxW="3xl" mx="auto">
+        <Text mb={2} fontSize="sm" color="gray.500" textAlign="right">
+          Last updated: 25/06/2025
+        </Text>
         <Heading as="h1" size="xl" mb={6} color="brand.green">
           Terms & Conditions
         </Heading>

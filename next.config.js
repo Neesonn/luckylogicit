@@ -2,14 +2,14 @@
 
 const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://client.crisp.chat https://www.googletagmanager.com;
-    style-src 'self' 'unsafe-inline' https://client.crisp.chat https://fonts.googleapis.com;
-    img-src 'self' data: https://image.crisp.chat https://client.crisp.chat https://www.google-analytics.com https://www.googletagmanager.com;
-    font-src 'self' https://client.crisp.chat https://fonts.gstatic.com;
-    connect-src 'self' https://client.crisp.chat https://storage.crisp.chat wss://client.relay.crisp.chat wss://stream.relay.crisp.chat https://www.google-analytics.com;
-    frame-src 'self' https://game.crisp.chat;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.crisp.chat https://www.googletagmanager.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/;
+    style-src 'self' 'unsafe-inline' https://*.crisp.chat https://fonts.googleapis.com;
+    img-src 'self' data: https://*.crisp.chat https://www.google-analytics.com https://www.googletagmanager.com https://www.gstatic.com/recaptcha/ https://www.google.com/recaptcha/;
+    font-src 'self' https://fonts.gstatic.com;
+    connect-src 'self' https://*.crisp.chat wss://*.crisp.chat https://www.google-analytics.com https://formspree.io/ https://www.google.com/;
+    frame-src 'self' https://*.crisp.chat https://www.google.com/recaptcha/;
     worker-src 'self' blob:;
-    media-src 'self' https://client.crisp.chat;
+    media-src 'self' https://*.crisp.chat;
 `.replace(/\s{2,}/g, ' ').trim();
 
 const nextConfig = {

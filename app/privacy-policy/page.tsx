@@ -15,6 +15,9 @@ export default function PrivacyPolicyPage() {
         <Heading as="h1" size="xl" mb={6} color="brand.green">
           Privacy Policy
         </Heading>
+        <Text mb={2} fontSize="sm" color="gray.500" textAlign="right">
+          Last updated: 25/06/2025
+        </Text>
 
         <Text mb={6}>
           Lucky Logic IT Services ("we", "us", "our") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and manage your personal data in compliance with the Australian Privacy Act 1988 and Australian Privacy Principles (APPs).

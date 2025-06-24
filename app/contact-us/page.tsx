@@ -131,7 +131,7 @@ function ContactForm() {
   };
 
   return (
-    <Box as="form" onSubmit={handleSubmit} w="full">
+    <Box as="form" onSubmit={handleSubmit} w="full" method="POST">
       <VStack spacing={6}>
         <FormControl isRequired>
           <FormLabel>Your Name</FormLabel>

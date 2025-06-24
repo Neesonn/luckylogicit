@@ -17,6 +17,9 @@ export default function CookiePolicyPage() {
         <Heading as="h1" size="xl" mb={6} color="brand.green">
           Cookie Policy
         </Heading>
+        <Text mb={2} fontSize="sm" color="gray.500" textAlign="right">
+          Last updated: 25/06/2025
+        </Text>
 
         <Text mb={6}>
           This Cookie Policy explains how Lucky Logic IT Services ("we", "us", "our") uses cookies and similar tracking technologies on our website.
