@@ -3,9 +3,9 @@
 const cspHeader = `
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'unsafe-eval' https://client.crisp.chat https://www.googletagmanager.com;
-    style-src 'self' 'unsafe-inline' https://client.crisp.chat;
+    style-src 'self' 'unsafe-inline' https://client.crisp.chat https://fonts.googleapis.com;
     img-src 'self' data: https://image.crisp.chat https://client.crisp.chat https://www.google-analytics.com https://www.googletagmanager.com;
-    font-src 'self' https://client.crisp.chat;
+    font-src 'self' https://client.crisp.chat https://fonts.gstatic.com;
     connect-src 'self' https://client.crisp.chat https://storage.crisp.chat wss://client.relay.crisp.chat wss://stream.relay.crisp.chat https://www.google-analytics.com;
     frame-src 'self' https://game.crisp.chat;
     worker-src 'self' blob:;
