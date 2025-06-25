@@ -258,7 +258,7 @@ npm run test:coverage # Generate coverage report
 - **Business Name**: Lucky Logic IT
 - **ABN**: 68 522 123 312
 - **Service Area**: Sydney Metropolitan Area
-- **Specialization**: Residential IT Support
+- **Specialization**: Reliable IT Services for Homes & Small Businesses
 
 ### **Service Hours**
 - **Monday - Friday**: 9:00 AM - 5:00 PM

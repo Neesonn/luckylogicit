@@ -71,7 +71,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            Expert Residential IT Support
+            Reliable IT Services for Homes & Small Businesses
           </MotionHeading>
 
           <MotionText
@@ -83,7 +83,7 @@ export default function Hero() {
             transition={{ delay: 0.4 }}
             maxW={{ base: '100%', md: '80%' }}
           >
-            Helping Sydney homes stay connected with reliable in-home tech support – from Wi-Fi setup and device fixes to smart home installs and ongoing help when you need it.
+            Keeping Sydney homes and small businesses connected with expert tech support for networking, devices, smart installations, and more.
           </MotionText>
 
           <MotionText

@@ -162,7 +162,7 @@ export default function AboutUsPage() {
           <Section
             icon={FiTarget}
             title="A Needed Solution"
-            content="In 2024, we identified a significant gap in the market for high-quality residential IT support. While businesses often have access to dedicated IT teams, many households and home offices struggle to find reliable and trustworthy help. Lucky Logic was created to fill this void. Our services are designed specifically for Sydney homes, providing expert assistance for everything from network setup to device troubleshooting. We understand the unique challenges faced by residential clients and are committed to delivering solutions that are both effective and easy to understand."
+            content="In 2024, we identified a significant gap in the market for high-quality IT support tailored to both homes and small businesses. While larger companies often have access to dedicated IT teams, many households, home offices, and small businesses struggle to find reliable and trustworthy help. Lucky Logic was created to fill this void. Our services are designed specifically for Sydney homes and small businesses, providing expert assistance with everything from network setup to device troubleshooting. We understand the unique challenges faced by residential clients and small business owners alike, and we're committed to delivering solutions that are both effective and easy to understand."
           />
           <Divider />
           <Section
