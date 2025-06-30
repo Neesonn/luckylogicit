@@ -280,7 +280,7 @@ export default function ContactUsPage() {
             Phone: <Link href="tel:+61426901209" color="brand.green" rel="noopener noreferrer">+61 426 901 209</Link>
           </Text>
           <Text fontSize="md">
-            Address: 580 Princes Highway, Kirrawee 2232
+            Address: South Village, 2 Kiln Rd, Kirrawee 2232 (Pickup and Dropoff only)
           </Text>
         </VStack>
 
