@@ -10,8 +10,8 @@ const containerStyle = {
 };
 
 const center = {
-  lat: -34.0542,  // Updated to 580 Princes Hwy, Kirrawee NSW 2232
-  lng: 151.0871
+  lat: -34.0347,  // Updated to South Village, 2 Kiln Rd, Kirrawee NSW 2232 (Pickup and Dropoff only)
+  lng: 151.0702
 };
 
 const circleOptions = {

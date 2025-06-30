@@ -115,7 +115,7 @@ export default function AboutUsPage() {
       },
       'address': {
         '@type': 'PostalAddress',
-        'streetAddress': '580 Princes Highway',
+        'streetAddress': 'South Village, 2 Kiln Rd, Kirrawee 2232 (Pickup and Dropoff only)',
         'addressLocality': 'Kirrawee',
         'addressRegion': 'NSW',
         'postalCode': '2232',
