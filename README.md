@@ -244,7 +244,7 @@ npm run test:coverage # Generate coverage report
 ### **Technical Support**
 - **Email**: support@luckylogic.com.au
 - **Phone**: +61 426 901 209
-- **Address**: 580 Princes Highway, Kirrawee NSW 2232
+- **Address**: South Village, 2 Kiln Rd, Kirrawee 2232 (Pickup and Dropoff only)
 
 ### **Maintenance Tasks**
 - **Regular Updates**: Dependencies and security patches

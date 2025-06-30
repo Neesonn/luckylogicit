@@ -17,7 +17,7 @@ export default function HomePage() {
     telephone: '+61426901209',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: '580 Princes Highway',
+      streetAddress: 'South Village, 2 Kiln Rd, Kirrawee 2232 (Pickup and Dropoff only)',
       addressLocality: 'Kirrawee',
       addressRegion: 'NSW',
       postalCode: '2232',

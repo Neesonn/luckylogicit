@@ -35,6 +35,7 @@ import {
 import { useSearchParams } from 'next/navigation';
 import SEO from '../../components/SEO';
 import JsonLd from '../../components/JsonLd';
+import { FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 
 function ContactForm() {
   const [name, setName] = useState('');
@@ -233,7 +234,7 @@ export default function ContactUsPage() {
       },
       address: {
         '@type': 'PostalAddress',
-        streetAddress: '580 Princes Highway',
+        streetAddress: 'South Village, 2 Kiln Rd, Kirrawee 2232 (Pickup and Dropoff only)',
         addressLocality: 'Kirrawee',
         addressRegion: 'NSW',
         postalCode: '2232',
@@ -273,13 +274,16 @@ export default function ContactUsPage() {
 
         <VStack spacing={2} align="center" mt={10} textAlign="center">
           <Text fontSize="lg" fontWeight="semibold" color="brand.green">Or reach us directly:</Text>
-          <Text fontSize="md">
+          <Text fontSize="md" display="flex" alignItems="center" justifyContent="center" gap={2}>
+            <Icon as={FiMail} boxSize={5} color="brand.green" />
             Email: <Link href="mailto:support@luckylogic.com.au" color="brand.green" rel="noopener noreferrer">support@luckylogic.com.au</Link>
           </Text>
-          <Text fontSize="md">
+          <Text fontSize="md" display="flex" alignItems="center" justifyContent="center" gap={2}>
+            <Icon as={FiPhone} boxSize={5} color="brand.green" />
             Phone: <Link href="tel:+61426901209" color="brand.green" rel="noopener noreferrer">+61 426 901 209</Link>
           </Text>
-          <Text fontSize="md">
+          <Text fontSize="md" display="flex" alignItems="center" justifyContent="center" gap={2}>
+            <Icon as={FiMapPin} boxSize={5} color="brand.green" />
             Address: South Village, 2 Kiln Rd, Kirrawee 2232 (Pickup and Dropoff only)
           </Text>
         </VStack>
