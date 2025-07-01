@@ -121,7 +121,7 @@ export default function FrequentFlyerHelpPage() {
         </VStack>
       </Box>
       {/* Navigation Buttons for FAQ, IT Services, Troubleshooting Guide */}
-      <HStack justify="center" spacing={4} mb={8}>
+      <HStack justify="center" spacing={4} mb={8} display={{ base: 'none', md: 'flex' }}>
         <Button as={NextLink} href="/faq" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
           <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1, color: '#e53e3e' }}>❓</span>
           FAQ
@@ -135,6 +135,20 @@ export default function FrequentFlyerHelpPage() {
           Troubleshooting Guide
         </Button>
       </HStack>
+      <VStack display={{ base: 'flex', md: 'none' }} spacing={3} mb={8} width="100%" align="center">
+        <Button as={NextLink} href="/faq" size="sm" maxW="320px" width="100%" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid">
+          <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1, color: '#e53e3e' }}>❓</span>
+          FAQ
+        </Button>
+        <Button as={NextLink} href="/services" size="sm" maxW="320px" width="100%" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid">
+          <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>⚙️</span>
+          IT Services
+        </Button>
+        <Button as={NextLink} href="/troubleshoot" size="sm" maxW="320px" width="100%" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid">
+          <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>🔧</span>
+          Troubleshooting Guide
+        </Button>
+      </VStack>
       {/* What We Can Help With */}
       <Box bg="white" borderRadius="2xl" boxShadow="lg" maxW="5xl" mx="auto" mb={{ base: 6, md: 10 }} px={{ base: 2, md: 10 }} py={{ base: 6, md: 14 }}>
         <Heading as="h2" size="lg" mb={6} color="#003f2d">
