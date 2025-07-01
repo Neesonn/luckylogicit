@@ -253,20 +253,46 @@ export default function ServicesPage() {
           <Text fontSize="lg" color="gray.600" maxW="2xl">
             Friendly, professional IT help delivered to your door with clear, upfront pricing. We only charge a call-out fee once we've assessed the issue and you've approved the quote. Most problems can be resolved during the initial visit, but if further diagnostics, parts, or repairs are needed, an updated quote will be provided for your approval before any additional work is done.
           </Text>
-          <HStack justify="center" spacing={4} mt={2}>
-            <Button as={NextLink} href="/faq" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
-              <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>❓</span>
-              View FAQ
-            </Button>
-            <Button as={NextLink} href="/travel-assistance" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
-              <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>✈️</span>
-              Frequent Flyer Help
-            </Button>
-            <Button as={NextLink} href="/troubleshoot" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
-              <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>🔧</span>
-              Troubleshooting Guide
-            </Button>
-          </HStack>
+          <Box width="100%">
+            <HStack
+              display={{ base: 'none', md: 'flex' }}
+              justify="center"
+              spacing={4}
+              mt={2}
+            >
+              <Button as={NextLink} href="/faq" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+                <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>❓</span>
+                View FAQ
+              </Button>
+              <Button as={NextLink} href="/travel-assistance" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+                <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>✈️</span>
+                Frequent Flyer Help
+              </Button>
+              <Button as={NextLink} href="/troubleshoot" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+                <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>🔧</span>
+                Troubleshooting Guide
+              </Button>
+            </HStack>
+            <VStack
+              display={{ base: 'flex', md: 'none' }}
+              spacing={3}
+              mt={2}
+              width="100%"
+            >
+              <Button as={NextLink} href="/faq" width="100%" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+                <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>❓</span>
+                View FAQ
+              </Button>
+              <Button as={NextLink} href="/travel-assistance" width="100%" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+                <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>✈️</span>
+                Frequent Flyer Help
+              </Button>
+              <Button as={NextLink} href="/troubleshoot" width="100%" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+                <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>🔧</span>
+                Troubleshooting Guide
+              </Button>
+            </VStack>
+          </Box>
         </VStack>
 
         {isMobile ? (
