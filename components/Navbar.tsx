@@ -1,4 +1,4 @@
-import { Flex, Text, Box, HStack, Spacer, IconButton, useBreakpointValue, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
+import { Flex, Text, Box, HStack, Spacer, IconButton, useBreakpointValue, Menu, MenuButton, MenuList, MenuItem, Button } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { FaWhatsapp, FaInstagram, FaFacebook, FaBars, FaLinkedin } from 'react-icons/fa';
 import React from 'react';
@@ -82,22 +82,19 @@ export default function Navbar() {
             </Text>
           </NextLink>
 
-          <NextLink href="/services" passHref legacyBehavior>
-            <Text
-              as="a"
-              color="brand.green"
-              fontWeight="medium"
-              fontSize="md"
-              cursor="pointer"
-              _focus={{
-                outline: '2px solid',
-                outlineColor: 'brand.green',
-                outlineOffset: '2px',
-              }}
-            >
+          <Menu isLazy>
+            <MenuButton as={Text} color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer" _focus={{ outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>
               Services
-            </Text>
-          </NextLink>
+            </MenuButton>
+            <MenuList zIndex={20}>
+              <NextLink href="/services" passHref legacyBehavior>
+                <MenuItem as="a" color="brand.green" fontWeight="medium" fontSize="md" _hover={{ bg: 'green.50', color: 'green.700' }} _focus={{ bg: 'green.50', color: 'green.700' }}>IT Services</MenuItem>
+              </NextLink>
+              <NextLink href="/travel-assistance" passHref legacyBehavior>
+                <MenuItem as="a" color="brand.green" fontWeight="medium" fontSize="md" _hover={{ bg: 'green.50', color: 'green.700' }} _focus={{ bg: 'green.50', color: 'green.700' }}>Frequent Flyer Help</MenuItem>
+              </NextLink>
+            </MenuList>
+          </Menu>
 
           <NextLink href="/troubleshoot" passHref legacyBehavior>
             <Text

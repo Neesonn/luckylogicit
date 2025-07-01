@@ -55,6 +55,7 @@ function ContactForm() {
     { label: 'Printer & Peripheral Support', icon: PhoneIcon },
     { label: 'Virus and Malware Support', icon: WarningIcon },
     { label: 'Mobile Device Support', icon: QuestionIcon },
+    { label: 'Frequent Flyer Help', icon: StarIcon },
     { label: 'Anything else', icon: QuestionIcon },
   ];
 

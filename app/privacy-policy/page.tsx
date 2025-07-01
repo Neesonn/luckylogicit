@@ -25,7 +25,7 @@ export default function PrivacyPolicyPage() {
           Privacy Policy
         </Heading>
         <Text mb={2} fontSize="sm" color="gray.500" textAlign="right">
-          Last updated: 25/06/2025
+          Last updated: 01/07/2025
         </Text>
 
         <Text mb={6}>
@@ -44,6 +44,7 @@ export default function PrivacyPolicyPage() {
           <ListItem>Details related to your device, network, and IT support requests</ListItem>
           <ListItem>Usage data and technical information collected via cookies, analytics tools (Google Analytics), and chat (Crisp)</ListItem>
           <ListItem>Any other information you provide directly to us (e.g., via contact forms powered by Formspree)</ListItem>
+          <ListItem>If you use our Frequent Flyer Help service, we may collect additional information such as your frequent flyer program details, account numbers, point balances, travel preferences, and intended travel dates. This information is used solely to provide the requested advisory or booking assistance.</ListItem>
         </UnorderedList>
 
         <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
@@ -60,6 +61,7 @@ export default function PrivacyPolicyPage() {
           <ListItem>Ensure compliance with legal obligations</ListItem>
           <ListItem>Enhance your experience on our website and services (including analytics and cookies, with your consent)</ListItem>
           <ListItem>Send marketing communications if you have consented (you may opt out at any time)</ListItem>
+          <ListItem>For Frequent Flyer Help, we use the information you provide to research award seat availability, provide advice, and (if applicable) assist with booking flights using your points. We do not share your frequent flyer account details or travel preferences with any third parties except as necessary to fulfill your request (e.g., to complete a booking with your explicit consent).</ListItem>
         </UnorderedList>
 
         <Text mb={6}>
@@ -90,6 +92,7 @@ export default function PrivacyPolicyPage() {
         </Heading>
         <Text mb={6}>
           We implement industry-standard measures including SSL encryption, access controls, and regular security reviews to protect your data from unauthorized access and breaches. All payments made via our site are processed securely by Stripe. We do not store or handle your full card information.
+          For Frequent Flyer Help, we take reasonable steps to protect the confidentiality and security of your frequent flyer information. Please do not send sensitive account passwords or PINs.
         </Text>
 
         <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">

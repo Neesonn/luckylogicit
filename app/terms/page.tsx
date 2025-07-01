@@ -22,7 +22,7 @@ export default function TermsPage() {
       <JsonLd data={termsData} />
       <Box px={6} py={{ base: 16, md: 24 }} maxW="3xl" mx="auto">
         <Text mb={2} fontSize="sm" color="gray.500" textAlign="right">
-          Last updated: 25/06/2025
+          Last updated: 01/07/2025
         </Text>
         <Heading as="h1" size="xl" mb={6} color="brand.green">
           Terms & Conditions
@@ -87,6 +87,20 @@ export default function TermsPage() {
         <Text mb={6}>
           These services may process your data outside Australia. Please review our <Link href="/privacy-policy" color="brand.green" textDecoration="underline">Privacy Policy</Link> and <Link href="/cookie-policy" color="brand.green" textDecoration="underline">Cookie Policy</Link> for more information about how your data is handled and your rights.
         </Text>
+
+        <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
+          4a. Frequent Flyer Assistance
+        </Heading>
+        <Text mb={6}>
+          Lucky Logic IT offers Frequent Flyer Help as a paid advisory and/or booking assistance service. This service includes advice on the use of frequent flyer points, research on award seat availability, and (if applicable) assistance with booking flights using points.
+        </Text>
+        <UnorderedList mb={6} pl={6}>
+          <ListItem>Lucky Logic IT is not affiliated with any airline, frequent flyer program, or travel provider. All advice is based on publicly available information and best efforts.</ListItem>
+          <ListItem>Seat availability, pricing, and program rules are subject to change by airlines and are outside our control. We do not guarantee the availability of any specific flight or reward.</ListItem>
+          <ListItem>Users are responsible for providing accurate frequent flyer account details, point balances, and travel preferences. Lucky Logic IT is not liable for errors resulting from incorrect information provided by the user.</ListItem>
+          <ListItem>Lucky Logic IT is not responsible for any losses, missed opportunities, or changes in airline policies that may affect your ability to book or use points.</ListItem>
+          <ListItem>By using this service, you acknowledge that all bookings are subject to the terms and conditions of the relevant airline or loyalty program.</ListItem>
+        </UnorderedList>
 
         <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
           5. Privacy
