@@ -278,16 +278,17 @@ export default function ServicesPage() {
               spacing={3}
               mt={2}
               width="100%"
+              align="center"
             >
-              <Button as={NextLink} href="/faq" width="100%" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+              <Button as={NextLink} href="/faq" size="sm" maxW="320px" width="100%" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid">
                 <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>❓</span>
                 View FAQ
               </Button>
-              <Button as={NextLink} href="/travel-assistance" width="100%" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+              <Button as={NextLink} href="/travel-assistance" size="sm" maxW="320px" width="100%" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid">
                 <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>✈️</span>
                 Frequent Flyer Help
               </Button>
-              <Button as={NextLink} href="/troubleshoot" width="100%" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+              <Button as={NextLink} href="/troubleshoot" size="sm" maxW="320px" width="100%" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid">
                 <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>🔧</span>
                 Troubleshooting Guide
               </Button>
