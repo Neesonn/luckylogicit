@@ -28,6 +28,7 @@ import {
   FiShield,
   FiHeadphones,
   FiPhone,
+  FiSend,
 } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
 import ServiceGrid from '../../components/ServiceGrid';
@@ -254,9 +255,15 @@ export default function ServicesPage() {
           </Text>
           <HStack justify="center" spacing={4} mt={2}>
             <Button as={NextLink} href="/faq" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+              <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>❓</span>
               View FAQ
             </Button>
-            <Button as={NextLink} href="/troubleshoot" variant="outline" size="md" color="#003f2d" borderColor="#003f2d" _hover={{ bg: '#e9f5f1' }}>
+            <Button as={NextLink} href="/travel-assistance" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+              <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>✈️</span>
+              Frequent Flyer Help
+            </Button>
+            <Button as={NextLink} href="/troubleshoot" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+              <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>🔧</span>
               Troubleshooting Guide
             </Button>
           </HStack>

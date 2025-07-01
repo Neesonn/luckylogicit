@@ -121,9 +121,11 @@ export default function FAQPage() {
         </Text>
         <HStack justify="center" spacing={4} mb={8}>
           <Button as={NextLink} href="/services" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+            <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>⚙️</span>
             Our Services
           </Button>
-          <Button as={NextLink} href="/troubleshoot" variant="outline" size="md" color="#003f2d" borderColor="#003f2d" _hover={{ bg: '#e9f5f1' }}>
+          <Button as={NextLink} href="/troubleshoot" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} variant="solid" size="md">
+            <span style={{ marginRight: 6, fontSize: '1.1em', lineHeight: 1 }}>🔧</span>
             Troubleshooting Guide
           </Button>
         </HStack>
