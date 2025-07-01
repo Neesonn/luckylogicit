@@ -1,4 +1,4 @@
-import { Flex, Text, Box, HStack, Spacer, IconButton, useBreakpointValue, Menu, MenuButton, MenuList, MenuItem, Button } from '@chakra-ui/react';
+import { Flex, Text, Box, HStack, Spacer, IconButton, useBreakpointValue, Menu, MenuButton, MenuList, MenuItem, Button, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { FaWhatsapp, FaInstagram, FaFacebook, FaBars, FaLinkedin } from 'react-icons/fa';
 import React from 'react';
@@ -164,76 +164,40 @@ export default function Navbar() {
           />
           <MenuList>
             <NextLink href="/" passHref>
-              <MenuItem
-                _focus={{
-                  bg: 'green.50',
-                  outline: '2px solid',
-                  outlineColor: 'brand.green',
-                  outlineOffset: '2px',
-                }}
-              >
-                Home
-              </MenuItem>
+              <MenuItem _focus={{ bg: 'green.50', outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>Home</MenuItem>
             </NextLink>
             <NextLink href="/about-us" passHref>
-              <MenuItem
-                _focus={{
-                  bg: 'green.50',
-                  outline: '2px solid',
-                  outlineColor: 'brand.green',
-                  outlineOffset: '2px',
-                }}
-              >
-                About Us
-              </MenuItem>
+              <MenuItem _focus={{ bg: 'green.50', outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>About Us</MenuItem>
             </NextLink>
-            <NextLink href="/services" passHref>
-              <MenuItem
-                _focus={{
-                  bg: 'green.50',
-                  outline: '2px solid',
-                  outlineColor: 'brand.green',
-                  outlineOffset: '2px',
-                }}
-              >
-                Services
-              </MenuItem>
-            </NextLink>
+            {/* Services expandable accordion */}
+            <Accordion allowToggle reduceMotion={true} borderColor="transparent">
+              <AccordionItem border="none">
+                {({ isExpanded }) => (
+                  <>
+                    <AccordionButton _focus={{ bg: 'green.50', outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }} px={4} py={2}>
+                      <Box flex="1" textAlign="left">Services</Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={2} pl={4}>
+                      <NextLink href="/services" passHref>
+                        <MenuItem as="a" color="brand.green" fontWeight="medium" fontSize="md" _hover={{ bg: 'green.50', color: 'green.700' }} _focus={{ bg: 'green.50', color: 'green.700' }}>IT Services</MenuItem>
+                      </NextLink>
+                      <NextLink href="/travel-assistance" passHref>
+                        <MenuItem as="a" color="brand.green" fontWeight="medium" fontSize="md" _hover={{ bg: 'green.50', color: 'green.700' }} _focus={{ bg: 'green.50', color: 'green.700' }}>Frequent Flyer Help</MenuItem>
+                      </NextLink>
+                    </AccordionPanel>
+                  </>
+                )}
+              </AccordionItem>
+            </Accordion>
             <NextLink href="/troubleshoot" passHref>
-              <MenuItem
-                _focus={{
-                  bg: 'green.50',
-                  outline: '2px solid',
-                  outlineColor: 'brand.green',
-                  outlineOffset: '2px',
-                }}
-              >
-                Troubleshoot
-              </MenuItem>
+              <MenuItem _focus={{ bg: 'green.50', outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>Troubleshoot</MenuItem>
             </NextLink>
             <NextLink href="/faq" passHref>
-              <MenuItem
-                _focus={{
-                  bg: 'green.50',
-                  outline: '2px solid',
-                  outlineColor: 'brand.green',
-                  outlineOffset: '2px',
-                }}
-              >
-                FAQ
-              </MenuItem>
+              <MenuItem _focus={{ bg: 'green.50', outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>FAQ</MenuItem>
             </NextLink>
             <NextLink href="/contact-us" passHref>
-              <MenuItem
-                _focus={{
-                  bg: 'green.50',
-                  outline: '2px solid',
-                  outlineColor: 'brand.green',
-                  outlineOffset: '2px',
-                }}
-              >
-                Contact Us
-              </MenuItem>
+              <MenuItem _focus={{ bg: 'green.50', outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>Contact Us</MenuItem>
             </NextLink>
           </MenuList>
         </Menu>
