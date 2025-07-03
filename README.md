@@ -89,6 +89,43 @@ Lucky Logic provides comprehensive residential IT support and computer services 
 - **Show Online Status Elsewhere**: Use the Crisp JS API to display online status outside the chatbox if needed.
 - **Further Customization**: See Crisp's [official documentation](https://help.crisp.chat/en/) for more options.
 
+## 🗄️ Product Catalogue & Supabase Integration
+
+### Live Product Catalogue Admin
+- The admin product catalogue page now uses **Supabase** for live, production-ready data sync.
+- All product CRUD operations (add, edit, delete) are instantly reflected in your Supabase database.
+
+### Supabase Setup
+1. **Create a Supabase project** at https://app.supabase.com/
+2. **Create a `products` table** with columns:
+   - `id` (integer, primary key, auto-increment)
+   - `name`, `vendor`, `description`, `category`, `distributor`, `vendorSku`, `distributorSku` (text)
+   - `rrp`, `cost`, `markup`, `sell` (numeric/float)
+   - `costGstType` (text)
+   - `createdAt`, `updatedAt` (timestamp, default: now())
+3. **Enable Row Level Security (RLS)** and add a permissive policy for development:
+   ```sql
+   CREATE POLICY "Allow all" ON products FOR ALL USING (true);
+   ```
+4. **Get your Supabase project URL and anon key** from Project Settings > API.
+
+### Environment Variables
+Add these to your `.env.local`:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+```
+
+### Development Notes
+- The product admin UI is in `app/admin/products/page.tsx`.
+- All product data is fetched and mutated via the Supabase JS client.
+- TypeScript types ensure type safety for all product operations.
+- Margin is always calculated on the fly: `(sell - cost)`.
+
+### Security
+- **Never expose your Supabase service_role key in the frontend.**
+- For production, restrict RLS policies as needed.
+
 ## 🛠️ Development
 
 ### **Prerequisites**
