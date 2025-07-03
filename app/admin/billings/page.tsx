@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Box, Heading, Text, Table, Thead, Tbody, Tr, Th, Td, Spinner, Alert, AlertIcon, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button } from '@chakra-ui/react';
+import Link from 'next/link';
 
 function getStatus(inv: any) {
   if (inv.status === 'open' && inv.due_date && inv.due_date * 1000 < Date.now()) {
@@ -31,6 +32,7 @@ export default function BillingsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalInvoices, setModalInvoices] = useState<any[]>([]);
   const [modalTitle, setModalTitle] = useState('');
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     fetch('/api/list-stripe-invoices')
@@ -105,6 +107,12 @@ export default function BillingsPage() {
     setModalTitle(title);
     setModalOpen(true);
   }
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    await fetch('/api/admin-logout', { method: 'POST' });
+    window.location.href = '/';
+  };
 
   return (
     <Box minH="100vh" display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" bg="gray.50" px={4} py={10}>
@@ -242,6 +250,12 @@ export default function BillingsPage() {
           </ModalBody>
         </ModalContent>
       </Modal>
+      <Button onClick={handleLogout} colorScheme="red" variant="outline" mt={6} isLoading={loggingOut}>
+        Logout
+      </Button>
+      <Button as={Link} href="/admin" colorScheme="red" variant="outline" mt={4}>
+        Back
+      </Button>
     </Box>
   );
 } 
