@@ -99,25 +99,9 @@ export default function FrequentFlyerHelpPage() {
           <Text fontSize={{ base: 'md', md: 'lg' }} maxW="2xl" mx="auto" opacity={0.95} color="white">
             Whether you're flying solo, booking a family holiday, or planning a round the world adventure, our Frequent Flyer Help service takes the guesswork out of using your hard-earned points. We specialise in turning loyalty points into premium travel experiences, without the overwhelm.
           </Text>
-          <NextLink href="/contact-us" passHref>
-            <Button
-              as="a"
-              size="lg"
-              colorScheme="green"
-              bg="#003f2d"
-              color="white"
-              fontWeight="bold"
-              borderRadius="full"
-              px={8}
-              py={6}
-              fontSize={{ base: 'md', md: 'xl' }}
-              mt={4}
-              boxShadow="lg"
-              _hover={{ bg: '#14543a', color: 'white' }}
-            >
-              Get Frequent Flyer Help
-            </Button>
-          </NextLink>
+          <Button as={NextLink} href="/contact-us" size="lg" colorScheme="green" bg="#003f2d" color="white" fontWeight="bold" borderRadius="full" px={8} py={6} fontSize={{ base: 'md', md: 'xl' }} mt={4} boxShadow="lg" _hover={{ bg: '#14543a', color: 'white' }}>
+            Get Frequent Flyer Help
+          </Button>
         </VStack>
       </Box>
       {/* Navigation Buttons for FAQ, IT Services, Troubleshooting Guide */}
@@ -247,25 +231,9 @@ export default function FrequentFlyerHelpPage() {
         <Text fontSize={{ base: 'md', md: 'lg' }} mb={4}>
           Stop letting your points sit idle or expire. Get expert guidance and start flying smarter.
         </Text>
-        <NextLink href="/contact-us" passHref>
-          <Button
-            as="a"
-            size="lg"
-            colorScheme="green"
-            bg="#003f2d"
-            color="white"
-            fontWeight="bold"
-            borderRadius="full"
-            px={8}
-            py={6}
-            fontSize={{ base: 'md', md: 'xl' }}
-            mt={2}
-            boxShadow="lg"
-            _hover={{ bg: '#14543a', color: 'white' }}
-          >
-            Contact us today
-          </Button>
-        </NextLink>
+        <Button as={NextLink} href="/contact-us" size="lg" colorScheme="green" bg="#003f2d" color="white" fontWeight="bold" borderRadius="full" px={8} py={6} fontSize={{ base: 'md', md: 'xl' }} mt={2} boxShadow="lg" _hover={{ bg: '#14543a', color: 'white' }}>
+          Contact us today
+        </Button>
       </Box>
     </Box>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, SimpleGrid, Text, Heading, Icon, Flex } from '@chakra-ui/react';
+import { Box, SimpleGrid, Text, Heading, Icon, Flex, Link as ChakraLink } from '@chakra-ui/react';
 import {
   MdWifi,
   MdBuild,
@@ -62,50 +62,54 @@ export default function ServiceGrid() {
             transition={{ duration: 0.5, delay: index * 0.08 }}
             viewport={{ once: true, amount: 0.2 }}
           >
-            <NextLink href={service.href} passHref legacyBehavior>
-              <a tabIndex={0} aria-label={`Learn more about ${service.label}`} style={{ textDecoration: 'none', height: '100%' }}>
-                <GlassCard
-                  p={7}
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="flex-start"
-                  minHeight="180px"
-                  height="100%"
-                  role="group"
-                  _hover={{
-                    boxShadow: '2xl',
-                    transform: 'translateY(-6px) scale(1.04)',
-                    borderColor: 'brand.green',
-                  }}
-                  _focus={{ boxShadow: 'outline', borderColor: 'brand.green' }}
-                  style={{ cursor: 'pointer', transition: 'all 0.2s', height: '100%' }}
-                >
-                  <Flex align="center" gap={4} flex="1" position="relative" zIndex={2}>
-                    <Box
-                      as="span"
-                      role="presentation"
-                      transition="transform 0.2s, color 0.2s"
-                      _groupHover={{ transform: 'scale(1.18)', color: 'green.600' }}
+            <ChakraLink
+              as={NextLink}
+              href={service.href}
+              tabIndex={0}
+              aria-label={`Learn more about ${service.label}`}
+              style={{ textDecoration: 'none', height: '100%' }}
+            >
+              <GlassCard
+                p={7}
+                display="flex"
+                flexDirection="column"
+                justifyContent="flex-start"
+                minHeight="180px"
+                height="100%"
+                role="group"
+                _hover={{
+                  boxShadow: '2xl',
+                  transform: 'translateY(-6px) scale(1.04)',
+                  borderColor: 'brand.green',
+                }}
+                _focus={{ boxShadow: 'outline', borderColor: 'brand.green' }}
+                style={{ cursor: 'pointer', transition: 'all 0.2s', height: '100%' }}
+              >
+                <Flex align="center" gap={4} flex="1" position="relative" zIndex={2}>
+                  <Box
+                    as="span"
+                    role="presentation"
+                    transition="transform 0.2s, color 0.2s"
+                    _groupHover={{ transform: 'scale(1.18)', color: 'green.600' }}
+                  >
+                    <Icon as={service.icon} boxSize={6} color="brand.green" mt={1} />
+                  </Box>
+                  <Box textAlign="left" w="100%">
+                    <Text
+                      fontSize="lg"
+                      fontWeight="medium"
+                      color="gray.800"
+                      lineHeight="taller"
                     >
-                      <Icon as={service.icon} boxSize={6} color="brand.green" mt={1} />
-                    </Box>
-                    <Box textAlign="left" w="100%">
-                      <Text
-                        fontSize="lg"
-                        fontWeight="medium"
-                        color="gray.800"
-                        lineHeight="taller"
-                      >
-                        {service.label}
-                      </Text>
-                      <Text fontSize="sm" color="gray.600" fontWeight="normal" mt={1}>
-                        {service.description}
-                      </Text>
-                    </Box>
-                  </Flex>
-                </GlassCard>
-              </a>
-            </NextLink>
+                      {service.label}
+                    </Text>
+                    <Text fontSize="sm" color="gray.600" fontWeight="normal" mt={1}>
+                      {service.description}
+                    </Text>
+                  </Box>
+                </Flex>
+              </GlassCard>
+            </ChakraLink>
           </MotionBox>
         ))}
       </SimpleGrid>

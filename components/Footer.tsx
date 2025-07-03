@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { FiMessageCircle } from 'react-icons/fi';
 import { Tooltip } from '@chakra-ui/react';
+import NextLink from 'next/link';
+import { Link as ChakraLink } from '@chakra-ui/react';
 
 declare global {
   interface Window {
@@ -133,12 +135,12 @@ export default function Footer() {
         {/* Sitemap/Quick Links */}
         <Box mb={4}>
           <Stack direction={{ base: 'column', sm: 'row' }} spacing={4} justify="center" align="center">
-            <Link href="/" color="white" textDecoration="underline">Home</Link>
-            <Link href="/about-us" color="white" textDecoration="underline">About Us</Link>
-            <Link href="/services" color="white" textDecoration="underline">Services</Link>
-            <Link href="/troubleshoot" color="white" textDecoration="underline">Troubleshoot</Link>
-            <Link href="/faq" color="white" textDecoration="underline">FAQ</Link>
-            <Link href="/contact-us" color="white" textDecoration="underline">Contact Us</Link>
+            <ChakraLink as={NextLink} href="/" color="white" textDecoration="underline">Home</ChakraLink>
+            <ChakraLink as={NextLink} href="/about-us" color="white" textDecoration="underline">About Us</ChakraLink>
+            <ChakraLink as={NextLink} href="/services" color="white" textDecoration="underline">Services</ChakraLink>
+            <ChakraLink as={NextLink} href="/troubleshoot" color="white" textDecoration="underline">Troubleshoot</ChakraLink>
+            <ChakraLink as={NextLink} href="/faq" color="white" textDecoration="underline">FAQ</ChakraLink>
+            <ChakraLink as={NextLink} href="/contact-us" color="white" textDecoration="underline">Contact Us</ChakraLink>
           </Stack>
         </Box>
 
@@ -153,9 +155,9 @@ export default function Footer() {
           
 
           <Text fontSize="sm" color="white">
-            <Link href="/legal" textDecoration="underline" color="white">
+            <ChakraLink as={NextLink} href="/legal" textDecoration="underline" color="white">
               Legal
-            </Link>
+            </ChakraLink>
           </Text>
         </Stack>
 
@@ -309,9 +311,9 @@ export default function Footer() {
                 </FormControl>
                 <Text fontSize="xs" color="gray.500" mt={3} mb={1} textAlign="center">
                   By using this live chat, you accept our{' '}
-                  <Link href="/privacy-policy" color="brand.green" textDecoration="underline" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>
+                  <ChakraLink as={NextLink} href="/privacy-policy" color="brand.green" textDecoration="underline" target="_blank" rel="noopener noreferrer">Privacy Policy</ChakraLink>
                   {' '}and{' '}
-                  <Link href="/terms" color="brand.green" textDecoration="underline" target="_blank" rel="noopener noreferrer">Terms & Conditions</Link>.
+                  <ChakraLink as={NextLink} href="/terms" color="brand.green" textDecoration="underline" target="_blank" rel="noopener noreferrer">Terms & Conditions</ChakraLink>.
                 </Text>
               </ModalBody>
               <ModalFooter display="flex" flexDirection="column" gap={2}>

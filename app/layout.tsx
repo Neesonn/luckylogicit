@@ -7,6 +7,8 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ErrorBoundary from '../components/ErrorBoundary';
 import GoogleAnalytics from '../components/GoogleAnalytics';
+import { LockProvider } from '../components/LockContext';
+import { StripeDataProvider } from '../components/StripeDataContext';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -77,13 +79,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <ChakraProvider theme={theme}>
           <ErrorBoundary>
-            <Flex direction="column" minH="100vh">
-          <Navbar />
-              <Box as="main" id="main-content" flex="1" pt="80px">
-            {children}
-              </Box>
-            <Footer />
-            </Flex>
+            <LockProvider>
+              <StripeDataProvider>
+                <Flex direction="column" minH="100vh">
+                  <Navbar />
+                  <Box as="main" id="main-content" flex="1" pt="80px">
+                    {children}
+                  </Box>
+                  <Footer />
+                </Flex>
+              </StripeDataProvider>
+            </LockProvider>
           </ErrorBoundary>
         </ChakraProvider>
         <GoogleAnalytics />
