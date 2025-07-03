@@ -6,7 +6,7 @@ import { AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, Ale
 import supabase from '../../services/supabaseClient';
 
 type Product = {
-  id: number;
+  id?: number;
   name: string;
   vendor: string;
   description: string;
@@ -19,8 +19,8 @@ type Product = {
   costGstType: string;
   markup: number;
   sell: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 const mockProducts = [
@@ -95,7 +95,22 @@ export default function ProductsPage() {
 
   // Modal state
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    id?: number;
+    name: string;
+    vendor: string;
+    description: string;
+    category: string;
+    distributor: string;
+    vendorSku: string;
+    distributorSku: string;
+    rrp: string;
+    cost: string;
+    costGstType: string;
+    markup: string;
+    sell: string;
+  }>({
+    id: undefined,
     name: '',
     vendor: '',
     description: '',
@@ -151,7 +166,7 @@ export default function ProductsPage() {
   };
 
   const handleAddProduct = () => {
-    setForm({ name: '', vendor: '', description: '', category: '', distributor: '', vendorSku: '', distributorSku: '', rrp: '', cost: '', costGstType: 'ex GST', markup: '', sell: '' });
+    setForm({ id: undefined, name: '', vendor: '', description: '', category: '', distributor: '', vendorSku: '', distributorSku: '', rrp: '', cost: '', costGstType: 'ex GST', markup: '', sell: '' });
     setProfit(0);
     setEditIndex(null);
     setErrors({});
@@ -162,6 +177,7 @@ export default function ProductsPage() {
   const handleEditProduct = (idx: number) => {
     const p: Product = products[idx];
     setForm({
+      id: p.id,
       name: p.name,
       vendor: p.vendor || '',
       description: p.description || '',
