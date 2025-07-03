@@ -271,9 +271,9 @@ export default function AdminDashboard() {
               w="100%"
               mb={2}
               mt={1}
-            >
+              >
               Products
-            </Button>
+              </Button>
           </Box>
         </Box>
         {/* Card footers with faded logo */}

@@ -6,7 +6,7 @@ const cspHeader = `
     style-src 'self' 'unsafe-inline' https://*.crisp.chat https://fonts.googleapis.com;
     img-src 'self' data: https://*.crisp.chat https://www.google-analytics.com https://www.googletagmanager.com https://www.gstatic.com/recaptcha/ https://www.google.com/recaptcha/;
     font-src 'self' https://fonts.gstatic.com https://client.crisp.chat;
-    connect-src 'self' https://*.crisp.chat wss://*.crisp.chat https://www.google-analytics.com https://formspree.io/ https://www.google.com/;
+    connect-src 'self' https://*.crisp.chat wss://*.crisp.chat https://www.google-analytics.com https://formspree.io/ https://www.google.com/ https://uidnfaskljfszjgresvo.supabase.co;
     frame-src 'self' https://*.crisp.chat https://www.google.com/recaptcha/;
     worker-src 'self' blob:;
     media-src 'self' https://*.crisp.chat;

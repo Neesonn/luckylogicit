@@ -3,6 +3,25 @@ import { Box, Heading, Text, Button, HStack, Input, Select, Table, Thead, Tbody,
 import { AddIcon, SearchIcon, EditIcon, InfoOutlineIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useState, useEffect, useRef } from 'react';
 import { AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay } from '@chakra-ui/react';
+import supabase from '../../services/supabaseClient';
+
+type Product = {
+  id: number;
+  name: string;
+  vendor: string;
+  description: string;
+  category: string;
+  distributor: string;
+  vendorSku: string;
+  distributorSku: string;
+  rrp: number;
+  cost: number;
+  costGstType: string;
+  markup: number;
+  sell: number;
+  createdAt: string;
+  updatedAt: string;
+};
 
 const mockProducts = [
   {
@@ -57,20 +76,22 @@ export default function ProductsPage() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [distributor, setDistributor] = useState('');
-  const [mounted, setMounted] = useState(false);
-  const [products, setProducts] = useState<any[]>(mockProducts);
+  const [products, setProducts] = useState<Product[]>([]);
 
+  // Fetch products from Supabase on mount
   useEffect(() => {
-    setMounted(true);
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('products') : null;
-    if (stored) setProducts(JSON.parse(stored));
+    const fetchProducts = async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('id, name, vendor, description, category, distributor, vendorSku, distributorSku, rrp, cost, costGstType, markup, sell, createdAt, updatedAt')
+        .order('createdAt', { ascending: false });
+      if (error) {
+        console.error('❌ Supabase fetch error:', error.message, error.details);
+      }
+      if (!error) setProducts(data || []);
+    };
+    fetchProducts();
   }, []);
-
-  useEffect(() => {
-    if (mounted) {
-      localStorage.setItem('products', JSON.stringify(products));
-    }
-  }, [products, mounted]);
 
   // Modal state
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -139,7 +160,7 @@ export default function ProductsPage() {
   };
 
   const handleEditProduct = (idx: number) => {
-    const p: any = products[idx];
+    const p: Product = products[idx];
     setForm({
       name: p.name,
       vendor: p.vendor || '',
@@ -171,9 +192,13 @@ export default function ProductsPage() {
     setIsDeleteOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteIdx !== null) {
-      setProducts((prev: any[]) => prev.filter((_, i) => i !== deleteIdx));
+      const id = products[deleteIdx].id;
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (!error) {
+        setProducts((prev: Product[]) => prev.filter((_, i) => i !== deleteIdx));
+      }
     }
     setIsDeleteOpen(false);
     setDeleteIdx(null);
@@ -197,57 +222,55 @@ export default function ProductsPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!validate()) return;
-    const cost = parseFloat(form.cost) || 0;
-    const markup = parseFloat(form.markup) || 0;
-    const sellPrice = cost * (1 + markup / 100);
-    const margin = sellPrice - cost;
-    if (editIndex !== null) {
-      // Edit mode
-      setProducts((prev: any[]) => prev.map((p: any, idx: number) => idx === editIndex ? {
-        ...p,
-        name: form.name,
-        vendor: form.vendor,
-        description: form.description,
-        category: form.category,
-        distributor: form.distributor,
-        vendorSku: form.vendorSku,
-        distributorSku: form.distributorSku,
-        rrp: parseFloat(form.rrp) || 0,
-        cost,
-        costGstType: form.costGstType,
-        markup,
-        sell: sellPrice,
-        margin,
-      } : p));
+    const productData = {
+      ...form,
+      rrp: parseFloat(form.rrp) || 0,
+      cost: parseFloat(form.cost) || 0,
+      markup: parseFloat(form.markup) || 0,
+      sell: parseFloat(form.sell) || 0,
+      costGstType: form.costGstType,
+    };
+    const insertData = { ...productData };
+    delete insertData.id;
+    if (editIndex === null) {
+      // Add product to Supabase
+      const { error } = await supabase.from('products').insert([insertData]);
+      if (!error) {
+        const { data: fetchedData, error: fetchError } = await supabase
+          .from('products')
+          .select('id, name, vendor, description, category, distributor, vendorSku, distributorSku, rrp, cost, costGstType, markup, sell, createdAt, updatedAt')
+          .order('createdAt', { ascending: false });
+        if (fetchError) {
+          console.error('❌ Supabase fetch error:', fetchError.message, fetchError.details);
+        }
+        setProducts(fetchedData || []);
+        onClose();
+      } else {
+        console.error('❌ Supabase insert/update error:', error.message, error.details);
+      }
     } else {
-      // Add mode
-      setProducts((prev: any[]) => [
-        ...prev,
-        {
-          name: form.name,
-          vendor: form.vendor,
-          description: form.description,
-          category: form.category,
-          distributor: form.distributor,
-          vendorSku: form.vendorSku,
-          distributorSku: form.distributorSku,
-          rrp: parseFloat(form.rrp) || 0,
-          cost,
-          costGstType: form.costGstType,
-          markup,
-          sell: sellPrice,
-          margin,
-        },
-      ]);
+      // Update product in Supabase
+      const id = products[editIndex].id;
+      const { error } = await supabase.from('products').update(productData).eq('id', id);
+      if (!error) {
+        const { data: fetchedData, error: fetchError } = await supabase
+          .from('products')
+          .select('id, name, vendor, description, category, distributor, vendorSku, distributorSku, rrp, cost, costGstType, markup, sell, createdAt, updatedAt')
+          .order('createdAt', { ascending: false });
+        if (fetchError) {
+          console.error('❌ Supabase fetch error:', fetchError.message, fetchError.details);
+        }
+        setProducts(fetchedData || []);
+        onClose();
+      }
     }
-    onClose();
   };
 
   // Filter products based on search, category, and distributor
-  const filteredProducts = products.filter((p: any) => {
+  const filteredProducts = products.filter((p: Product) => {
     // Category filter
     if (category && p.category !== category) return false;
     // Distributor filter
@@ -266,7 +289,6 @@ export default function ProductsPage() {
       p.costGstType,
       p.markup?.toString(),
       p.sell?.toString(),
-      p.margin?.toString(),
       p.description,
       p.category,
     ].some(f => (f || '').toLowerCase().includes(term));
@@ -286,10 +308,6 @@ export default function ProductsPage() {
     else if (marginRating <= 6) marginLabel = 'Fair';
     else if (marginRating <= 8) marginLabel = 'Good';
     else marginLabel = 'Excellent';
-  }
-
-  if (!mounted) {
-    return null;
   }
 
   return (
@@ -349,7 +367,7 @@ export default function ProductsPage() {
             </Tr>
           </Thead>
           <Tbody>
-            {filteredProducts.map((p: any, idx: number) => (
+            {filteredProducts.map((p: Product, idx: number) => (
               <Tr key={idx}>
                 <Td>
                   {p.vendor}
@@ -410,7 +428,7 @@ export default function ProductsPage() {
                 <Td isNumeric>${p.cost.toFixed(2)}</Td>
                 <Td isNumeric>{isNaN(Number(p.markup)) ? '0.00%' : (Math.round(Number(p.markup) * 100) / 100).toFixed(2) + '%'}</Td>
                 <Td isNumeric>${p.sell.toFixed(2)}</Td>
-                <Td isNumeric>${p.margin.toFixed(2)}</Td>
+                <Td isNumeric>${(p.sell - p.cost).toFixed(2)}</Td>
                 <Td>
                   {(() => {
                     const { marginRating } = getMarginRating(p.cost, p.sell, p.rrp);
@@ -443,7 +461,7 @@ export default function ProductsPage() {
       {/* Pagination and Footer (Placeholder) */}
       <Flex maxW="1200px" mx="auto" mt={4} align="center" justify="space-between" color="gray.600">
         <Text>Rows per page: 10</Text>
-        <Text>Total margin this page: ${filteredProducts.reduce((sum: number, p: any) => sum + p.margin, 0).toFixed(2)}</Text>
+        <Text>Total margin this page: ${filteredProducts.reduce((sum: number, p: Product) => sum + (p.sell - p.cost), 0).toFixed(2)}</Text>
       </Flex>
       {/* Add/Edit Product Modal */}
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
