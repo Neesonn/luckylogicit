@@ -1,5 +1,6 @@
-export const dynamic = 'force-dynamic';
 'use client';
+
+export const dynamic = 'force-dynamic';
 import { Box, Heading, Text, Button, HStack, Input, Select, Table, Thead, Tbody, Tr, Th, Td, IconButton, Flex, Spacer, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, FormControl, FormLabel, Textarea, useDisclosure, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, Tooltip, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, Divider, useToast, SimpleGrid } from '@chakra-ui/react';
 import { AddIcon, SearchIcon, EditIcon, InfoOutlineIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useState, useEffect, useRef } from 'react';
