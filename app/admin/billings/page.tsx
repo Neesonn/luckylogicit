@@ -1,7 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Box, Heading, Text, Table, Thead, Tbody, Tr, Th, Td, Spinner, Alert, AlertIcon, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button } from '@chakra-ui/react';
+import { Box, Heading, Text, Table, Thead, Tbody, Tr, Th, Td, Spinner, Alert, AlertIcon, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button, IconButton } from '@chakra-ui/react';
 import Link from 'next/link';
+import { FaLock, FaUnlock } from 'react-icons/fa';
+import { useLock } from '../../../components/LockContext';
+import { useStripeData } from '../../../components/StripeDataContext';
 
 function getStatus(inv: any) {
   if (inv.status === 'open' && inv.due_date && inv.due_date * 1000 < Date.now()) {
@@ -26,24 +29,12 @@ function formatAmount(cents: number) {
 }
 
 export default function BillingsPage() {
-  const [invoices, setInvoices] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { invoices, loading, error, refresh } = useStripeData();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalInvoices, setModalInvoices] = useState<any[]>([]);
   const [modalTitle, setModalTitle] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/list-stripe-invoices')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) setInvoices(data.invoices);
-        else setError(data.error || 'Failed to fetch invoices.');
-        setLoading(false);
-      })
-      .catch(() => { setError('Something went wrong.'); setLoading(false); });
-  }, []);
+  const { metricsLocked } = useLock();
 
   // Calculate buckets
   const buckets = [
@@ -56,7 +47,7 @@ export default function BillingsPage() {
   ];
   const bucketData = buckets.map(b => {
     let count = 0, amount = 0, invs: any[] = [];
-    invoices.forEach(inv => {
+    (invoices ?? []).forEach(inv => {
       if (getStatus(inv) === 'Past Due') {
         const days = getDaysPastDue(inv);
         if (days && days >= (b.min ?? 0) && days <= b.max) {
@@ -76,7 +67,7 @@ export default function BillingsPage() {
 
   // Top customers calculation
   const customerMap: Record<string, { name: string, email: string, count: number, total: number, paid: number, due: number, since: number | null }> = {};
-  invoices.forEach(inv => {
+  (invoices ?? []).forEach(inv => {
     if (!inv.customer_email) return;
     const key = inv.customer_email;
     if (!customerMap[key]) {
@@ -118,9 +109,11 @@ export default function BillingsPage() {
     <Box minH="100vh" display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" bg="gray.50" px={4} py={10}>
       <Box w="100%" maxW="1200px" mb={8} px={6}>
         <Box bg="#003f2d" color="white" py={6} px={8} borderRadius="2xl" boxShadow="lg" textAlign="center">
-          <Heading as="h1" size="xl" fontWeight="bold" letterSpacing="tight" color="white" m={0} mb={2}>
-            Billings
-          </Heading>
+          <Box display="flex" alignItems="center" justifyContent="center" gap={3} mb={2}>
+            <Heading as="h1" size="xl" fontWeight="bold" letterSpacing="tight" color="white" m={0}>
+              Billings
+            </Heading>
+          </Box>
         </Box>
       </Box>
       <Box w="100%" maxW="1200px" display="flex" flexDirection={{ base: 'column', md: 'row' }} gap={6}>
@@ -133,7 +126,7 @@ export default function BillingsPage() {
             {loading ? <Spinner /> : error ? <Alert status="error"><AlertIcon />{error}</Alert> : (
               <>
                 <Text fontSize="2xl" fontWeight="bold" color="gray.700" mb={2}>Outstanding invoices</Text>
-                <Text fontSize="3xl" fontWeight="extrabold" color="yellow.600" mb={4}>${(outstanding / 100).toFixed(2)} AUD</Text>
+                <Text fontSize="3xl" fontWeight="extrabold" color="yellow.600" mb={4} style={metricsLocked ? { filter: 'blur(8px)' } : {}}>${(outstanding / 100).toFixed(2)} AUD</Text>
                 <Table size="sm" variant="simple">
                   <Thead>
                     <Tr bg="#003f2d">
@@ -146,12 +139,12 @@ export default function BillingsPage() {
                     {bucketData.map(b => (
                       <Tr key={b.label}>
                         <Td><Box display="inline-block" w={2} h={2} borderRadius="full" bg={b.color} mr={2} />{b.label}</Td>
-                        <Td isNumeric>
+                        <Td isNumeric style={metricsLocked ? { filter: 'blur(8px)' } : {}}>
                           {b.count > 0 ? (
                             <Button size="xs" variant="link" colorScheme="blue" onClick={() => openModal(b.invs, b.label)}>{b.count}</Button>
                           ) : 0}
                         </Td>
-                        <Td isNumeric>${(b.amount / 100).toFixed(2)}</Td>
+                        <Td isNumeric style={metricsLocked ? { filter: 'blur(8px)' } : {}}>${(b.amount / 100).toFixed(2)}</Td>
                       </Tr>
                     ))}
                   </Tbody>
@@ -184,23 +177,23 @@ export default function BillingsPage() {
                     <Tr><Td colSpan={7}><Text color="gray.400">No customers found.</Text></Td></Tr>
                   ) : topCustomers.map(c => (
                     <Tr key={c.email}>
-                      <Td>{c.name || <Text color="gray.400">(No name)</Text>}</Td>
-                      <Td>{c.email}</Td>
+                      <Td style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{c.name || <Text color="gray.400">(No name)</Text>}</Td>
+                      <Td style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{c.email}</Td>
                       <Td>{formatMonthYear(c.since)}</Td>
-                      <Td isNumeric>{c.count > 0 ? (
-                        <Button size="xs" variant="link" colorScheme="blue" onClick={() => openModal(invoices.filter(inv => inv.customer_email === c.email), `${c.name || c.email}'s`)}>{c.count}</Button>
+                      <Td isNumeric style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{c.count > 0 ? (
+                        <Button size="xs" variant="link" colorScheme="blue" onClick={() => openModal((invoices ?? []).filter(inv => inv.customer_email === c.email), `${c.name || c.email}'s`)}>{c.count}</Button>
                       ) : 0}</Td>
-                      <Td isNumeric>{c.paid > 0 ? (
+                      <Td isNumeric style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{c.paid > 0 ? (
                         <Box as="span" px={2} py={1} borderRadius="md" bg="green.100" color="green.800" fontWeight="bold" display="inline-block">
                           ${(c.paid / 100).toFixed(2)}
                         </Box>
                       ) : '$0.00'}</Td>
-                      <Td isNumeric>{c.due > 0 ? (
+                      <Td isNumeric style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{c.due > 0 ? (
                         <Box as="span" px={2} py={1} borderRadius="md" bg="red.100" color="red.800" fontWeight="bold" display="inline-block">
                           ${(c.due / 100).toFixed(2)}
                         </Box>
                       ) : '$0.00'}</Td>
-                      <Td isNumeric>${(c.total / 100).toFixed(2)}</Td>
+                      <Td isNumeric style={metricsLocked ? { filter: 'blur(8px)' } : {}}>${(c.total / 100).toFixed(2)}</Td>
                     </Tr>
                   ))}
                 </Tbody>
@@ -211,36 +204,36 @@ export default function BillingsPage() {
       </Box>
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} size="xl" isCentered>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent maxW="1000px">
           <ModalHeader>{modalTitle} Invoices</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {modalInvoices.length === 0 ? (
               <Text>No invoices in this bucket.</Text>
             ) : (
-              <Table size="sm" variant="simple">
+              <Table size="sm" variant="simple" width="100%">
                 <Thead>
                   <Tr>
-                    <Th>Invoice #</Th>
-                    <Th>Customer</Th>
-                    <Th>Amount</Th>
-                    <Th>Due Date</Th>
-                    <Th>View</Th>
+                    <Th minW="90px" whiteSpace="nowrap">Invoice #</Th>
+                    <Th minW="110px" whiteSpace="nowrap">Customer</Th>
+                    <Th minW="150px" whiteSpace="nowrap">Description</Th>
+                    <Th minW="80px" whiteSpace="nowrap">Amount</Th>
+                    <Th minW="80px" whiteSpace="nowrap">Status</Th>
+                    <Th minW="100px" whiteSpace="nowrap">Due Date</Th>
+                    <Th minW="80px" whiteSpace="nowrap">View</Th>
                   </Tr>
                 </Thead>
-                <Tbody>
+                <Tbody fontSize={{ base: 'xs', md: 'sm' }}>
                   {modalInvoices.map(inv => (
                     <Tr key={inv.id}>
                       <Td>{inv.number || inv.id}</Td>
                       <Td>{inv.customer_name}</Td>
+                      <Td>{inv.lines && inv.lines.length > 0 && inv.lines[0].description ? inv.lines[0].description : '-'}</Td>
                       <Td>{formatAmount(inv.amount_due)}</Td>
+                      <Td>{getStatus(inv)}</Td>
                       <Td>{formatDate(inv.due_date)}</Td>
                       <Td>
-                        {inv.hosted_invoice_url ? (
-                          <Button as="a" href={inv.hosted_invoice_url} target="_blank" rel="noopener noreferrer" size="xs" colorScheme="green" variant="outline">View</Button>
-                        ) : (
-                          <Text color="gray.400">N/A</Text>
-                        )}
+                        <Button as="a" href={`https://dashboard.stripe.com/invoices/${inv.id}`} target="_blank" rel="noopener noreferrer" size="xs" colorScheme="green" variant="outline">View</Button>
                       </Td>
                     </Tr>
                   ))}

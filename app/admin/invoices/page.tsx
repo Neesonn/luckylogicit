@@ -1,13 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Box, Heading, Spinner, Alert, AlertIcon, Table, Thead, Tbody, Tr, Th, Td, Text, Button, ButtonGroup, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, Input, InputGroup, InputLeftElement, Select, Checkbox, useToast } from '@chakra-ui/react';
+import { Box, Heading, Spinner, Alert, AlertIcon, Table, Thead, Tbody, Tr, Th, Td, Text, Button, ButtonGroup, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, Input, InputGroup, InputLeftElement, Select, Checkbox, useToast, IconButton } from '@chakra-ui/react';
 import { ArrowBackIcon, ExternalLinkIcon, DownloadIcon, SearchIcon, TriangleDownIcon, TriangleUpIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
+import { FaLock, FaUnlock } from 'react-icons/fa';
+import { useLock } from '../../../components/LockContext';
+import { useStripeData } from '../../../components/StripeDataContext';
 
 export default function InvoicesPage() {
-  const [invoices, setInvoices] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { invoices, loading, error, refresh } = useStripeData();
   const [loggingOut, setLoggingOut] = useState(false);
   const [filter, setFilter] = useState('all');
   const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
@@ -26,9 +27,26 @@ export default function InvoicesPage() {
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesValue, setNotesValue] = useState('');
   const [notesLoading, setNotesLoading] = useState(false);
+  const { metricsLocked } = useLock();
+
+  function formatDate(ts: number | null) {
+    if (!ts) return '-';
+    return new Date(ts * 1000).toLocaleDateString();
+  }
+
+  function formatAmount(cents: number) {
+    return `$${(cents / 100).toFixed(2)}`;
+  }
+
+  function getStatus(inv: any) {
+    if (inv.status === 'open' && inv.due_date && inv.due_date * 1000 < Date.now()) {
+      return 'Past Due';
+    }
+    return inv.status.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+  }
 
   // Filtered invoices
-  const filteredInvoices = invoices.filter(inv => {
+  const filteredInvoices = (invoices ?? []).filter(inv => {
     // Hide Void filter
     if (hideVoid && getStatus(inv) === 'Void') return false;
     // Status filter
@@ -63,10 +81,10 @@ export default function InvoicesPage() {
   const pageCount = Math.ceil(filteredInvoices.length / pageSize);
 
   // Summary calculations
-  const totalPaid = filteredInvoices.filter(inv => getStatus(inv) === 'Paid').reduce((sum, inv) => sum + inv.amount_due, 0);
-  const totalOverdue = filteredInvoices.filter(inv => getStatus(inv) === 'Past Due').reduce((sum, inv) => sum + inv.amount_due, 0);
-  const totalOutstanding = filteredInvoices.filter(inv => ['Open', 'Past Due'].includes(getStatus(inv))).reduce((sum, inv) => sum + inv.amount_due, 0);
-  const totalVoid = filteredInvoices.filter(inv => getStatus(inv) === 'Void').reduce((sum, inv) => sum + inv.amount_due, 0);
+  const totalPaid = (filteredInvoices ?? []).filter(inv => getStatus(inv) === 'Paid').reduce((sum, inv) => sum + inv.amount_due, 0);
+  const totalOverdue = (filteredInvoices ?? []).filter(inv => getStatus(inv) === 'Past Due').reduce((sum, inv) => sum + inv.amount_due, 0);
+  const totalOutstanding = (filteredInvoices ?? []).filter(inv => ['Open', 'Past Due'].includes(getStatus(inv))).reduce((sum, inv) => sum + inv.amount_due, 0);
+  const totalVoid = (filteredInvoices ?? []).filter(inv => getStatus(inv) === 'Void').reduce((sum, inv) => sum + inv.amount_due, 0);
 
   function handleSort(col: string) {
     if (sortBy === col) {
@@ -83,7 +101,7 @@ export default function InvoicesPage() {
   }
 
   // Sort filteredInvoices before paginating
-  const sortedInvoices = [...filteredInvoices].sort((a, b) => {
+  const sortedInvoices = [...(filteredInvoices ?? [])].sort((a, b) => {
     let aVal = a[sortBy];
     let bVal = b[sortBy];
     if (sortBy === 'customer_name' || sortBy === 'customer_email' || sortBy === 'status' || sortBy === 'number') {
@@ -103,41 +121,6 @@ export default function InvoicesPage() {
     return 0;
   });
   const paginatedInvoices = sortedInvoices.slice((page - 1) * pageSize, page * pageSize);
-
-  useEffect(() => {
-    fetch('/api/list-stripe-invoices')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setInvoices(data.invoices);
-        } else {
-          setError(data.error || 'Failed to fetch invoices.');
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('Something went wrong.');
-        setLoading(false);
-      });
-  }, []);
-
-  function formatDate(ts: number | null) {
-    if (!ts) return '-';
-    return new Date(ts * 1000).toLocaleDateString();
-  }
-
-  function formatAmount(cents: number) {
-    return `$${(cents / 100).toFixed(2)}`;
-  }
-
-  function getStatus(inv: any) {
-    // If invoice is open and due_date is in the past, show 'Past Due'
-    if (inv.status === 'open' && inv.due_date && inv.due_date * 1000 < Date.now()) {
-      return 'Past Due';
-    }
-    // Otherwise, show the Stripe status (capitalize, replace underscores)
-    return inv.status.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
-  }
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -199,25 +182,27 @@ export default function InvoicesPage() {
       {/* Banner */}
       <Box w="100%" maxW="1200px" mb={8} px={6}>
         <Box bg="#003f2d" color="white" py={6} px={8} borderRadius="2xl" boxShadow="lg" textAlign="center">
-          <Heading as="h1" size="xl" fontWeight="bold" letterSpacing="tight" color="white" m={0} mb={2}>
-            Invoices
-          </Heading>
+          <Box display="flex" alignItems="center" justifyContent="center" gap={3} mb={2}>
+            <Heading as="h1" size="xl" fontWeight="bold" letterSpacing="tight" color="white" m={0}>
+              Invoices
+            </Heading>
+          </Box>
           <Box display="flex" flexWrap="wrap" justifyContent="center" gap={6} mt={2}>
             <Box>
               <Text fontSize="sm" color="gray.200">Total Outstanding</Text>
-              <Text fontWeight="bold" fontSize="lg" color="yellow.200">{formatAmount(totalOutstanding)}</Text>
+              <Text fontWeight="bold" fontSize="lg" color="yellow.200" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{formatAmount(totalOutstanding)}</Text>
             </Box>
             <Box>
               <Text fontSize="sm" color="gray.200">Total Paid</Text>
-              <Text fontWeight="bold" fontSize="lg" color="green.200">{formatAmount(totalPaid)}</Text>
+              <Text fontWeight="bold" fontSize="lg" color="green.200" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{formatAmount(totalPaid)}</Text>
             </Box>
             <Box>
               <Text fontSize="sm" color="gray.200">Total Overdue</Text>
-              <Text fontWeight="bold" fontSize="lg" color="red.200">{formatAmount(totalOverdue)}</Text>
+              <Text fontWeight="bold" fontSize="lg" color="red.200" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{formatAmount(totalOverdue)}</Text>
             </Box>
             <Box>
               <Text fontSize="sm" color="gray.200">Total Void</Text>
-              <Text fontWeight="bold" fontSize="lg" color="yellow.100">{formatAmount(totalVoid)}</Text>
+              <Text fontWeight="bold" fontSize="lg" color="yellow.100" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{formatAmount(totalVoid)}</Text>
             </Box>
           </Box>
         </Box>
@@ -339,12 +324,12 @@ export default function InvoicesPage() {
             <Tbody fontSize={{ base: 'xs', md: 'sm' }}>
               {paginatedInvoices.map(inv => (
                 <Tr key={inv.id} _hover={{ bg: 'green.50', cursor: 'pointer' }} onClick={() => handleRowClick(inv)}>
-                  <Td maxW="180px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">{inv.customer_name || <Text color="gray.400">(No name)</Text>}</Td>
-                  <Td maxW="220px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">{inv.customer_email || <Text color="gray.400">(No email)</Text>}</Td>
+                  <Td maxW="180px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{inv.customer_name || <Text color="gray.400">(No name)</Text>}</Td>
+                  <Td maxW="220px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{inv.customer_email || <Text color="gray.400">(No email)</Text>}</Td>
                   <Td whiteSpace="nowrap">{formatDate(inv.created)}</Td>
                   <Td whiteSpace="nowrap">{formatDate(inv.due_date)}</Td>
-                  <Td whiteSpace="nowrap">{formatAmount(inv.amount_due)}</Td>
-                  <Td whiteSpace="nowrap" textAlign="center">
+                  <Td whiteSpace="nowrap" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{formatAmount(inv.amount_due)}</Td>
+                  <Td whiteSpace="nowrap" textAlign="center" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>
                     {(() => {
                       const status = getStatus(inv);
                       let badgeProps = {};
@@ -369,7 +354,7 @@ export default function InvoicesPage() {
                       );
                     })()}
                   </Td>
-                  <Td maxW="140px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">{inv.number || inv.id}</Td>
+                  <Td maxW="140px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{inv.number || inv.id}</Td>
                   <Td whiteSpace="nowrap">
                     {inv.hosted_invoice_url ? (
                       <Button size={{ base: 'xs', md: 'sm' }} leftIcon={<ExternalLinkIcon />} colorScheme="green" variant="outline" onClick={e => { e.stopPropagation(); handleViewInvoice(inv); }}>

@@ -5,11 +5,10 @@ import { useRouter } from 'next/navigation';
 import { EditIcon, CheckIcon, CloseIcon, ArrowBackIcon, DeleteIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
 import NextLink from 'next/link';
+import { useStripeData } from '../../../components/StripeDataContext';
 
 export default function ViewCustomersPage() {
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { customers, loading, error, refresh } = useStripeData();
   const router = useRouter();
   const [editId, setEditId] = useState<string | null>(null);
   const [editData, setEditData] = useState<any>({});
@@ -26,23 +25,6 @@ export default function ViewCustomersPage() {
     { code: 'GB', name: 'United Kingdom' },
     // ...add more as needed
   ];
-
-  useEffect(() => {
-    fetch('/api/list-stripe-customers')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setCustomers(data.customers);
-        } else {
-          setError(data.error || 'Failed to fetch customers.');
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('Something went wrong.');
-        setLoading(false);
-      });
-  }, []);
 
   const handleLogout = async () => {
     await fetch('/api/admin-logout', { method: 'POST' });
@@ -82,7 +64,6 @@ export default function ViewCustomersPage() {
 
   const saveEdit = async (id: string) => {
     setSaving(true);
-    setError('');
     try {
       const res = await fetch('/api/update-stripe-customer', {
         method: 'POST',
@@ -91,15 +72,10 @@ export default function ViewCustomersPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setCustomers((prev) => prev.map((c) => (c.id === id ? data.customer : c)));
         setEditId(null);
         setEditData({});
         setIsEditModalOpen(false);
-      } else {
-        setError(data.error || 'Failed to update customer.');
       }
-    } catch (err) {
-      setError('Something went wrong.');
     } finally {
       setSaving(false);
     }
@@ -118,7 +94,6 @@ export default function ViewCustomersPage() {
   const confirmDelete = async () => {
     if (!deleteId) return;
     setDeleting(true);
-    setError('');
     try {
       const res = await fetch('/api/delete-stripe-customer', {
         method: 'POST',
@@ -127,14 +102,9 @@ export default function ViewCustomersPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setCustomers((prev) => prev.filter((c) => c.id !== deleteId));
         setDeleteId(null);
         setIsDeleteModalOpen(false);
-      } else {
-        setError(data.error || 'Failed to delete customer.');
       }
-    } catch (err) {
-      setError('Something went wrong.');
     } finally {
       setDeleting(false);
     }
@@ -160,7 +130,7 @@ export default function ViewCustomersPage() {
               </Tr>
             </Thead>
             <Tbody>
-              {customers.map((c) => (
+              {(customers ?? []).map((c) => (
                 <Tr key={c.id}>
                   <Td>
                     <NextLink href={`https://dashboard.stripe.com/customers/${c.id}`} target="_blank" rel="noopener noreferrer" style={{ color: '#003f2d', textDecoration: 'underline', fontWeight: 500 }}>
@@ -268,7 +238,6 @@ export default function ViewCustomersPage() {
                 </Select>
               </FormControl>
             </VStack>
-            {error && <Alert status="error" mt={4}><AlertIcon />{error}</Alert>}
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="green" mr={3} isLoading={saving} onClick={() => saveEdit(editId!)}>
