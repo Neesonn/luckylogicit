@@ -248,6 +248,7 @@ export default function AdminDashboard() {
               transform: 'translateY(-2px)',
               transition: 'all 0.2s ease-in-out',
             }}
+            mb={{ base: 4, md: 0 }}
           >
             <Box display="flex" alignItems="center" w="100%" mb={4}>
               <Box w="4px" h="32px" bg="#003f2d" borderRadius="full" mr={3} />
@@ -256,18 +257,23 @@ export default function AdminDashboard() {
               </Heading>
             </Box>
             <Text fontSize="md" color="gray.600" mb={3} textAlign="center">
-              Product catalogue and inventory (coming soon).
+              Manage your product catalogue and inventory.
             </Text>
-            <Tooltip label="This feature will be available soon." hasArrow placement="top">
-              <Button leftIcon={<Icon as={FaBoxOpen} />} size="lg" w="100%" colorScheme="gray" variant="outline" isDisabled mb={3}
-                _disabled={{ bg: '#e0e0e0', color: '#a1a1a1', cursor: 'not-allowed', borderColor: '#e0e0e0' }}
-                _hover={{ bg: '#e0e0e0', color: '#a1a1a1', cursor: 'not-allowed' }}
-                _focus={{ bg: '#e0e0e0', color: '#a1a1a1', cursor: 'not-allowed' }}
-              >
-                Product catalogue
-              </Button>
-            </Tooltip>
-            <Text color="gray.400" fontSize="md" mt={2}>Coming soon</Text>
+            <Button
+              as={Link}
+              href="/admin/products"
+              leftIcon={<Icon as={FaBoxOpen} />}
+              bg="#003f2d"
+              color="white"
+              _hover={{ bg: '#14543a' }}
+              _focus={{ bg: '#14543a' }}
+              size="lg"
+              w="100%"
+              mb={2}
+              mt={1}
+            >
+              Products
+            </Button>
           </Box>
         </Box>
         {/* Card footers with faded logo */}
