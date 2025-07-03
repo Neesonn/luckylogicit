@@ -2,6 +2,8 @@
 import { Box, Heading, Text, Button, HStack } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { FaFileInvoiceDollar, FaMoneyBillWave } from 'react-icons/fa';
+import { Icon } from '@chakra-ui/react';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -25,6 +27,8 @@ export default function AdminDashboard() {
         <Button as={Link} href="/admin/view-customers" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} size="lg">
           View Customers
         </Button>
+        <Button as={Link} href="/admin/invoices" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} size="lg" leftIcon={<Icon as={FaFileInvoiceDollar} />}>Invoices</Button>
+        <Button as={Link} href="/admin/billings" bg="#003f2d" color="white" _hover={{ bg: '#14543a' }} size="lg" leftIcon={<Icon as={FaMoneyBillWave} />}>Billings</Button>
       </HStack>
       <Button onClick={handleLogout} colorScheme="red" variant="outline" mt={6}>
         Logout

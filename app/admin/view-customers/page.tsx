@@ -150,13 +150,13 @@ export default function ViewCustomersPage() {
         <Box w="100%" maxW="1200px" px={6} overflowX="auto" mb={8}>
           <Table variant="simple" size="md">
             <Thead>
-              <Tr>
-                <Th>Customer ID</Th>
-                <Th>Name</Th>
-                <Th>Email</Th>
-                <Th>Phone</Th>
-                <Th>Address</Th>
-                <Th></Th>
+              <Tr bg="#003f2d">
+                <Th color="white" borderTopLeftRadius="2xl">Customer ID</Th>
+                <Th color="white">Name</Th>
+                <Th color="white">Email</Th>
+                <Th color="white">Phone</Th>
+                <Th color="white">Address</Th>
+                <Th color="white" borderTopRightRadius="2xl"></Th>
               </Tr>
             </Thead>
             <Tbody>
