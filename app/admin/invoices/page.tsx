@@ -1,11 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Box, Heading, Spinner, Alert, AlertIcon, Table, Thead, Tbody, Tr, Th, Td, Text, Button, ButtonGroup, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, Input, InputGroup, InputLeftElement, Select, Checkbox, useToast, IconButton } from '@chakra-ui/react';
+import { Box, Heading, Spinner, Alert, AlertIcon, Table, Thead, Tbody, Tr, Th, Td, Text, Button, ButtonGroup, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, Input, InputGroup, InputLeftElement, Select, Checkbox, useToast, IconButton, useBreakpointValue, VStack, HStack } from '@chakra-ui/react';
 import { ArrowBackIcon, ExternalLinkIcon, DownloadIcon, SearchIcon, TriangleDownIcon, TriangleUpIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
 import { FaLock, FaUnlock } from 'react-icons/fa';
 import { useLock } from '../../../components/LockContext';
 import { useStripeData } from '../../../components/StripeDataContext';
+import GlassCard from '../../../components/GlassCard';
 
 export default function InvoicesPage() {
   const { invoices, loading, error, refresh } = useStripeData();
@@ -28,6 +29,7 @@ export default function InvoicesPage() {
   const [notesValue, setNotesValue] = useState('');
   const [notesLoading, setNotesLoading] = useState(false);
   const { metricsLocked } = useLock();
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   function formatDate(ts: number | null) {
     if (!ts) return '-';
@@ -293,82 +295,135 @@ export default function InvoicesPage() {
       ) : error ? (
         <Alert status="error" mb={6}><AlertIcon />{error}</Alert>
       ) : (
-        <Box w="100%" maxW="1200px" px={{ base: 0, md: 6 }} overflowX="auto" mb={8}>
-          <Table variant="simple" size={{ base: 'xs', md: 'sm' }} sx={{ tableLayout: 'fixed', width: '100%' }}>
-            <Thead>
-              <Tr bg="#003f2d" borderRadius="2xl">
-                <Th color="white" borderTopLeftRadius="2xl" cursor="pointer" onClick={() => handleSort('customer_name')} minW="120px" maxW="180px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" fontSize={{ base: 'xs', md: 'sm' }}>
-                  Customer Name {getSortIcon('customer_name')}
-                </Th>
-                <Th color="white" cursor="pointer" onClick={() => handleSort('customer_email')} minW="160px" maxW="220px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" fontSize={{ base: 'xs', md: 'sm' }}>
-                  Email {getSortIcon('customer_email')}
-                </Th>
-                <Th color="white" cursor="pointer" onClick={() => handleSort('created')} minW="90px" maxW="110px" whiteSpace="nowrap" fontSize={{ base: 'xs', md: 'sm' }}>
-                  Created {getSortIcon('created')}
-                </Th>
-                <Th color="white" cursor="pointer" onClick={() => handleSort('due_date')} minW="90px" maxW="110px" whiteSpace="nowrap" fontSize={{ base: 'xs', md: 'sm' }}>
-                  Due {getSortIcon('due_date')}
-                </Th>
-                <Th color="white" cursor="pointer" onClick={() => handleSort('amount_due')} minW="80px" maxW="100px" whiteSpace="nowrap" fontSize={{ base: 'xs', md: 'sm' }}>
-                  Amount {getSortIcon('amount_due')}
-                </Th>
-                <Th color="white" cursor="pointer" onClick={() => handleSort('status')} minW="80px" maxW="100px" whiteSpace="nowrap" fontSize={{ base: 'xs', md: 'sm' }}>
-                  Status {getSortIcon('status')}
-                </Th>
-                <Th color="white" cursor="pointer" onClick={() => handleSort('number')} minW="100px" maxW="140px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" fontSize={{ base: 'xs', md: 'sm' }}>
-                  Invoice {getSortIcon('number')}
-                </Th>
-                <Th color="white" borderTopRightRadius="2xl" minW="110px" maxW="120px" whiteSpace="nowrap" fontSize={{ base: 'xs', md: 'sm' }}>View Invoice</Th>
-              </Tr>
-            </Thead>
-            <Tbody fontSize={{ base: 'xs', md: 'sm' }}>
-              {paginatedInvoices.map(inv => (
-                <Tr key={inv.id} _hover={{ bg: 'green.50', cursor: 'pointer' }} onClick={() => handleRowClick(inv)}>
-                  <Td maxW="180px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{inv.customer_name || <Text color="gray.400">(No name)</Text>}</Td>
-                  <Td maxW="220px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{inv.customer_email || <Text color="gray.400">(No email)</Text>}</Td>
-                  <Td whiteSpace="nowrap">{formatDate(inv.created)}</Td>
-                  <Td whiteSpace="nowrap">{formatDate(inv.due_date)}</Td>
-                  <Td whiteSpace="nowrap" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{formatAmount(inv.amount_due)}</Td>
-                  <Td whiteSpace="nowrap" textAlign="center" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>
-                    {(() => {
-                      const status = getStatus(inv);
-                      let badgeProps = {};
-                      let badgeText = status;
-                      if (status === 'Past Due') {
-                        badgeProps = { bg: 'red.50', border: '1px solid', borderColor: 'red.400', color: 'red.700' };
-                      } else if (status === 'Void') {
-                        badgeProps = { bg: 'yellow.50', border: '1px solid', borderColor: 'yellow.400', color: 'yellow.700' };
-                      } else if (status === 'Paid') {
-                        badgeProps = { bg: 'green.50', border: '1px solid', borderColor: 'green.400', color: 'green.700' };
-                      } else if (status === 'Open') {
-                        badgeProps = { bg: 'blue.50', border: '1px solid', borderColor: 'blue.400', color: 'blue.700' };
-                      } else if (status === 'Draft') {
-                        badgeProps = { bg: 'gray.100', border: '1px solid', borderColor: 'gray.400', color: 'gray.700' };
-                      } else {
-                        badgeProps = { bg: 'gray.50', border: '1px solid', borderColor: 'gray.300', color: 'gray.600' };
-                      }
-                      return (
-                        <Box display="inline-block" px={2} py={1} borderRadius="md" fontWeight="bold" {...badgeProps} fontSize={{ base: 'xs', md: 'sm' }}>
-                          {badgeText}
-                        </Box>
-                      );
-                    })()}
-                  </Td>
-                  <Td maxW="140px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{inv.number || inv.id}</Td>
-                  <Td whiteSpace="nowrap">
-                    {inv.hosted_invoice_url ? (
-                      <Button size={{ base: 'xs', md: 'sm' }} leftIcon={<ExternalLinkIcon />} colorScheme="green" variant="outline" onClick={e => { e.stopPropagation(); handleViewInvoice(inv); }}>
-                        View
-                      </Button>
-                    ) : (
-                      <Text color="gray.400">N/A</Text>
-                    )}
-                  </Td>
+        isMobile ? (
+          <VStack w="100%" spacing={4} maxW="500px" mb={8}>
+            {paginatedInvoices.map(inv => (
+              <GlassCard key={inv.id} w="100%" p={4} borderRadius="lg" boxShadow="md">
+                <Box mb={2}>
+                  <Text fontSize="xs" color="brand.green" fontWeight="bold">
+                    Invoice: {inv.number || inv.id}
+                  </Text>
+                </Box>
+                <VStack align="start" spacing={1} mb={2}>
+                  <Text fontWeight="bold">{inv.customer_name || <Text as="span" color="gray.400">(No name)</Text>}</Text>
+                  <Text>{inv.customer_email || <Text as="span" color="gray.400">(No email)</Text>}</Text>
+                  <Text fontSize="sm" color="gray.600">Created: {formatDate(inv.created)}</Text>
+                  <Text fontSize="sm" color="gray.600">Due: {formatDate(inv.due_date)}</Text>
+                  <Text fontSize="sm" color="gray.600">Amount: {formatAmount(inv.amount_due)}</Text>
+                  <Box display="inline-block" px={2} py={1} borderRadius="md" fontWeight="bold" fontSize="sm" mt={1} {...(() => {
+                    const status = getStatus(inv);
+                    if (status === 'Past Due') return { bg: 'red.50', border: '1px solid', borderColor: 'red.400', color: 'red.700' };
+                    if (status === 'Void') return { bg: 'yellow.50', border: '1px solid', borderColor: 'yellow.400', color: 'yellow.700' };
+                    if (status === 'Paid') return { bg: 'green.50', border: '1px solid', borderColor: 'green.400', color: 'green.700' };
+                    if (status === 'Open') return { bg: 'blue.50', border: '1px solid', borderColor: 'blue.400', color: 'blue.700' };
+                    if (status === 'Draft') return { bg: 'gray.100', border: '1px solid', borderColor: 'gray.400', color: 'gray.700' };
+                    return { bg: 'gray.50', border: '1px solid', borderColor: 'gray.300', color: 'gray.600' };
+                  })()}>{getStatus(inv)}</Box>
+                </VStack>
+                <HStack w="100%" spacing={3} mt={2}>
+                  {inv.hosted_invoice_url ? (
+                    <Button
+                      leftIcon={<ExternalLinkIcon />} size="md" colorScheme="green" variant="solid" flex={1}
+                      onClick={e => { e.stopPropagation(); handleViewInvoice(inv); }}
+                    >View</Button>
+                  ) : (
+                    <Button size="md" colorScheme="gray" variant="outline" flex={1} isDisabled>
+                      N/A
+                    </Button>
+                  )}
+                  {inv.hosted_invoice_url && (
+                    <Button
+                      leftIcon={<DownloadIcon />} size="md" colorScheme="green" variant="outline" flex={1}
+                      as="a"
+                      href={inv.hosted_invoice_url + '/pdf'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={e => e.stopPropagation()}
+                      download
+                    >PDF</Button>
+                  )}
+                </HStack>
+              </GlassCard>
+            ))}
+          </VStack>
+        ) : (
+          <Box w="100%" maxW="1200px" px={{ base: 0, md: 6 }} overflowX="auto" mb={8}>
+            <Table variant="simple" size={{ base: 'xs', md: 'sm' }} sx={{ tableLayout: 'fixed', width: '100%' }}>
+              <Thead>
+                <Tr bg="#003f2d" borderRadius="2xl">
+                  <Th color="white" borderTopLeftRadius="2xl" cursor="pointer" onClick={() => handleSort('customer_name')} minW="120px" maxW="180px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" fontSize={{ base: 'xs', md: 'sm' }}>
+                    Customer Name {getSortIcon('customer_name')}
+                  </Th>
+                  <Th color="white" cursor="pointer" onClick={() => handleSort('customer_email')} minW="160px" maxW="220px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" fontSize={{ base: 'xs', md: 'sm' }}>
+                    Email {getSortIcon('customer_email')}
+                  </Th>
+                  <Th color="white" cursor="pointer" onClick={() => handleSort('created')} minW="90px" maxW="110px" whiteSpace="nowrap" fontSize={{ base: 'xs', md: 'sm' }}>
+                    Created {getSortIcon('created')}
+                  </Th>
+                  <Th color="white" cursor="pointer" onClick={() => handleSort('due_date')} minW="90px" maxW="110px" whiteSpace="nowrap" fontSize={{ base: 'xs', md: 'sm' }}>
+                    Due {getSortIcon('due_date')}
+                  </Th>
+                  <Th color="white" cursor="pointer" onClick={() => handleSort('amount_due')} minW="80px" maxW="100px" whiteSpace="nowrap" fontSize={{ base: 'xs', md: 'sm' }}>
+                    Amount {getSortIcon('amount_due')}
+                  </Th>
+                  <Th color="white" cursor="pointer" onClick={() => handleSort('status')} minW="80px" maxW="100px" whiteSpace="nowrap" fontSize={{ base: 'xs', md: 'sm' }}>
+                    Status {getSortIcon('status')}
+                  </Th>
+                  <Th color="white" cursor="pointer" onClick={() => handleSort('number')} minW="100px" maxW="140px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" fontSize={{ base: 'xs', md: 'sm' }}>
+                    Invoice {getSortIcon('number')}
+                  </Th>
+                  <Th color="white" borderTopRightRadius="2xl" minW="110px" maxW="120px" whiteSpace="nowrap" fontSize={{ base: 'xs', md: 'sm' }}>View Invoice</Th>
                 </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </Box>
+              </Thead>
+              <Tbody fontSize={{ base: 'xs', md: 'sm' }}>
+                {paginatedInvoices.map(inv => (
+                  <Tr key={inv.id} _hover={{ bg: 'green.50', cursor: 'pointer' }} onClick={() => handleRowClick(inv)}>
+                    <Td maxW="180px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{inv.customer_name || <Text color="gray.400">(No name)</Text>}</Td>
+                    <Td maxW="220px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{inv.customer_email || <Text color="gray.400">(No email)</Text>}</Td>
+                    <Td whiteSpace="nowrap">{formatDate(inv.created)}</Td>
+                    <Td whiteSpace="nowrap">{formatDate(inv.due_date)}</Td>
+                    <Td whiteSpace="nowrap" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{formatAmount(inv.amount_due)}</Td>
+                    <Td whiteSpace="nowrap" textAlign="center" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>
+                      {(() => {
+                        const status = getStatus(inv);
+                        let badgeProps = {};
+                        let badgeText = status;
+                        if (status === 'Past Due') {
+                          badgeProps = { bg: 'red.50', border: '1px solid', borderColor: 'red.400', color: 'red.700' };
+                        } else if (status === 'Void') {
+                          badgeProps = { bg: 'yellow.50', border: '1px solid', borderColor: 'yellow.400', color: 'yellow.700' };
+                        } else if (status === 'Paid') {
+                          badgeProps = { bg: 'green.50', border: '1px solid', borderColor: 'green.400', color: 'green.700' };
+                        } else if (status === 'Open') {
+                          badgeProps = { bg: 'blue.50', border: '1px solid', borderColor: 'blue.400', color: 'blue.700' };
+                        } else if (status === 'Draft') {
+                          badgeProps = { bg: 'gray.100', border: '1px solid', borderColor: 'gray.400', color: 'gray.700' };
+                        } else {
+                          badgeProps = { bg: 'gray.50', border: '1px solid', borderColor: 'gray.300', color: 'gray.600' };
+                        }
+                        return (
+                          <Box display="inline-block" px={2} py={1} borderRadius="md" fontWeight="bold" {...badgeProps} fontSize={{ base: 'xs', md: 'sm' }}>
+                            {badgeText}
+                          </Box>
+                        );
+                      })()}
+                    </Td>
+                    <Td maxW="140px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden" style={metricsLocked ? { filter: 'blur(8px)' } : {}}>{inv.number || inv.id}</Td>
+                    <Td whiteSpace="nowrap">
+                      {inv.hosted_invoice_url ? (
+                        <Button size={{ base: 'xs', md: 'sm' }} leftIcon={<ExternalLinkIcon />} colorScheme="green" variant="outline" onClick={e => { e.stopPropagation(); handleViewInvoice(inv); }}>
+                          View
+                        </Button>
+                      ) : (
+                        <Text color="gray.400">N/A</Text>
+                      )}
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
+        )
       )}
       {/* Pagination */}
       {pageCount > 1 && (
@@ -411,9 +466,9 @@ export default function InvoicesPage() {
         Back
       </Button>
       {/* Invoice Modal */}
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal} size="md" isCentered>
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} size={isMobile ? 'full' : 'md'} isCentered>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent maxW={isMobile ? 'xs' : undefined}>
           <ModalHeader>Invoice Actions</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -439,9 +494,9 @@ export default function InvoicesPage() {
         </ModalContent>
       </Modal>
       {/* Invoice Details Modal */}
-      <Modal isOpen={isDetailsOpen} onClose={handleCloseDetails} size="lg" isCentered>
+      <Modal isOpen={isDetailsOpen} onClose={handleCloseDetails} size={isMobile ? 'full' : 'lg'} isCentered>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent maxW={isMobile ? 'xs' : undefined}>
           <ModalHeader>Invoice Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>

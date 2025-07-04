@@ -1,11 +1,12 @@
 'use client';
 
 export const dynamic = 'force-dynamic';
-import { Box, Heading, Text, Button, HStack, Input, Select, Table, Thead, Tbody, Tr, Th, Td, IconButton, Flex, Spacer, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, FormControl, FormLabel, Textarea, useDisclosure, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, Tooltip, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, Divider, useToast, SimpleGrid } from '@chakra-ui/react';
+import { Box, Heading, Text, Button, HStack, Input, Select, Table, Thead, Tbody, Tr, Th, Td, IconButton, Flex, Spacer, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, FormControl, FormLabel, Textarea, useDisclosure, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, Tooltip, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, Divider, useToast, SimpleGrid, useBreakpointValue, VStack } from '@chakra-ui/react';
 import { AddIcon, SearchIcon, EditIcon, InfoOutlineIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useState, useEffect, useRef } from 'react';
 import { AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay } from '@chakra-ui/react';
 import supabase from '../../services/supabaseClient';
+import GlassCard from '../../../components/GlassCard';
 
 type Product = {
   id?: number;
@@ -204,6 +205,8 @@ export default function ProductsPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const toast = useToast();
+  const [deleting, setDeleting] = useState(false);
 
   const handleDeleteProduct = (idx: number) => {
     setDeleteIdx(idx);
@@ -211,15 +214,30 @@ export default function ProductsPage() {
   };
 
   const confirmDelete = async () => {
+    setDeleting(true);
     if (deleteIdx !== null) {
       const id = products[deleteIdx].id;
+      console.log('Deleting product with id:', id, 'Type:', typeof id);
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (!error) {
-        setProducts((prev: Product[]) => prev.filter((_, i) => i !== deleteIdx));
+        // Refetch products from Supabase after delete
+        const { data: fetchedData, error: fetchError } = await supabase
+          .from('products')
+          .select('id, name, vendor, description, category, distributor, vendorSku, distributorSku, rrp, cost, costGstType, markup, sell, createdAt, updatedAt')
+          .order('createdAt', { ascending: false });
+        if (fetchError) {
+          toast({ title: 'Error fetching products', description: fetchError.message, status: 'error', duration: 4000, isClosable: true });
+        } else {
+          setProducts(fetchedData || []);
+          toast({ title: 'Product deleted', status: 'success', duration: 3000, isClosable: true });
+        }
+      } else {
+        toast({ title: 'Error deleting product', description: error.message, status: 'error', duration: 4000, isClosable: true });
       }
     }
     setIsDeleteOpen(false);
     setDeleteIdx(null);
+    setDeleting(false);
   };
 
   const cancelDelete = () => {
@@ -328,6 +346,8 @@ export default function ProductsPage() {
     else marginLabel = 'Excellent';
   }
 
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   return (
     <Box minH="100vh" bg="gray.50" px={4} py={10}>
       {/* Header */}
@@ -367,115 +387,138 @@ export default function ProductsPage() {
         </Box>
       </Flex>
       {/* Static Table */}
-      <Box maxW="1200px" mx="auto" bg="white" boxShadow="md" borderRadius="2xl" p={0}>
-        <Table variant="simple" size="sm" sx={{ 'th, td': { whiteSpace: 'nowrap', fontSize: '14px', px: 2, py: 1, verticalAlign: 'middle' } }} layout="auto">
-          <Thead bg="gray.100">
-            <Tr>
-              <Th fontSize="15px">Vendor</Th>
-              <Th fontSize="15px">Category</Th>
-              <Th fontSize="15px">Product Name</Th>
-              <Th fontSize="15px">Distributor</Th>
-              <Th isNumeric fontSize="15px">RRP$</Th>
-              <Th isNumeric fontSize="15px">Buy</Th>
-              <Th isNumeric fontSize="15px">Markup %</Th>
-              <Th isNumeric fontSize="15px">Sell $</Th>
-              <Th isNumeric fontSize="15px">Margin $</Th>
-              <Th fontSize="15px">Rating</Th>
-              <Th fontSize="15px">Actions</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {filteredProducts.map((p: Product, idx: number) => (
-              <Tr key={idx}>
-                <Td>
-                  {p.vendor}
-                  <Popover placement="right" trigger="click">
-                    <PopoverTrigger>
-                      <InfoOutlineIcon ml={1} color="gray.400" cursor="pointer" aria-label="Show Vendor SKU" />
-                    </PopoverTrigger>
-                    <PopoverContent w="auto" fontSize="sm">
-                      <PopoverArrow />
-                      <PopoverBody>
-                        <b>Vendor SKU:</b> {p.vendorSku || 'No SKU available'}
-                      </PopoverBody>
-                    </PopoverContent>
-                  </Popover>
-                </Td>
-                <Td>{p.category}</Td>
-                <Td>
-                  {p.name}
-                  <Popover placement="right" trigger="click">
-                    <PopoverTrigger>
-                      <InfoOutlineIcon
-                        ml={2}
-                        boxSize={3.5}
-                        color="gray.500"
-                        cursor="pointer"
-                        aria-label="Show Description"
-                      />
-                    </PopoverTrigger>
-                    <PopoverContent w="auto" fontSize="sm">
-                      <PopoverArrow />
-                      <PopoverBody>
-                        <b>Description:</b> {p.description || 'No description'}
-                      </PopoverBody>
-                    </PopoverContent>
-                  </Popover>
-                </Td>
-                <Td>
-                  {p.distributor}
-                  <Popover placement="right" trigger="click">
-                    <PopoverTrigger>
-                      <InfoOutlineIcon
-                        ml={2}
-                        boxSize={3.5}
-                        color="gray.500"
-                        cursor="pointer"
-                        aria-label="Show Distributor SKU"
-                      />
-                    </PopoverTrigger>
-                    <PopoverContent w="auto" fontSize="sm">
-                      <PopoverArrow />
-                      <PopoverBody>
-                        <b>Distributor SKU:</b> {p.distributorSku || 'No SKU available'}
-                      </PopoverBody>
-                    </PopoverContent>
-                  </Popover>
-                </Td>
-                <Td isNumeric>{p.rrp ? `$${Number(p.rrp).toFixed(2)}` : '-'}</Td>
-                <Td isNumeric>${p.cost.toFixed(2)}</Td>
-                <Td isNumeric>{isNaN(Number(p.markup)) ? '0.00%' : (Math.round(Number(p.markup) * 100) / 100).toFixed(2) + '%'}</Td>
-                <Td isNumeric>${p.sell.toFixed(2)}</Td>
-                <Td isNumeric>${(p.sell - p.cost).toFixed(2)}</Td>
-                <Td>
-                  {(() => {
-                    const { marginRating } = getMarginRating(p.cost, p.sell, p.rrp);
-                    return (
-                      <Box display="flex" gap={0.5} alignItems="center">
-                        {[...Array(10)].map((_, i) => (
-                          <Box key={i} w={3} h={3} borderRadius="full" bg={
-                            i < marginRating
-                              ? marginRating >= 8
-                                ? 'green.400'
-                                : marginRating >= 5
-                                  ? 'yellow.400'
-                                  : 'red.400'
-                              : 'gray.200'
-                          } border={i < marginRating ? '2px solid #14543a' : '1px solid #e2e8f0'} />
-                        ))}
-                      </Box>
-                    );
-                  })()}
-                </Td>
-                <Td>
-                  <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" colorScheme="blue" variant="outline" onClick={() => handleEditProduct(products.indexOf(p))} mr={2} />
-                  <IconButton aria-label="Delete" icon={<DeleteIcon />} size="sm" colorScheme="red" variant="outline" onClick={() => handleDeleteProduct(products.indexOf(p))} />
-                </Td>
+      {isMobile ? (
+        <VStack w="100%" spacing={4} maxW="500px" mx="auto" mb={8}>
+          {filteredProducts.map((p: Product, idx: number) => (
+            <GlassCard key={idx} w="100%" p={4} borderRadius="lg" boxShadow="md">
+              <Text fontWeight="bold" fontSize="lg">{p.name}</Text>
+              <Text>Vendor: {p.vendor}</Text>
+              <Text>Category: {p.category}</Text>
+              <Text>Distributor: {p.distributor}</Text>
+              <Text>RRP: ${p.rrp}</Text>
+              <Text>Buy: ${p.cost}</Text>
+              <Text>Markup: {p.markup}%</Text>
+              <Text>Sell: ${p.sell}</Text>
+              <Text>Margin: ${((p.sell || 0) - (p.cost || 0)).toFixed(2)}</Text>
+              <Text>Rating: {getMarginRating(p.cost, p.sell, p.rrp).marginLabel}</Text>
+              <HStack spacing={2} mt={2}>
+                <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" colorScheme="green" onClick={() => handleEditProduct(idx)} />
+                <IconButton aria-label="Delete" icon={<DeleteIcon />} size="sm" colorScheme="red" onClick={() => handleDeleteProduct(idx)} />
+              </HStack>
+            </GlassCard>
+          ))}
+        </VStack>
+      ) : (
+        <Box maxW="1200px" mx="auto" bg="white" boxShadow="md" borderRadius="2xl" p={0}>
+          <Table variant="simple" size="sm" sx={{ 'th, td': { whiteSpace: 'nowrap', fontSize: '14px', px: 2, py: 1, verticalAlign: 'middle' } }} layout="auto">
+            <Thead bg="gray.100">
+              <Tr>
+                <Th fontSize="15px">Vendor</Th>
+                <Th fontSize="15px">Category</Th>
+                <Th fontSize="15px">Product Name</Th>
+                <Th fontSize="15px">Distributor</Th>
+                <Th isNumeric fontSize="15px">RRP$</Th>
+                <Th isNumeric fontSize="15px">Buy</Th>
+                <Th isNumeric fontSize="15px">Markup %</Th>
+                <Th isNumeric fontSize="15px">Sell $</Th>
+                <Th isNumeric fontSize="15px">Margin $</Th>
+                <Th fontSize="15px">Rating</Th>
+                <Th fontSize="15px">Actions</Th>
               </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </Box>
+            </Thead>
+            <Tbody>
+              {filteredProducts.map((p: Product, idx: number) => (
+                <Tr key={idx}>
+                  <Td>
+                    {p.vendor}
+                    <Popover placement="right" trigger="click">
+                      <PopoverTrigger>
+                        <InfoOutlineIcon ml={1} color="gray.400" cursor="pointer" aria-label="Show Vendor SKU" />
+                      </PopoverTrigger>
+                      <PopoverContent w="auto" fontSize="sm">
+                        <PopoverArrow />
+                        <PopoverBody>
+                          <b>Vendor SKU:</b> {p.vendorSku || 'No SKU available'}
+                        </PopoverBody>
+                      </PopoverContent>
+                    </Popover>
+                  </Td>
+                  <Td>{p.category}</Td>
+                  <Td>
+                    {p.name}
+                    <Popover placement="right" trigger="click">
+                      <PopoverTrigger>
+                        <InfoOutlineIcon
+                          ml={2}
+                          boxSize={3.5}
+                          color="gray.500"
+                          cursor="pointer"
+                          aria-label="Show Description"
+                        />
+                      </PopoverTrigger>
+                      <PopoverContent w="auto" fontSize="sm">
+                        <PopoverArrow />
+                        <PopoverBody>
+                          <b>Description:</b> {p.description || 'No description'}
+                        </PopoverBody>
+                      </PopoverContent>
+                    </Popover>
+                  </Td>
+                  <Td>
+                    {p.distributor}
+                    <Popover placement="right" trigger="click">
+                      <PopoverTrigger>
+                        <InfoOutlineIcon
+                          ml={2}
+                          boxSize={3.5}
+                          color="gray.500"
+                          cursor="pointer"
+                          aria-label="Show Distributor SKU"
+                        />
+                      </PopoverTrigger>
+                      <PopoverContent w="auto" fontSize="sm">
+                        <PopoverArrow />
+                        <PopoverBody>
+                          <b>Distributor SKU:</b> {p.distributorSku || 'No SKU available'}
+                        </PopoverBody>
+                      </PopoverContent>
+                    </Popover>
+                  </Td>
+                  <Td isNumeric>{p.rrp ? `$${Number(p.rrp).toFixed(2)}` : '-'}</Td>
+                  <Td isNumeric>${p.cost.toFixed(2)}</Td>
+                  <Td isNumeric>{isNaN(Number(p.markup)) ? '0.00%' : (Math.round(Number(p.markup) * 100) / 100).toFixed(2) + '%'}</Td>
+                  <Td isNumeric>${p.sell.toFixed(2)}</Td>
+                  <Td isNumeric>${(p.sell - p.cost).toFixed(2)}</Td>
+                  <Td>
+                    {(() => {
+                      const { marginRating } = getMarginRating(p.cost, p.sell, p.rrp);
+                      return (
+                        <Box display="flex" gap={0.5} alignItems="center">
+                          {[...Array(10)].map((_, i) => (
+                            <Box key={i} w={3} h={3} borderRadius="full" bg={
+                              i < marginRating
+                                ? marginRating >= 8
+                                  ? 'green.400'
+                                  : marginRating >= 5
+                                    ? 'yellow.400'
+                                    : 'red.400'
+                                : 'gray.200'
+                            } border={i < marginRating ? '2px solid #14543a' : '1px solid #e2e8f0'} />
+                          ))}
+                        </Box>
+                      );
+                    })()}
+                  </Td>
+                  <Td>
+                    <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" colorScheme="blue" variant="outline" onClick={() => handleEditProduct(products.indexOf(p))} mr={2} />
+                    <IconButton aria-label="Delete" icon={<DeleteIcon />} size="sm" colorScheme="red" variant="outline" onClick={() => handleDeleteProduct(products.indexOf(p))} />
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Box>
+      )}
       {/* Pagination and Footer (Placeholder) */}
       <Flex maxW="1200px" mx="auto" mt={4} align="center" justify="space-between" color="gray.600">
         <Text>Rows per page: 10</Text>
@@ -663,7 +706,7 @@ export default function ProductsPage() {
             <Button ref={cancelRef} onClick={cancelDelete}>
               No
             </Button>
-            <Button colorScheme="red" onClick={confirmDelete} ml={3}>
+            <Button colorScheme="red" onClick={confirmDelete} ml={3} isLoading={deleting} isDisabled={deleting}>
               Yes, Delete
             </Button>
           </AlertDialogFooter>

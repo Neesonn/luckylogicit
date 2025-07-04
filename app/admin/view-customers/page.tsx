@@ -1,11 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Box, Heading, Text, Spinner, Alert, AlertIcon, Table, Thead, Tbody, Tr, Th, Td, Button, Input, Select, IconButton, VStack, HStack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, FormControl, FormLabel } from '@chakra-ui/react';
+import { Box, Heading, Text, Spinner, Alert, AlertIcon, Table, Thead, Tbody, Tr, Th, Td, Button, Input, Select, IconButton, VStack, HStack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, FormControl, FormLabel, useBreakpointValue } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { EditIcon, CheckIcon, CloseIcon, ArrowBackIcon, DeleteIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
 import NextLink from 'next/link';
 import { useStripeData } from '../../../components/StripeDataContext';
+import GlassCard from '../../../components/GlassCard';
 
 export default function ViewCustomersPage() {
   const { customers, loading, error, refresh } = useStripeData();
@@ -17,6 +18,7 @@ export default function ViewCustomersPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   const countries = [
     { code: '', name: 'Choose a country...' },
@@ -117,72 +119,106 @@ export default function ViewCustomersPage() {
       ) : error ? (
         <Alert status="error" mb={6}><AlertIcon />{error}</Alert>
       ) : (
-        <Box w="100%" maxW="1200px" px={6} overflowX="auto" mb={8}>
-          <Table variant="simple" size="md">
-            <Thead>
-              <Tr bg="#003f2d">
-                <Th color="white" borderTopLeftRadius="2xl">Customer ID</Th>
-                <Th color="white">Name</Th>
-                <Th color="white">Email</Th>
-                <Th color="white">Phone</Th>
-                <Th color="white">Address</Th>
-                <Th color="white" borderTopRightRadius="2xl"></Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {(customers ?? []).map((c) => (
-                <Tr key={c.id}>
-                  <Td>
-                    <NextLink href={`https://dashboard.stripe.com/customers/${c.id}`} target="_blank" rel="noopener noreferrer" style={{ color: '#003f2d', textDecoration: 'underline', fontWeight: 500 }}>
+        isMobile ? (
+          <VStack w="100%" spacing={4} maxW="500px" mb={8}>
+            {(customers ?? []).map((c) => (
+              <GlassCard key={c.id} w="100%" p={4} borderRadius="lg" boxShadow="md">
+                <Box mb={2}>
+                  <Text fontSize="xs" color="brand.green" fontWeight="bold">
+                    <NextLink href={`https://dashboard.stripe.com/customers/${c.id}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>
                       {c.id}
                     </NextLink>
-                  </Td>
-                  <Td>
-                    {editId === c.id ? (
-                      <Input size="sm" value={editData.name} onChange={e => handleEditChange('name', e.target.value)} />
-                    ) : c.name || <Text color="gray.400">(No name)</Text>}
-                  </Td>
-                  <Td>
-                    {editId === c.id ? (
-                      <Input size="sm" value={editData.email} onChange={e => handleEditChange('email', e.target.value)} />
-                    ) : c.email || <Text color="gray.400">(No email)</Text>}
-                  </Td>
-                  <Td>
-                    {editId === c.id ? (
-                      <Input size="sm" value={editData.phone || ''} onChange={e => handleEditChange('phone', e.target.value)} />
-                    ) : c.phone || <Text color="gray.400">(No phone)</Text>}
-                  </Td>
-                  <Td>
-                    {editId === c.id ? (
-                      <VStack align="start" spacing={1}>
-                        <Input size="sm" placeholder="Line 1" value={editData.address?.line1} onChange={e => handleEditAddressChange('line1', e.target.value)} />
-                        <Input size="sm" placeholder="Line 2" value={editData.address?.line2 || ''} onChange={e => handleEditAddressChange('line2', e.target.value)} />
-                        <Input size="sm" placeholder="City" value={editData.address?.city} onChange={e => handleEditAddressChange('city', e.target.value)} />
-                        <Input size="sm" placeholder="State" value={editData.address?.state} onChange={e => handleEditAddressChange('state', e.target.value)} />
-                        <Input size="sm" placeholder="Postal Code" value={editData.address?.postal_code} onChange={e => handleEditAddressChange('postal_code', e.target.value)} />
-                        <Select size="sm" value={editData.address?.country} onChange={e => handleEditAddressChange('country', e.target.value)}>
-                          {countries.map(cn => (
-                            <option key={cn.code} value={cn.code}>{cn.name}</option>
-                          ))}
-                        </Select>
-                      </VStack>
-                    ) : c.address ? (
-                      <span>
-                        {[c.address.line1, c.address.line2, c.address.city, c.address.state, c.address.country, c.address.postal_code]
-                          .filter(Boolean)
-                          .join(', ') || <Text color="gray.400">(No address)</Text>}
-                      </span>
-                    ) : <Text color="gray.400">(No address)</Text>}
-                  </Td>
-                  <Td>
-                    <IconButton aria-label="Edit" icon={<EditIcon color="#fff" />} size="sm" onClick={() => startEdit(c)} mr={2} bg="#003f2d" _hover={{ bg: '#14543a' }} />
-                    <IconButton aria-label="Delete" icon={<DeleteIcon />} size="sm" colorScheme="red" onClick={() => startDelete(c.id)} />
-                  </Td>
+                  </Text>
+                </Box>
+                <VStack align="start" spacing={1} mb={2}>
+                  <Text fontWeight="bold">{c.name || <Text as="span" color="gray.400">(No name)</Text>}</Text>
+                  <Text>{c.email || <Text as="span" color="gray.400">(No email)</Text>}</Text>
+                  <Text>{c.phone || <Text as="span" color="gray.400">(No phone)</Text>}</Text>
+                  <Text fontSize="sm" color="gray.600">
+                    {[c.address?.line1, c.address?.line2, c.address?.city, c.address?.state, c.address?.country, c.address?.postal_code].filter(Boolean).join(', ') || <Text as="span" color="gray.400">(No address)</Text>}
+                  </Text>
+                </VStack>
+                <HStack w="100%" spacing={3} mt={2}>
+                  <Button
+                    leftIcon={<EditIcon />} size="md" colorScheme="green" variant="solid" flex={1}
+                    onClick={() => startEdit(c)}
+                  >Edit</Button>
+                  <Button
+                    leftIcon={<DeleteIcon />} size="md" colorScheme="red" variant="outline" flex={1}
+                    onClick={() => startDelete(c.id)}
+                  >Delete</Button>
+                </HStack>
+              </GlassCard>
+            ))}
+          </VStack>
+        ) : (
+          <Box w="100%" maxW="1200px" px={6} overflowX="auto" mb={8}>
+            <Table variant="simple" size="md">
+              <Thead>
+                <Tr bg="#003f2d">
+                  <Th color="white" borderTopLeftRadius="2xl">Customer ID</Th>
+                  <Th color="white">Name</Th>
+                  <Th color="white">Email</Th>
+                  <Th color="white">Phone</Th>
+                  <Th color="white">Address</Th>
+                  <Th color="white" borderTopRightRadius="2xl"></Th>
                 </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </Box>
+              </Thead>
+              <Tbody>
+                {(customers ?? []).map((c) => (
+                  <Tr key={c.id}>
+                    <Td>
+                      <NextLink href={`https://dashboard.stripe.com/customers/${c.id}`} target="_blank" rel="noopener noreferrer" style={{ color: '#003f2d', textDecoration: 'underline', fontWeight: 500 }}>
+                        {c.id}
+                      </NextLink>
+                    </Td>
+                    <Td>
+                      {editId === c.id ? (
+                        <Input size="sm" value={editData.name} onChange={e => handleEditChange('name', e.target.value)} />
+                      ) : c.name || <Text color="gray.400">(No name)</Text>}
+                    </Td>
+                    <Td>
+                      {editId === c.id ? (
+                        <Input size="sm" value={editData.email} onChange={e => handleEditChange('email', e.target.value)} />
+                      ) : c.email || <Text color="gray.400">(No email)</Text>}
+                    </Td>
+                    <Td>
+                      {editId === c.id ? (
+                        <Input size="sm" value={editData.phone || ''} onChange={e => handleEditChange('phone', e.target.value)} />
+                      ) : c.phone || <Text color="gray.400">(No phone)</Text>}
+                    </Td>
+                    <Td>
+                      {editId === c.id ? (
+                        <VStack align="start" spacing={1}>
+                          <Input size="sm" placeholder="Line 1" value={editData.address?.line1} onChange={e => handleEditAddressChange('line1', e.target.value)} />
+                          <Input size="sm" placeholder="Line 2" value={editData.address?.line2 || ''} onChange={e => handleEditAddressChange('line2', e.target.value)} />
+                          <Input size="sm" placeholder="City" value={editData.address?.city} onChange={e => handleEditAddressChange('city', e.target.value)} />
+                          <Input size="sm" placeholder="State" value={editData.address?.state} onChange={e => handleEditAddressChange('state', e.target.value)} />
+                          <Input size="sm" placeholder="Postal Code" value={editData.address?.postal_code} onChange={e => handleEditAddressChange('postal_code', e.target.value)} />
+                          <Select size="sm" value={editData.address?.country} onChange={e => handleEditAddressChange('country', e.target.value)}>
+                            {countries.map(cn => (
+                              <option key={cn.code} value={cn.code}>{cn.name}</option>
+                            ))}
+                          </Select>
+                        </VStack>
+                      ) : c.address ? (
+                        <span>
+                          {[c.address.line1, c.address.line2, c.address.city, c.address.state, c.address.country, c.address.postal_code]
+                            .filter(Boolean)
+                            .join(', ') || <Text color="gray.400">(No address)</Text>}
+                        </span>
+                      ) : <Text color="gray.400">(No address)</Text>}
+                    </Td>
+                    <Td>
+                      <IconButton aria-label="Edit" icon={<EditIcon color="#fff" />} size="sm" onClick={() => startEdit(c)} mr={2} bg="#003f2d" _hover={{ bg: '#14543a' }} />
+                      <IconButton aria-label="Delete" icon={<DeleteIcon />} size="sm" colorScheme="red" onClick={() => startDelete(c.id)} />
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
+        )
       )}
       <Button onClick={handleLogout} colorScheme="red" variant="outline" mt={6}>
         Logout
@@ -190,9 +226,9 @@ export default function ViewCustomersPage() {
       <Button as={Link} href="/admin" leftIcon={<ArrowBackIcon />} colorScheme="red" variant="outline" mt={4}>
         Back
       </Button>
-      <Modal isOpen={isEditModalOpen} onClose={cancelEdit} isCentered>
+      <Modal isOpen={isEditModalOpen} onClose={cancelEdit} isCentered size={isMobile ? 'full' : 'md'} motionPreset="slideInBottom">
         <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(8px)" />
-        <ModalContent>
+        <ModalContent maxW={isMobile ? 'xs' : undefined}>
           <ModalHeader>Edit Customer</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -247,9 +283,9 @@ export default function ViewCustomersPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Modal isOpen={isDeleteModalOpen} onClose={cancelDelete} isCentered>
+      <Modal isOpen={isDeleteModalOpen} onClose={cancelDelete} isCentered size={isMobile ? 'full' : 'md'} motionPreset="slideInBottom">
         <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(8px)" />
-        <ModalContent>
+        <ModalContent maxW={isMobile ? 'xs' : undefined}>
           <ModalHeader>Delete Customer</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
