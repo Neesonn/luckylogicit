@@ -1,10 +1,10 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { Box, Heading, Text, Spinner, Link, Alert, AlertIcon, VStack, Badge } from '@chakra-ui/react';
 
-export default function InvoiceAccessPage() {
+function InvoiceAccessContent() {
   const token = useSearchParams().get('token');
   const [invoice, setInvoice] = useState<any>(null);
   const [error, setError] = useState('');
@@ -54,5 +54,13 @@ export default function InvoiceAccessPage() {
         </Link>
       </VStack>
     </Box>
+  );
+}
+
+export default function InvoiceAccessPage() {
+  return (
+    <Suspense fallback={<Box textAlign="center" mt={20}><Spinner size="xl" /><Text mt={4}>Loading...</Text></Box>}>
+      <InvoiceAccessContent />
+    </Suspense>
   );
 } 
