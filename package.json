@@ -23,6 +23,7 @@
     "@supabase/supabase-js": "^2.50.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/nodemailer": "^6.4.17",
+    "@vercel/edge": "^1.2.2",
     "framer-motion": "^11.18.2",
     "jsonwebtoken": "^9.0.2",
     "lottie-react": "^2.4.1",

@@ -6,13 +6,35 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY!;
 const EMAIL_FROM = 'Lucky Logic <no-reply@luckylogic.com.au>';
 
 export async function POST(req: Request) {
-  const { email, invoiceNumber } = await req.json();
+  try {
+    const { email, invoiceNumber } = await req.json();
 
-  const token = jwt.sign(
-    { email, invoiceNumber },
-    JWT_SECRET,
-    { expiresIn: '10m' }
-  );
+    // Validate input
+    if (!email || !invoiceNumber) {
+      return NextResponse.json(
+        { error: 'Email and invoice number are required' },
+        { status: 400 }
+      );
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+
+    // Sanitize inputs
+    const sanitizedEmail = email.toLowerCase().trim();
+    const sanitizedInvoiceNumber = invoiceNumber.toString().trim();
+
+    const token = jwt.sign(
+      { email: sanitizedEmail, invoiceNumber: sanitizedInvoiceNumber },
+      JWT_SECRET,
+      { expiresIn: '10m' }
+    );
 
   const magicLink = `https://luckylogic.com.au/invoice-access?token=${token}`;
 
@@ -41,4 +63,11 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error in send-magic-link:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 } 
