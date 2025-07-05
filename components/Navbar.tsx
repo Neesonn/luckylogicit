@@ -61,6 +61,7 @@ export default function Navbar() {
           </Menu>
           <Text as={NextLink} href="/troubleshoot" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer" _focus={{ outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>Troubleshoot</Text>
           <Text as={NextLink} href="/faq" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer" _focus={{ outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>FAQ</Text>
+          <Text as={NextLink} href="/invoice-search" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer" _focus={{ outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>Pay Invoice</Text>
           <Text as={NextLink} href="/contact-us" color="brand.green" fontWeight="medium" fontSize="md" cursor="pointer" _focus={{ outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>Contact Us</Text>
         </HStack>
       ) : (
@@ -99,6 +100,7 @@ export default function Navbar() {
             </Accordion>
             <MenuItem as={NextLink} href="/troubleshoot" _focus={{ bg: 'green.50', outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>Troubleshoot</MenuItem>
             <MenuItem as={NextLink} href="/faq" _focus={{ bg: 'green.50', outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>FAQ</MenuItem>
+            <MenuItem as={NextLink} href="/invoice-search" _focus={{ bg: 'green.50', outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>Pay Invoice</MenuItem>
             <MenuItem as={NextLink} href="/contact-us" _focus={{ bg: 'green.50', outline: '2px solid', outlineColor: 'brand.green', outlineOffset: '2px' }}>Contact Us</MenuItem>
           </MenuList>
         </Menu>
