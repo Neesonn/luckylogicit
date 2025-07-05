@@ -268,7 +268,7 @@ export default function ContactUsPage() {
           color="brand.green"
           textAlign="center"
         >
-          Get in Touch
+          Get in Touch.
         </Heading>
 
         <ContactForm />
