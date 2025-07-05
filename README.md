@@ -1,6 +1,6 @@
 # Lucky Logic - IT Support & Computer Services
 
-A modern, responsive, production-ready website for Lucky Logic, a professional IT support and computer services company based in Sydney, Australia. Built with Next.js 14, TypeScript, and Chakra UI, featuring a robust contact form system and comprehensive SEO optimization.
+A modern, responsive, production-ready website for Lucky Logic, a professional IT support and computer services company based in Sydney, Australia. Built with Next.js 14, TypeScript, and Chakra UI, featuring a robust admin dashboard, customer management system, and comprehensive SEO optimization.
 
 ## 🎯 Project Overview
 
@@ -19,6 +19,16 @@ Lucky Logic provides comprehensive residential IT support and computer services 
 - **Chakra UI** for beautiful, accessible, and responsive components
 - **Framer Motion** for smooth animations and enhanced UX
 - **Jest & React Testing Library** for comprehensive unit testing
+- **Supabase** for real-time database operations and customer management
+
+### **Admin Dashboard & Customer Management**
+- **Secure Admin Area** - Password-protected admin dashboard accessible via hidden spanner icon
+- **Stripe Integration** - Full customer management with Stripe API integration
+- **Customer CRUD Operations** - Create, read, update, and delete customer profiles
+- **Real-time Data Sync** - Live updates between admin interface and Stripe dashboard
+- **Product Catalogue Management** - Complete product inventory with Supabase backend
+- **Bulk Operations** - Multi-select and bulk delete functionality for customers
+- **Advanced Filtering & Search** - Sort, filter, and search customers by various criteria
 
 ### **Contact System**
 - **Formspree Integration** - Reliable, production-ready contact form
@@ -168,9 +178,17 @@ npm run test:coverage # Run tests with coverage report
 
 ```
 ├── app/                          # Next.js app directory
+│   ├── admin/                    # Admin dashboard pages
+│   │   ├── create-customer/      # Customer creation form
+│   │   ├── view-customers/       # Customer management interface
+│   │   ├── products/             # Product catalogue management
+│   │   ├── invoices/             # Invoice management
+│   │   └── billings/             # Billing management
+│   ├── api/                      # API routes for admin functions
 │   ├── about-us/                # About page with company story
 │   ├── contact-us/              # Contact page with Formspree form
 │   ├── services/                # Services page with detailed offerings
+│   ├── troubleshoot/            # Troubleshooting guide
 │   ├── privacy-policy/          # Privacy policy page
 │   ├── cookie-policy/           # Cookie policy page
 │   ├── terms/                   # Terms of service page
@@ -185,11 +203,13 @@ npm run test:coverage # Run tests with coverage report
 │   ├── Hero.tsx                 # Homepage hero section
 │   ├── ContactForm.tsx          # Formspree contact form
 │   ├── ServiceGrid.tsx          # Services display
-│   ├── Footer.tsx               # Site footer
+│   ├── Footer.tsx               # Site footer with admin access
 │   ├── CookieBanner.tsx         # GDPR cookie consent
 │   ├── GoogleAnalytics.tsx      # Analytics integration
 │   ├── SEO.tsx                  # SEO component
 │   ├── JsonLd.tsx               # Structured data
+│   ├── StripeDataContext.tsx    # Stripe data management
+│   ├── LockContext.tsx          # Admin authentication context
 │   └── __tests__/               # Component tests
 ├── theme/                       # Chakra UI theme configuration
 ├── public/                      # Static assets
@@ -221,6 +241,16 @@ npm run test:coverage # Run tests with coverage report
 
 ### **Environment Variables (Production)**
 ```env
+# Admin Authentication
+ADMIN_PASSWORD=yourStrongAdminPassword
+
+# Stripe Integration
+STRIPE_SECRET_KEY=sk_live_...
+
+# Supabase Integration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+
 # Google Analytics (Optional - for tracking)
 NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 
@@ -239,6 +269,8 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
 
 ### **Data Protection**
 - **Formspree Security** - Enterprise-grade form handling
+- **Stripe Security** - PCI DSS compliant payment processing
+- **Supabase Security** - Enterprise-grade database with RLS
 - **No Data Storage** - Form submissions sent directly to email
 - **GDPR Compliance** - User consent and data protection
 - **Privacy Policy** - Comprehensive data handling information
@@ -247,6 +279,7 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
 - **CSP Headers** - Protection against XSS and injection attacks
 - **HTTPS Only** - Secure connections enforced
 - **No Sensitive Data** - No API keys or secrets in client code
+- **Admin Authentication** - Secure password-protected admin area
 
 ## 📊 Performance & Monitoring
 
@@ -264,8 +297,8 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
 ## 🧪 Testing
 
 ### **Test Coverage**
-- **Unit Tests**: Contact form, service components
-- **Integration Tests**: Form submission flow
+- **Unit Tests**: Contact form, service components, admin functions
+- **Integration Tests**: Form submission flow, admin authentication
 - **Manual Testing**: Cross-browser, mobile responsiveness
 - **Performance Testing**: Lighthouse audits
 
@@ -288,6 +321,7 @@ npm run test:coverage # Generate coverage report
 - **Performance Monitoring**: Core Web Vitals tracking
 - **Content Updates**: Service offerings and company information
 - **SEO Optimization**: Regular metadata and content reviews
+- **Admin Dashboard**: Regular customer data management and updates
 
 ## 🎯 Business Information
 
@@ -313,7 +347,7 @@ This project is proprietary and confidential. All rights reserved by Lucky Logic
 
 ## 🔄 Version History
 
-### **Current Version**: 1.0.0 (Production Ready)
+### **Current Version**: 2.0.0 (Production Ready with Admin Dashboard)
 - ✅ Contact form with Formspree integration
 - ✅ Complete SEO optimization
 - ✅ Mobile-responsive design
@@ -321,8 +355,18 @@ This project is proprietary and confidential. All rights reserved by Lucky Logic
 - ✅ Performance optimization
 - ✅ Security implementation
 - ✅ Legal compliance
+- ✅ Admin dashboard with customer management
+- ✅ Stripe integration for customer data
+- ✅ Product catalogue with Supabase backend
+- ✅ Advanced filtering and search capabilities
+- ✅ Bulk operations for customer management
 
 ### **Recent Updates**
+- **Admin Dashboard**: Complete customer management system with Stripe integration
+- **Product Management**: Live product catalogue with Supabase backend
+- **Customer Operations**: Create, edit, delete, and bulk operations for customers
+- **Advanced UI**: Enhanced admin interface with filtering, sorting, and search
+- **Security**: Password-protected admin area with secure API routes
 - **Contact Form**: Migrated to Formspree for reliability
 - **Build Configuration**: Optimized for static export
 - **Error Handling**: Comprehensive error boundaries
@@ -350,6 +394,13 @@ For technical support or questions about this website, contact support@luckylogi
   - Edit customer details (name, email, mobile, address, etc.) via a modal popup.
   - Delete customers with a confirmation modal and warning.
   - Customer ID links directly to the Stripe dashboard profile.
+  - Bulk operations for multiple customer management.
+  - Advanced filtering and sorting capabilities.
+- **Product Management**:
+  - Complete product catalogue with Supabase backend.
+  - Add, edit, and delete products with real-time updates.
+  - Automatic margin calculations and pricing.
+  - Category and vendor management.
 - **UI/UX**: Modern, clean Chakra UI design with accessibility and responsive layout.
 
 ## Environment Variables
@@ -359,9 +410,13 @@ Create a `.env.local` file in the project root with the following:
 ```
 ADMIN_PASSWORD=yourStrongAdminPassword
 STRIPE_SECRET_KEY=sk_live_...
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 ```
 - `ADMIN_PASSWORD`: Password for admin login (never exposed to the frontend).
 - `STRIPE_SECRET_KEY`: Your Stripe secret key for API access.
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL.
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key.
 
 ## Local Development
 
@@ -386,7 +441,7 @@ STRIPE_SECRET_KEY=sk_live_...
 ## Deployment
 
 - Deploy to [Vercel](https://vercel.com/) for full serverless support (API routes, middleware, etc.).
-- Set the same environment variables (`ADMIN_PASSWORD`, `STRIPE_SECRET_KEY`) in your Vercel project settings.
+- Set the same environment variables (`ADMIN_PASSWORD`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) in your Vercel project settings.
 - Do **not** use static export (`output: 'export'`) as this disables API routes and authentication.
 
 ## Security Notes
@@ -394,11 +449,13 @@ STRIPE_SECRET_KEY=sk_live_...
 - The admin password and Stripe secret key are never exposed to the frontend.
 - All sensitive actions (create, update, delete customers) are performed via secure API routes.
 - Only authenticated admins can access the admin dashboard and customer management features.
+- Supabase Row Level Security (RLS) policies protect database access.
 
 ## Customization
 
 - Update the list of Australian states or countries in `app/admin/create-customer/page.tsx` as needed.
 - Adjust the Chakra UI theme in `theme/theme.ts` for branding.
+- Modify product categories and vendors in the product management interface.
 
 ## Support
 
