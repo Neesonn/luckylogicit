@@ -199,11 +199,11 @@ export default function CreateCustomerPage() {
             <FormLabel fontSize={{ base: "sm", md: "md" }} fontWeight="semibold" color="gray.700" mb={2}>Mobile number</FormLabel>
             <Input 
               as={InputMask} 
-              mask="(04XX) XXX XXX" 
+              mask="(9999) 999 999" 
               maskChar=" " 
               value={phone} 
               onChange={e => setPhone(e.target.value)} 
-              placeholder="(04XX) XXX XXX" 
+              placeholder="(0412) 345 678" 
               size={{ base: "md", md: "lg" }}
               borderWidth="2px"
               borderColor="gray.200"
