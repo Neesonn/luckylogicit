@@ -140,7 +140,7 @@ export default function Footer() {
             <ChakraLink as={NextLink} href="/services" color="white" textDecoration="underline">Services</ChakraLink>
             <ChakraLink as={NextLink} href="/troubleshoot" color="white" textDecoration="underline">Troubleshoot</ChakraLink>
             <ChakraLink as={NextLink} href="/faq" color="white" textDecoration="underline">FAQ</ChakraLink>
-            <ChakraLink as={NextLink} href="/invoice-search" color="white" textDecoration="underline">Pay Invoice</ChakraLink>
+
             <ChakraLink as={NextLink} href="/contact-us" color="white" textDecoration="underline">Contact Us</ChakraLink>
           </Stack>
         </Box>
