@@ -75,9 +75,10 @@ function InvoiceAccessContent() {
             <Icon as={FaUniversity} color="blue.600" boxSize={5} />
             <Text fontWeight="bold" color="blue.600">Bank Transfer Details</Text>
           </HStack>
-          <Text><strong>Account Name:</strong> Lucky Logic IT Services</Text>
-          <Text><strong>BSB:</strong> 633-000</Text>
-          <Text><strong>Account Number:</strong> 123456789</Text>
+          <Text><strong>Bank:</strong> Commonwealth Bank of Australia</Text>
+          <Text><strong>Account Name:</strong> Lucky Logic IT</Text>
+          <Text><strong>BSB:</strong> 067-873</Text>
+          <Text><strong>Account Number:</strong> 1786 7448</Text>
           <Text><strong>Reference:</strong> {invoice.number}</Text>
           <Text fontSize="sm" color="blue.600" mt={2}>
             Please use your invoice number as the payment reference.
@@ -90,8 +91,8 @@ function InvoiceAccessContent() {
             <Icon as={FaUniversity} color="purple.600" boxSize={5} />
             <Text fontWeight="bold" color="purple.600">PayID Details</Text>
           </HStack>
-          <Text><strong>PayID:</strong> lucky.logic@payid.au</Text>
-          <Text><strong>Account Name:</strong> Lucky Logic IT Services</Text>
+          <Text><strong>PayID:</strong> michael@luckylogic.com.au</Text>
+          <Text><strong>Account Name:</strong> LUCKY LOGIC IT SERVICES</Text>
           <Text><strong>Reference:</strong> {invoice.number}</Text>
           <Text fontSize="sm" color="purple.600" mt={2}>
             Use your invoice number as the payment reference.
