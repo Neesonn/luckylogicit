@@ -69,17 +69,46 @@ function InvoiceAccessContent() {
           <Text>{invoice.customer_email}</Text>
         </HStack>
         <Divider />
-        <Box mt={2} mb={2} p={4} borderWidth="1px" borderRadius="md" bg="gray.50">
+        {/* Bank Transfer Section */}
+        <Box mt={2} mb={2} p={4} borderWidth="1px" borderRadius="md" bg="blue.50" borderColor="blue.200">
           <HStack mb={2} spacing={2} align="center">
-            <Icon as={FaUniversity} color="brand.green" boxSize={5} />
-            <Text fontWeight="bold" color="brand.green">Bank Transfer Details</Text>
+            <Icon as={FaUniversity} color="blue.600" boxSize={5} />
+            <Text fontWeight="bold" color="blue.600">Bank Transfer Details</Text>
           </HStack>
           <Text><strong>Account Name:</strong> Lucky Logic IT Services</Text>
           <Text><strong>BSB:</strong> 633-000</Text>
           <Text><strong>Account Number:</strong> 123456789</Text>
           <Text><strong>Reference:</strong> {invoice.number}</Text>
-          <Text fontSize="sm" color="gray.500" mt={2}>
+          <Text fontSize="sm" color="blue.600" mt={2}>
             Please use your invoice number as the payment reference.
+          </Text>
+        </Box>
+
+        {/* PayID Section */}
+        <Box mt={2} mb={2} p={4} borderWidth="1px" borderRadius="md" bg="purple.50" borderColor="purple.200">
+          <HStack mb={2} spacing={2} align="center">
+            <Icon as={FaUniversity} color="purple.600" boxSize={5} />
+            <Text fontWeight="bold" color="purple.600">PayID Details</Text>
+          </HStack>
+          <Text><strong>PayID:</strong> lucky.logic@payid.au</Text>
+          <Text><strong>Account Name:</strong> Lucky Logic IT Services</Text>
+          <Text><strong>Reference:</strong> {invoice.number}</Text>
+          <Text fontSize="sm" color="purple.600" mt={2}>
+            Use your invoice number as the payment reference.
+          </Text>
+        </Box>
+
+        {/* Credit Card Section */}
+        <Box mt={2} mb={2} p={4} borderWidth="1px" borderRadius="md" bg="green.50" borderColor="green.200">
+          <HStack mb={2} spacing={2} align="center">
+            <Icon as={FaUniversity} color="green.600" boxSize={5} />
+            <Text fontWeight="bold" color="green.600">Credit Card Payment</Text>
+          </HStack>
+          <Text><strong>Processing Fees:</strong></Text>
+          <Text fontSize="sm" ml={4}>• Visa/Mastercard: 1.75% + $0.30</Text>
+          <Text fontSize="sm" ml={4}>• American Express: 3.5% + $0.30</Text>
+          <Text fontSize="sm" color="green.600" mt={2}>
+            Fees cover transaction costs only - no profit is made from these charges.
           </Text>
         </Box>
         <Divider />
