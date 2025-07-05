@@ -179,6 +179,17 @@ export default function InvoicesPage() {
     return lines.map((line, i) => <div key={i}>{line}</div>);
   }
 
+  // Add helper function for days overdue
+  function getDaysOverdue(inv: any) {
+    if (!inv.due_date) return null;
+    const due = new Date(inv.due_date * 1000);
+    const today = new Date();
+    due.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
+    const diff = Math.floor((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : null;
+  }
+
   return (
     <Box minH="100vh" display="flex" flexDirection="column" alignItems="center" justifyContent="flex-start" bg="gray.50" px={4} py={10}>
       {/* Banner */}
@@ -510,10 +521,8 @@ export default function InvoicesPage() {
                   let extra = null;
                   if (status === 'Past Due') {
                     bannerProps = { bg: 'red.500', color: 'white' };
-                    if (detailsInvoice.due_date) {
-                      const daysOverdue = Math.floor((Date.now() - detailsInvoice.due_date * 1000) / (1000 * 60 * 60 * 24));
-                      extra = daysOverdue > 0 ? ` – ${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue` : '';
-                    }
+                    const daysOverdue = getDaysOverdue(detailsInvoice);
+                    extra = daysOverdue ? ` – ${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue` : '';
                   } else if (status === 'Paid') {
                     bannerProps = { bg: 'green.500', color: 'white' };
                   } else if (status === 'Void') {

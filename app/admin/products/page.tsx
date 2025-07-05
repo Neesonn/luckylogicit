@@ -220,17 +220,10 @@ export default function ProductsPage() {
       console.log('Deleting product with id:', id, 'Type:', typeof id);
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (!error) {
-        // Refetch products from Supabase after delete
-        const { data: fetchedData, error: fetchError } = await supabase
-          .from('products')
-          .select('id, name, vendor, description, category, distributor, vendorSku, distributorSku, rrp, cost, costGstType, markup, sell, createdAt, updatedAt')
-          .order('createdAt', { ascending: false });
-        if (fetchError) {
-          toast({ title: 'Error fetching products', description: fetchError.message, status: 'error', duration: 4000, isClosable: true });
-        } else {
-          setProducts(fetchedData || []);
-          toast({ title: 'Product deleted', status: 'success', duration: 3000, isClosable: true });
-        }
+        setProducts((prev: Product[]) => prev.filter((_, i) => i !== deleteIdx));
+        // Dispatch custom event for live update
+        window.dispatchEvent(new Event('products-updated'));
+        toast({ title: 'Product deleted', status: 'success', duration: 3000, isClosable: true });
       } else {
         toast({ title: 'Error deleting product', description: error.message, status: 'error', duration: 4000, isClosable: true });
       }
@@ -283,6 +276,8 @@ export default function ProductsPage() {
           console.error('❌ Supabase fetch error:', fetchError.message, fetchError.details);
         }
         setProducts(fetchedData || []);
+        // Dispatch custom event for live update
+        window.dispatchEvent(new Event('products-updated'));
         onClose();
       } else {
         console.error('❌ Supabase insert/update error:', error.message, error.details);
@@ -300,6 +295,8 @@ export default function ProductsPage() {
           console.error('❌ Supabase fetch error:', fetchError.message, fetchError.details);
         }
         setProducts(fetchedData || []);
+        // Dispatch custom event for live update
+        window.dispatchEvent(new Event('products-updated'));
         onClose();
       }
     }
@@ -355,6 +352,9 @@ export default function ProductsPage() {
         <Heading as="h1" size="xl" color="#003f2d" fontWeight="bold" mb={1}>
           Product Catalogue
         </Heading>
+        <Text fontSize="md" color="gray.700" fontWeight="semibold" mt={2}>
+          Products in Catalogue: {products.length}
+        </Text>
         <Text fontSize="lg" color="gray.600">
           Track, price, and manage your IT product listings.
         </Text>
