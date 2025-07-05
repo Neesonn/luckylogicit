@@ -173,7 +173,7 @@ export default function Footer() {
         {/* Golden wrench icon button to open admin modal */}
         <Button
           position="absolute"
-          right={4}
+          left={4}
           top={4}
           aria-label="Admin Panel"
           bg="transparent"

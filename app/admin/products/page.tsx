@@ -216,6 +216,8 @@ export default function ProductsPage() {
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (!error) {
         setProducts((prev: Product[]) => prev.filter((_, i) => i !== deleteIdx));
+        // Dispatch custom event for live update
+        window.dispatchEvent(new Event('products-updated'));
       }
     }
     setIsDeleteOpen(false);
@@ -265,6 +267,8 @@ export default function ProductsPage() {
           console.error('❌ Supabase fetch error:', fetchError.message, fetchError.details);
         }
         setProducts(fetchedData || []);
+        // Dispatch custom event for live update
+        window.dispatchEvent(new Event('products-updated'));
         onClose();
       } else {
         console.error('❌ Supabase insert/update error:', error.message, error.details);
@@ -282,6 +286,8 @@ export default function ProductsPage() {
           console.error('❌ Supabase fetch error:', fetchError.message, fetchError.details);
         }
         setProducts(fetchedData || []);
+        // Dispatch custom event for live update
+        window.dispatchEvent(new Event('products-updated'));
         onClose();
       }
     }
@@ -335,6 +341,9 @@ export default function ProductsPage() {
         <Heading as="h1" size="xl" color="#003f2d" fontWeight="bold" mb={1}>
           Product Catalogue
         </Heading>
+        <Text fontSize="md" color="gray.700" fontWeight="semibold" mt={2}>
+          Products in Catalogue: {products.length}
+        </Text>
         <Text fontSize="lg" color="gray.600">
           Track, price, and manage your IT product listings.
         </Text>

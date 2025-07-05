@@ -8,6 +8,7 @@ import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { useLock } from '../../components/LockContext';
 import { useStripeData } from '../../components/StripeDataContext';
+import supabase from '../services/supabaseClient';
 
 // Animated counter hook
 function useCountUp(target: number, duration = 1200) {
@@ -38,6 +39,7 @@ export default function AdminDashboard() {
   const adminName = 'Admin'; // Replace with dynamic name if available
   const { customers, invoices, loading, error, refresh } = useStripeData();
   const { metricsLocked, setMetricsLocked } = useLock();
+  const [productCount, setProductCount] = useState<number>(0);
 
   // Outstanding invoices calculation
   const outstanding = invoices
@@ -46,6 +48,22 @@ export default function AdminDashboard() {
 
   const animatedCustomers = useCountUp(customers?.length ?? 0, 1000);
   const animatedOutstanding = useCountUp(Math.round(outstanding / 100), 1200); // show dollars only
+
+  useEffect(() => {
+    async function fetchProductCount() {
+      const { count, error } = await supabase
+        .from('products')
+        .select('id', { count: 'exact', head: true });
+      if (!error && typeof count === 'number') {
+        setProductCount(count);
+      }
+    }
+    fetchProductCount();
+    // Listen for live updates
+    const handler = () => fetchProductCount();
+    window.addEventListener('products-updated', handler);
+    return () => window.removeEventListener('products-updated', handler);
+  }, []);
 
   const handleLogout = async () => {
     await fetch('/api/admin-logout', { method: 'POST' });
@@ -128,7 +146,10 @@ export default function AdminDashboard() {
             <Box display="flex" alignItems="center" bg="white" boxShadow="md" borderRadius="full" px={5} py={2} minW="220px">
               <Icon as={FaBoxOpen} color="#003f2d" boxSize={5} mr={2} />
               <Text fontWeight="bold" color="#003f2d" mr={2}>Products in Catalogue:</Text>
-              <Badge colorScheme="gray" fontSize="md" px={3} py={1} borderRadius="full">0</Badge>
+              <Badge colorScheme="gray" fontSize="md" px={3} py={1} borderRadius="full"
+                style={metricsLocked ? { filter: 'blur(8px)' } : {}}>
+                {productCount}
+              </Badge>
             </Box>
           </HStack>
         </Box>
