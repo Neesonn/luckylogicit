@@ -48,8 +48,8 @@ import {
 } from '@chakra-ui/react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowBackIcon, EditIcon, DeleteIcon, ChevronRightIcon, AddIcon } from '@chakra-ui/icons';
-import { useState, useEffect, useCallback } from 'react';
+import { ArrowBackIcon, EditIcon, DeleteIcon, ChevronRightIcon, AddIcon, ChevronDownIcon, ChevronUpIcon, CheckCircleIcon } from '@chakra-ui/icons';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   FaInfoCircle, 
   FaRegCalendarAlt, 
@@ -73,6 +73,7 @@ import {
   FaTrash,
   FaEdit
 } from 'react-icons/fa';
+import ReactMarkdown from 'react-markdown';
 
 // Default project data (fallback if localStorage is empty)
 const defaultProjects = [
@@ -116,6 +117,45 @@ const defaultProjects = [
   },
 ];
 
+// Add at the top, after imports
+const getCurrentUser = () => 'Current User'; // Replace with real user logic if available
+const getNow = () => new Date().toISOString();
+
+function createHistoryEntry(action: string, details: string) {
+  return {
+    timestamp: getNow(),
+    user: getCurrentUser(),
+    action,
+    details,
+  };
+}
+
+// Add a helper to diff two tasks and summarize changes
+function diffTasks(oldTask: any, newTask: any) {
+  if (!oldTask) return 'Task was edited.';
+  const changes = [];
+  for (const key of Object.keys(newTask)) {
+    if (key === 'id') continue;
+    if (oldTask[key] !== newTask[key]) {
+      changes.push(`${key} changed from "${oldTask[key]}" to "${newTask[key]}"`);
+    }
+  }
+  return changes.length > 0 ? changes.join('; ') : 'Task was edited.';
+}
+
+// Add a helper to diff two projects and summarize changes
+function diffProjects(oldProject: any, newProject: any) {
+  if (!oldProject) return 'Project was edited.';
+  const changes = [];
+  for (const key of Object.keys(newProject)) {
+    if (['updated_at', 'history'].includes(key)) continue;
+    if (oldProject[key] !== newProject[key]) {
+      changes.push(`${key} changed from "${oldProject[key]}" to "${newProject[key]}"`);
+    }
+  }
+  return changes.length > 0 ? changes.join('; ') : 'Project was edited.';
+}
+
 export default function ProjectDetailsPage() {
   const router = useRouter();
   const params = useParams();
@@ -153,6 +193,14 @@ export default function ProjectDetailsPage() {
   const [editingUpdate, setEditingUpdate] = useState<any>(null);
   const [editUpdateText, setEditUpdateText] = useState('');
   const [editingUpdateLoading, setEditingUpdateLoading] = useState(false);
+  // In component state:
+  const [history, setHistory] = useState<any[]>([]);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyLimit, setHistoryLimit] = useState(5);
+  const [expandedTasks, setExpandedTasks] = useState<string[]>([]); // store expanded task ids
+  const tasksSectionRef = useRef<HTMLDivElement>(null);
+  // At the top, after other refs:
+  const updatesSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Fetch project details from database
@@ -187,6 +235,13 @@ export default function ProjectDetailsPage() {
           } else {
             setTasks([]);
             console.log('No tasks found for project, initializing empty array');
+          }
+          
+          // Load history if available, initialize as empty array if not
+          if (foundProject.history && Array.isArray(foundProject.history)) {
+            setHistory(foundProject.history);
+          } else {
+            setHistory([]);
           }
         } else {
           setError('Project not found');
@@ -278,6 +333,22 @@ export default function ProjectDetailsPage() {
       
       // Clear success message after 3 seconds
       setTimeout(() => setSaveSuccess(''), 3000);
+
+      // Add a helper to diff two projects and summarize changes
+      const projectChanges = diffProjects(project, updatedProject);
+      if (projectChanges && projectChanges !== 'Project was edited.') {
+        const updatedHistory = [
+          ...history,
+          createHistoryEntry('Project Overview Edited', projectChanges)
+        ];
+        setHistory(updatedHistory);
+        // Also send history in the PUT request
+        await fetch(`/api/projects/${projectCode}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...updatedProject, history: updatedHistory }),
+        });
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to save project changes');
     } finally {
@@ -325,6 +396,8 @@ export default function ProjectDetailsPage() {
     const elapsedDays = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     const remainingDays = Math.max(0, totalDays - elapsedDays);
     
+    // If the project hasn't started yet, show 0%
+    if (today < startDate) return 0;
     return Math.round(((totalDays - remainingDays) / totalDays) * 100);
   };
 
@@ -386,13 +459,20 @@ export default function ProjectDetailsPage() {
       setProjectUpdates(updatedUpdates);
       
       // Save project updates to database
+      const updatedHistory = [
+        ...history,
+        createHistoryEntry('Update Added', `Project update added: "${newUpdateText.trim().slice(0, 40)}..."`)
+      ];
+      setHistory(updatedHistory);
+      
       const response = await fetch(`/api/projects/${projectCode}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          updates: updatedUpdates
+          updates: updatedUpdates,
+          history: updatedHistory
         })
       });
       
@@ -457,13 +537,20 @@ export default function ProjectDetailsPage() {
     
     // Save tasks to database
     try {
+      const updatedHistory = [
+        ...history,
+        createHistoryEntry('Task Created', `Task "${newTask.title}" was created.`)
+      ];
+      setHistory(updatedHistory);
+      
       const response = await fetch(`/api/projects/${projectCode}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tasks: updatedTasks
+          tasks: updatedTasks,
+          history: updatedHistory
         })
       });
       
@@ -522,13 +609,22 @@ export default function ProjectDetailsPage() {
     
     // Save updated tasks to database
     try {
+      const oldTask = tasks.find(task => task.id === editingTask.id);
+      const editDetails = `Task "${editingTask.title}" was edited. ${diffTasks(oldTask, editingTask)}`;
+      const updatedHistory = [
+        ...history,
+        createHistoryEntry('Task Edited', editDetails)
+      ];
+      setHistory(updatedHistory);
+      
       const response = await fetch(`/api/projects/${projectCode}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tasks: updatedTasks
+          tasks: updatedTasks,
+          history: updatedHistory
         })
       });
       
@@ -597,10 +693,20 @@ export default function ProjectDetailsPage() {
     const updatedTasks = tasks.filter(task => task.id !== taskId);
     setTasks(updatedTasks);
     try {
+      const deletedTask = tasks.find(task => task.id === taskId);
+      const updatedHistory = [
+        ...history,
+        createHistoryEntry('Task Deleted', `Task "${deletedTask?.title || 'Unknown'}" was deleted.`)
+      ];
+      setHistory(updatedHistory);
+      
       const response = await fetch(`/api/projects/${projectCode}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tasks: updatedTasks })
+        body: JSON.stringify({
+          tasks: updatedTasks,
+          history: updatedHistory
+        })
       });
       const result = await response.json();
       if (!response.ok) {
@@ -617,10 +723,20 @@ export default function ProjectDetailsPage() {
     const updatedUpdates = projectUpdates.filter(update => update.id !== updateId);
     setProjectUpdates(updatedUpdates);
     try {
+      const deletedUpdate = projectUpdates.find(update => update.id === updateId);
+      const updatedHistory = [
+        ...history,
+        createHistoryEntry('Update Deleted', `Project update deleted: "${deletedUpdate?.text?.slice(0, 40)}..."`)
+      ];
+      setHistory(updatedHistory);
+      
       const response = await fetch(`/api/projects/${projectCode}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ updates: updatedUpdates })
+        body: JSON.stringify({
+          updates: updatedUpdates,
+          history: updatedHistory
+        })
       });
       const result = await response.json();
       if (!response.ok) {
@@ -646,10 +762,20 @@ export default function ProjectDetailsPage() {
     );
     setProjectUpdates(updatedUpdates);
     try {
+      const oldUpdate = projectUpdates.find(update => update.id === editingUpdate.id);
+      const updatedHistory = [
+        ...history,
+        createHistoryEntry('Update Edited', `Project update edited. Old: "${oldUpdate?.text?.slice(0, 40)}..." New: "${editUpdateText.slice(0, 40)}..."`)
+      ];
+      setHistory(updatedHistory);
+      
       const response = await fetch(`/api/projects/${projectCode}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ updates: updatedUpdates })
+        body: JSON.stringify({
+          updates: updatedUpdates,
+          history: updatedHistory
+        })
       });
       const result = await response.json();
       if (!response.ok) {
@@ -670,6 +796,37 @@ export default function ProjectDetailsPage() {
     setIsEditUpdateModalOpen(false);
     setEditingUpdate(null);
     setEditUpdateText('');
+  };
+
+  // Add this handler in the component:
+  const handleToggleTaskCompleted = async (task: any) => {
+    const newStatus = task.status === 'completed' ? 'in-progress' : 'completed';
+    const updatedTask = { ...task, status: newStatus, completedDate: newStatus === 'completed' ? new Date().toISOString().split('T')[0] : null };
+    const updatedTasks = tasks.map(t => t.id === task.id ? updatedTask : t);
+    setTasks(updatedTasks);
+    // Audit log
+    const oldTask = tasks.find(t => t.id === task.id);
+    const editDetails = `Task "${task.title}" status changed from "${oldTask.status}" to "${newStatus}".`;
+    const updatedHistory = [
+      ...history,
+      createHistoryEntry('Task Status Toggled', editDetails)
+    ];
+    setHistory(updatedHistory);
+    // Save to backend
+    try {
+      const response = await fetch(`/api/projects/${projectCode}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tasks: updatedTasks, history: updatedHistory })
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to update task status');
+      }
+    } catch (error: any) {
+      setTasks(tasks); // revert
+      setError(error.message || 'Failed to update task status. Please try again.');
+    }
   };
 
   if (loading) {
@@ -959,7 +1116,7 @@ export default function ProjectDetailsPage() {
       </Box>
 
       {/* Main Content */}
-      <Container maxW="1400px" py={8}>
+      <Container maxW="1400px" py={8} pb={{ base: 16, md: 0 }}>
         {/* Success/Error Messages */}
         {saveSuccess && (
           <Alert status="success" borderRadius="lg" mb={6}>
@@ -976,7 +1133,7 @@ export default function ProjectDetailsPage() {
         
         <SimpleGrid columns={{ base: 1, xl: 4 }} spacing={8}>
           {/* Main Content Area */}
-          <Box gridColumn={{ xl: "span 3" }}>
+          <Box gridColumn={{ xl: "span 3" }} minW={0}>
                           <VStack spacing={8} align="stretch">
                 {/* Project Overview */}
                 <Card shadow="sm" border="1px solid" borderColor="gray.200">
@@ -1342,7 +1499,7 @@ export default function ProjectDetailsPage() {
               </SimpleGrid>
 
               {/* Project Updates */}
-              <Card shadow="sm" border="1px solid" borderColor="gray.200">
+              <Card ref={updatesSectionRef} shadow="sm" border="1px solid" borderColor="gray.200">
                 <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
                   <Flex justify="space-between" align="center">
                     <HStack>
@@ -1434,7 +1591,7 @@ export default function ProjectDetailsPage() {
               </Card>
 
                 {/* Tasks */}
-                <Card shadow="sm" border="1px solid" borderColor="gray.200">
+                <Card ref={tasksSectionRef} shadow="sm" border="1px solid" borderColor="gray.200">
                   <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
                     <Flex justify="space-between" align="center">
                       <HStack>
@@ -1473,99 +1630,109 @@ export default function ProjectDetailsPage() {
                             _hover={{ boxShadow: "md", borderColor: '#14543a' }}
                             transition="all 0.2s"
                           >
-                            <Flex justify="space-between" align="start" mb={3}>
-                              <Box flex="1">
-                                <HStack spacing={3} mb={2}>
-                                  <Text fontSize="lg" fontWeight="semibold" color="gray.800">
-                                    {task.title}
-                                  </Text>
-                                  <Badge 
-                                    colorScheme={getTaskStatusColor(task.status)} 
-                                    size="sm"
-                                    borderRadius="full"
-                                    px={2}
-                                    textTransform="lowercase"
-                                  >
-                                    {task.status.replace('-', ' ')}
-                                  </Badge>
-                                  <Badge 
-                                    colorScheme={getTaskPriorityColor(task.priority)} 
-                                    size="sm"
-                                    borderRadius="full"
-                                    px={2}
-                                    textTransform="lowercase"
-                                  >
-                                    {task.priority}
-                                  </Badge>
+                            <Flex align="center" justify="space-between" cursor="pointer" onClick={() => {
+                              setExpandedTasks((prev) =>
+                                prev.includes(task.id)
+                                  ? prev.filter((id) => id !== task.id)
+                                  : [...prev, task.id]
+                              );
+                            }}>
+                              <Box>
+                                <Text fontWeight="bold" fontSize="md" color="#003f2d">{task.title}</Text>
+                                <HStack spacing={3} mt={1}>
+                                  <Badge colorScheme={getTaskStatusColor(task.status)}>{task.status}</Badge>
+                                  <Badge colorScheme={getTaskPriorityColor(task.priority)}>{task.priority}</Badge>
+                                  <Text fontSize="sm" color="gray.600">Assignee: {task.assignee}</Text>
+                                  <Text fontSize="sm" color="gray.600">Due: {task.dueDate}</Text>
                                 </HStack>
-                                <Text fontSize="sm" color="gray.600" mb={3}>
-                                  {task.description}
-                                </Text>
                               </Box>
-                              <IconButton
-                                aria-label="Edit task"
-                                icon={<EditIcon />}
-                                size="sm"
-                                variant="ghost"
-                                colorScheme="blue"
-                                onClick={() => handleEditTask(task)}
-                                _hover={{ bg: 'blue.50' }}
-                              />
-                              <IconButton
-                                aria-label="Delete task"
-                                icon={<FaTrash />}
-                                size="sm"
-                                variant="ghost"
-                                colorScheme="red"
-                                ml={2}
-                                onClick={() => handleDeleteTask(task.id)}
-                                _hover={{ bg: 'red.50' }}
-                              />
-                            </Flex>
-                            
-                            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4} mb={3}>
-                              <Box>
-                                <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">
-                                  Assignee
-                                </Text>
-                                <Text fontSize="sm" fontWeight="medium">{task.assignee}</Text>
-                              </Box>
-                              <Box>
-                                <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">
-                                  Due Date
-                                </Text>
-                                <Text fontSize="sm" fontWeight="medium">{task.dueDate}</Text>
-                              </Box>
-                              <Box>
-                                <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">
-                                  Hours
-                                </Text>
-                                <Text fontSize="sm" fontWeight="medium">
-                                  {task.actualHours}/{task.estimatedHours} hrs
-                                </Text>
-                              </Box>
-                            </SimpleGrid>
-
-                            {task.status === 'in-progress' && (
-                              <Box mt={2}>
-                                <Text fontSize="xs" color="gray.500" mb={1}>
-                                  Progress: {task.actualHours}/{task.estimatedHours} hours ({getTaskProgress(task)}%)
-                                </Text>
-                                <Progress 
-                                  value={getTaskProgress(task)} 
-                                  colorScheme="green" 
-                                  size="sm" 
-                                  borderRadius="md"
-                                  height="8px"
+                              <HStack spacing={1}>
+                                <IconButton
+                                  aria-label="Edit task"
+                                  icon={<EditIcon />}
+                                  size="sm"
+                                  variant="ghost"
+                                  colorScheme="blue"
+                                  onClick={e => { e.stopPropagation(); handleEditTask(task); }}
+                                  _hover={{ bg: 'blue.50' }}
                                 />
-                              </Box>
-                            )}
-
-                            {task.status === 'completed' && task.completedDate && (
-                              <Box mt={2}>
-                                <Text fontSize="xs" color="green.600" fontWeight="medium">
-                                  ✅ Completed on {task.completedDate}
-                                </Text>
+                                <IconButton
+                                  aria-label="Delete task"
+                                  icon={<FaTrash />}
+                                  size="sm"
+                                  variant="ghost"
+                                  colorScheme="red"
+                                  ml={2}
+                                  onClick={e => { e.stopPropagation(); handleDeleteTask(task.id); }}
+                                  _hover={{ bg: 'red.50' }}
+                                />
+                                <IconButton
+                                  aria-label={task.status === 'completed' ? 'Mark as In Progress' : 'Mark as Completed'}
+                                  icon={<CheckCircleIcon color={task.status === 'completed' ? 'white' : 'gray.400'} />}
+                                  size="sm"
+                                  variant={task.status === 'completed' ? 'solid' : 'ghost'}
+                                  colorScheme={task.status === 'completed' ? 'green' : 'gray'}
+                                  onClick={e => { e.stopPropagation(); handleToggleTaskCompleted(task); }}
+                                  _hover={{ bg: task.status === 'completed' ? 'green.100' : 'gray.100' }}
+                                  ml={2}
+                                />
+                                <Icon as={expandedTasks.includes(task.id) ? ChevronUpIcon : ChevronDownIcon} boxSize={5} color="gray.500" />
+                              </HStack>
+                            </Flex>
+                            {expandedTasks.includes(task.id) && (
+                              <Box mt={4}>
+                                <Box fontSize="sm" color="gray.600" mb={3}>
+                                  <ReactMarkdown
+                                    components={{
+                                      h1: (props) => <Heading as="h2" size="md" mt={4} mb={2} {...props} />,
+                                      h2: (props) => <Heading as="h3" size="sm" mt={3} mb={1} {...props} />,
+                                      h3: (props) => <Heading as="h4" size="xs" mt={2} mb={1} {...props} />,
+                                      ul: (props) => <Box as="ul" pl={5} mb={2} style={{ listStyleType: 'disc' }} {...props} />,
+                                      ol: (props) => <Box as="ol" pl={5} mb={2} style={{ listStyleType: 'decimal' }} {...props} />,
+                                      li: (props) => <Box as="li" mb={1} {...props} />,
+                                      p: (props) => <Box as="p" mb={2} {...props} />,
+                                      code: (props) => <Box as="code" bg="gray.100" px={1} py={0.5} borderRadius="md" fontSize="sm" {...props} />,
+                                      blockquote: (props) => <Box as="blockquote" pl={4} borderLeft="4px solid #CBD5E0" color="gray.500" fontStyle="italic" {...props} />,
+                                    }}
+                                  >
+                                    {task.description}
+                                  </ReactMarkdown>
+                                </Box>
+                                <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4} mb={3}>
+                                  <Box>
+                                    <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">Assignee</Text>
+                                    <Text fontSize="sm" fontWeight="medium">{task.assignee}</Text>
+                                  </Box>
+                                  <Box>
+                                    <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">Due Date</Text>
+                                    <Text fontSize="sm" fontWeight="medium">{task.dueDate}</Text>
+                                  </Box>
+                                  <Box>
+                                    <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">Hours</Text>
+                                    <Text fontSize="sm" fontWeight="medium">{task.actualHours}/{task.estimatedHours} hrs</Text>
+                                  </Box>
+                                </SimpleGrid>
+                                {task.status === 'in-progress' && (
+                                  <Box mt={2}>
+                                    <Text fontSize="xs" color="gray.500" mb={1}>
+                                      Progress: {task.actualHours}/{task.estimatedHours} hours ({getTaskProgress(task)}%)
+                                    </Text>
+                                    <Progress
+                                      value={getTaskProgress(task)}
+                                      colorScheme="green"
+                                      size="sm"
+                                      borderRadius="md"
+                                      height="8px"
+                                    />
+                                  </Box>
+                                )}
+                                {task.status === 'completed' && task.completedDate && (
+                                  <Box mt={2}>
+                                    <Text fontSize="xs" color="green.600" fontWeight="medium">
+                                      ✅ Completed on {task.completedDate}
+                                    </Text>
+                                  </Box>
+                                )}
                               </Box>
                             )}
                           </Box>
@@ -1599,7 +1766,7 @@ export default function ProjectDetailsPage() {
             </Box>
 
           {/* Sidebar */}
-          <Box>
+          <Box minW={0}>
             <VStack spacing={6} align="stretch">
               {/* Team & Ownership */}
               <Card shadow="sm" border="1px solid" borderColor="gray.200">
@@ -1709,32 +1876,6 @@ export default function ProjectDetailsPage() {
                   </Box>
                 </CardBody>
               </Card>
-
-              {/* Quick Actions */}
-              <Card shadow="sm" border="1px solid" borderColor="gray.200">
-                <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
-                  <Heading size="md" color="#003f2d" fontWeight="bold">Quick Actions</Heading>
-                </CardHeader>
-                <CardBody py={6}>
-                  <VStack spacing={3} align="stretch">
-                    <Button 
-                      leftIcon={<EditIcon />} 
-                      colorScheme="blue" 
-                      variant="outline" 
-                      size="md"
-                      onClick={handleEdit}
-                    >
-                      Edit Project
-                    </Button>
-                    <Button leftIcon={<FaTasks />} colorScheme="green" variant="outline" size="md">
-                      View Tasks
-                    </Button>
-                    <Button leftIcon={<FaChartLine />} colorScheme="purple" variant="outline" size="md">
-                      View Reports
-                    </Button>
-                  </VStack>
-                </CardBody>
-              </Card>
             </VStack>
           </Box>
         </SimpleGrid>
@@ -1743,8 +1884,44 @@ export default function ProjectDetailsPage() {
       {/* Sticky Action Bar */}
       <Box position="sticky" bottom={0} bg="white" zIndex={10} py={4} px={6} boxShadow="sm" borderTop="1px solid" borderColor="gray.200">
         <HStack justify="center">
+          <Button
+            leftIcon={<FaTasks />}
+            colorScheme="teal"
+            size="md"
+            onClick={() => {
+              if (tasksSectionRef.current) {
+                tasksSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
+            _hover={{ bg: 'teal.700' }}
+            transition="all 0.2s"
+          >
+            Tasks
+          </Button>
+          <Button
+            leftIcon={<FaInfoCircle />}
+            colorScheme="purple"
+            size="md"
+            onClick={() => {
+              if (updatesSectionRef.current) {
+                updatesSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
+            _hover={{ bg: 'purple.700' }}
+            transition="all 0.2s"
+          >
+            Updates
+          </Button>
           {!isEditing ? (
-            <Button leftIcon={<EditIcon />} colorScheme="green" size="md" onClick={handleEdit}>
+            <Button 
+              leftIcon={<EditIcon />} 
+              bg="#003f2d" 
+              color="white" 
+              size="md" 
+              onClick={handleEdit}
+              _hover={{ bg: '#14543a' }}
+              transition="all 0.2s"
+            >
               Edit
             </Button>
           ) : (
@@ -1856,11 +2033,12 @@ export default function ProjectDetailsPage() {
               </Button>
               <Button
                 onClick={handleSaveUpdate}
-                colorScheme="blue"
+                bg="#003f2d"
+                color="white"
                 isLoading={addingUpdate}
                 loadingText="Adding..."
                 isDisabled={!newUpdateText.trim()}
-                _hover={{ transform: 'scale(1.02)' }}
+                _hover={{ bg: '#14543a' }}
                 transition="all 0.2s"
               >
                 Add Update
@@ -2571,6 +2749,56 @@ export default function ProjectDetailsPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Change History */}
+      <Card mt={12} shadow="sm" border="1px solid" borderColor="gray.200">
+        <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
+          <HStack justify="space-between">
+            <Heading size="md" color="#003f2d" fontWeight="bold">Change History</Heading>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setHistoryOpen((open) => !open)}
+              rightIcon={historyOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+            >
+              {historyOpen ? 'Hide' : 'Show'}
+            </Button>
+          </HStack>
+        </CardHeader>
+        {historyOpen && (
+          <CardBody py={6}>
+            <VStack align="stretch" spacing={4}>
+              {history && history.length > 0 ? (
+                history.slice().reverse().slice(0, historyLimit).map((entry, idx) => (
+                  <Box key={idx} p={3} bg="gray.50" borderRadius="md">
+                    <Text fontSize="sm" color="gray.600">
+                      <b>{entry.user}</b> — {entry.action}
+                    </Text>
+                    <Text fontSize="xs" color="gray.400">
+                      {new Date(entry.timestamp).toLocaleString()}
+                    </Text>
+                    {entry.details && (
+                      <Text fontSize="sm" color="gray.700" mt={1}>{entry.details}</Text>
+                    )}
+                  </Box>
+                ))
+              ) : (
+                <Text color="gray.400" fontSize="sm">No changes yet.</Text>
+              )}
+              {history && history.length > historyLimit && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setHistoryLimit((limit) => limit + 5)}
+                  alignSelf="center"
+                >
+                  Show More
+                </Button>
+              )}
+            </VStack>
+          </CardBody>
+        )}
+      </Card>
     </Box>
   );
 } 
