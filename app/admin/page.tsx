@@ -1,5 +1,5 @@
 'use client';
-import { Box, Heading, Text, Button, HStack, Tooltip, Skeleton, SkeletonText, Badge, IconButton } from '@chakra-ui/react';
+import { Box, Heading, Text, Button, HStack, Tooltip, Skeleton, SkeletonText, Badge, IconButton, SimpleGrid } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaUserPlus, FaUsers, FaFileInvoiceDollar, FaMoneyBillWave, FaBoxOpen, FaLock, FaUnlock, FaProjectDiagram, FaFile } from 'react-icons/fa';
@@ -37,7 +37,7 @@ function useCountUp(target: number, duration = 1200) {
 export default function AdminDashboard() {
   const router = useRouter();
   const adminName = 'Admin'; // Replace with dynamic name if available
-  const { customers, invoices, loading, error, refresh } = useStripeData();
+  const { customers, invoices, quotes, loading, error, refresh } = useStripeData();
   const { metricsLocked, setMetricsLocked } = useLock();
   const [productCount, setProductCount] = useState<number>(0);
 
@@ -46,8 +46,22 @@ export default function AdminDashboard() {
     ?.filter(inv => ['open', 'past_due'].includes(inv.status))
     .reduce((sum, inv) => sum + (inv.amount_due || 0), 0);
 
+  // Open quotes calculation
+  const getQuoteStatus = (quote: any) => {
+    if (quote.status === 'open' && quote.expires_at && quote.expires_at * 1000 < Date.now()) {
+      return 'Expired';
+    }
+    return quote.status.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+  };
+
+  const openQuotes = quotes?.filter(quote => getQuoteStatus(quote) === 'Open') || [];
+  const openQuotesCount = openQuotes.length;
+  const openQuotesTotal = openQuotes.reduce((sum, quote) => sum + (quote.amount_total || 0), 0);
+
   const animatedCustomers = useCountUp(customers?.length ?? 0, 1000);
   const animatedOutstanding = useCountUp(Math.round(outstanding / 100), 1200); // show dollars only
+  const animatedOpenQuotesCount = useCountUp(openQuotesCount, 1000);
+  const animatedOpenQuotesTotal = useCountUp(Math.round(openQuotesTotal / 100), 1200); // show dollars only
 
   useEffect(() => {
     async function fetchProductCount() {
@@ -100,269 +114,388 @@ export default function AdminDashboard() {
     >
       <Box position="relative" zIndex={1} w="100%" maxW="1200px" mx="auto" px={4} py={8}>
         <Box mb={8} display="flex" alignItems="center" gap={3}>
-          <Heading as="h1" size="xl" color="#003f2d" fontWeight="bold" mb={2} letterSpacing="tight">
+          <Heading as="h1" size="2xl" color="gray.900" fontWeight="extrabold" mb={2} letterSpacing="tight">
             Welcome back, {adminName}
           </Heading>
           <IconButton
             aria-label={metricsLocked ? 'Unlock metrics' : 'Lock metrics'}
             icon={metricsLocked ? <FaLock /> : <FaUnlock />}
             onClick={() => setMetricsLocked(!metricsLocked)}
-            size="sm"
+            size="md"
             colorScheme={metricsLocked ? 'gray' : 'green'}
             variant={metricsLocked ? 'outline' : 'solid'}
             ml={2}
+            boxShadow="md"
+            _hover={{
+              transform: 'translateY(-1px)',
+              boxShadow: 'lg',
+            }}
           />
         </Box>
-        <Text fontSize="lg" color="gray.600">
+        <Text fontSize="xl" color="gray.700" fontWeight="medium" mb={8} lineHeight="tall">
           Manage your customers, finances, and products from one place.
         </Text>
-        {/* Metrics summary row */}
-        <Box w="100%" maxW="1200px" mx="auto" mb={8}>
-          <HStack spacing={4} justify="center" flexWrap="wrap">
-            <Box display="flex" alignItems="center" bg="white" boxShadow="md" borderRadius="full" px={5} py={2} minW="200px">
-              <Icon as={FaUsers} color="#003f2d" boxSize={5} mr={2} />
-              <Text fontWeight="bold" color="#003f2d" mr={2}>Total Customers:</Text>
-              {loading ? (
-                <Skeleton height="24px" width="32px" borderRadius="full" />
-              ) : (
-                <Badge colorScheme="green" fontSize="md" px={3} py={1} borderRadius="full"
+        
+        {/* Enhanced Metrics summary row with tooltips */}
+        <Box w="100%" maxW="1200px" mx="auto" mb={10}>
+          <HStack spacing={8} justify="center" align="center" flexWrap="wrap">
+            {/* Each metric card: fixed width, height, and vertical centering */}
+            <Tooltip label="Total number of customers in your system." fontSize="md" borderRadius="md" bg="gray.700" color="white" hasArrow>
+              <Box 
+                display="flex" 
+                flexDirection="column"
+                alignItems="center" 
+                justifyContent="center"
+                bg="white" 
+                boxShadow="lg" 
+                borderRadius="xl" 
+                w="240px"
+                h="120px"
+                border="2px solid"
+                borderColor="green.200"
+                _hover={{
+                  boxShadow: 'xl',
+                  transform: 'translateY(-2px)',
+                  transition: 'all 0.2s ease-in-out',
+                }}
+              >
+                <Icon as={FaUsers} color="green.600" boxSize={7} mb={1} />
+                <Text fontSize="sm" color="gray.600" fontWeight="medium" mb={1}>Total Customers</Text>
+                {loading ? (
+                  <Skeleton height="32px" width="48px" borderRadius="md" />
+                ) : (
+                  <Text fontSize="2xl" fontWeight="bold" color="green.700"
+                    style={metricsLocked ? { filter: 'blur(8px)' } : {}}>
+                    {animatedCustomers}
+                  </Text>
+                )}
+              </Box>
+            </Tooltip>
+            <Tooltip label="Total value of all outstanding invoices (not yet paid)." fontSize="md" borderRadius="md" bg="gray.700" color="white" hasArrow>
+              <Box 
+                display="flex" 
+                flexDirection="column"
+                alignItems="center" 
+                justifyContent="center"
+                bg="white" 
+                boxShadow="lg" 
+                borderRadius="xl" 
+                w="240px"
+                h="120px"
+                border="2px solid"
+                borderColor="orange.200"
+                _hover={{
+                  boxShadow: 'xl',
+                  transform: 'translateY(-2px)',
+                  transition: 'all 0.2s ease-in-out',
+                }}
+              >
+                <Icon as={FaMoneyBillWave} color="orange.600" boxSize={7} mb={1} />
+                <Text fontSize="sm" color="gray.600" fontWeight="medium" mb={1}>Outstanding Invoices</Text>
+                {loading ? (
+                  <Skeleton height="32px" width="80px" borderRadius="md" />
+                ) : (
+                  <Text fontSize="2xl" fontWeight="bold" color="orange.700"
+                    style={metricsLocked ? { filter: 'blur(8px)' } : {}}>
+                    ${animatedOutstanding.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </Text>
+                )}
+              </Box>
+            </Tooltip>
+            <Tooltip label="Total value of all open quotes awaiting client action." fontSize="md" borderRadius="md" bg="gray.700" color="white" hasArrow>
+              <Box 
+                display="flex" 
+                flexDirection="column"
+                alignItems="center" 
+                justifyContent="center"
+                bg="white" 
+                boxShadow="lg" 
+                borderRadius="xl" 
+                w="240px"
+                h="120px"
+                border="2px solid"
+                borderColor="blue.200"
+                _hover={{
+                  boxShadow: 'xl',
+                  transform: 'translateY(-2px)',
+                  transition: 'all 0.2s ease-in-out',
+                }}
+              >
+                <Icon as={FaFile} color="blue.600" boxSize={7} mb={1} />
+                <Text fontSize="sm" color="gray.600" fontWeight="medium" mb={1}>Open Quotes</Text>
+                {loading ? (
+                  <Skeleton height="32px" width="80px" borderRadius="md" />
+                ) : (
+                  <Text fontSize="2xl" fontWeight="bold" color="blue.700"
+                    style={metricsLocked ? { filter: 'blur(8px)' } : {}}>
+                    ${animatedOpenQuotesTotal.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </Text>
+                )}
+              </Box>
+            </Tooltip>
+            <Tooltip label="Number of products currently in your catalogue." fontSize="md" borderRadius="md" bg="gray.700" color="white" hasArrow>
+              <Box 
+                display="flex" 
+                flexDirection="column"
+                alignItems="center" 
+                justifyContent="center"
+                bg="white" 
+                boxShadow="lg" 
+                borderRadius="xl" 
+                w="240px"
+                h="120px"
+                border="2px solid"
+                borderColor="purple.200"
+                _hover={{
+                  boxShadow: 'xl',
+                  transform: 'translateY(-2px)',
+                  transition: 'all 0.2s ease-in-out',
+                }}
+              >
+                <Icon as={FaBoxOpen} color="purple.600" boxSize={7} mb={1} />
+                <Text fontSize="sm" color="gray.600" fontWeight="medium" mb={1}>Products in Catalogue</Text>
+                <Text fontSize="2xl" fontWeight="bold" color="purple.700"
                   style={metricsLocked ? { filter: 'blur(8px)' } : {}}>
-                  {animatedCustomers}
-                </Badge>
-              )}
-            </Box>
-            <Box display="flex" alignItems="center" bg="white" boxShadow="md" borderRadius="full" px={5} py={2} minW="240px">
-              <Icon as={FaMoneyBillWave} color="#003f2d" boxSize={5} mr={2} />
-              <Text fontWeight="bold" color="#003f2d" mr={2}>Outstanding Invoices:</Text>
-              {loading ? (
-                <Skeleton height="24px" width="80px" borderRadius="full" />
-              ) : (
-                <Badge colorScheme="yellow" fontSize="md" px={3} py={1} borderRadius="full"
-                  style={metricsLocked ? { filter: 'blur(8px)' } : {}}>
-                  ${animatedOutstanding.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                </Badge>
-              )}
-            </Box>
-            <Box display="flex" alignItems="center" bg="white" boxShadow="md" borderRadius="full" px={5} py={2} minW="220px">
-              <Icon as={FaBoxOpen} color="#003f2d" boxSize={5} mr={2} />
-              <Text fontWeight="bold" color="#003f2d" mr={2}>Products in Catalogue:</Text>
-              <Badge colorScheme="gray" fontSize="md" px={3} py={1} borderRadius="full"
-                style={metricsLocked ? { filter: 'blur(8px)' } : {}}>
-                {productCount}
-              </Badge>
-            </Box>
+                  {productCount}
+                </Text>
+              </Box>
+            </Tooltip>
           </HStack>
         </Box>
-        {/* Top Row - Customers and Projects */}
-        <Box
-          className="dashboard-container"
-          display="flex"
-          flexDirection={{ base: 'column', md: 'row' }}
-          gap={8}
-          py={{ base: 2, md: 0 }}
-          mb={8}
-        >
-          {/* Customers Card */}
-          <Box
-            className="dashboard-card"
-            flex="1"
-            bg="white"
-            boxShadow="md"
-            borderRadius="2xl"
-            p={6}
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            minH="260px"
-            border="1px solid #e2e8f0"
-            boxSizing="border-box"
-            _hover={{
-              boxShadow: '0 6px 12px rgba(0,0,0,0.12)',
-              transform: 'translateY(-2px)',
-              transition: 'all 0.2s ease-in-out',
-            }}
-            mb={{ base: 4, md: 0 }}
+        
+        {/* Quick Actions as SimpleGrid for alignment */}
+        <Box w="100%" maxW="1200px" mx="auto" mb={10}>
+          <Heading as="h2" size="lg" color="gray.800" fontWeight="bold" mb={6} textAlign="center">
+            Quick Actions
+          </Heading>
+          <SimpleGrid 
+            columns={{ base: 1, md: 2 }}
+            spacing={8}
+            w="100%"
           >
-            <Box display="flex" alignItems="center" w="100%" mb={4}>
-              <Box w="4px" h="32px" bg="#003f2d" borderRadius="full" mr={3} />
-              <Heading as="h2" size="md" color="#003f2d" fontWeight="bold" display="flex" alignItems="center" gap={2}>
-                <Icon as={FaUsers} boxSize={6} color="#003f2d" /> Customers
-              </Heading>
+            {/* Customers Card - Enhanced */}
+            <Box
+              flex="1"
+              className="dashboard-card"
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              minH="380px"
+              bg="white"
+              boxShadow="xl"
+              borderRadius="2xl"
+              p={8}
+              border="2px solid"
+              borderColor="green.200"
+              boxSizing="border-box"
+              _hover={{
+                boxShadow: '2xl',
+                transform: 'translateY(-4px)',
+                transition: 'all 0.3s ease-in-out',
+                borderColor: 'green.300',
+              }}
+            >
+              <Box display="flex" alignItems="center" w="100%" mb={6}>
+                <Box w="6px" h="40px" bg="green.500" borderRadius="full" mr={4} />
+                <Heading as="h3" size="lg" color="green.700" fontWeight="bold" display="flex" alignItems="center" gap={3}>
+                  <Icon as={FaUsers} boxSize={7} color="green.600" /> Customers
+                </Heading>
+              </Box>
+              <Text fontSize="lg" color="gray.600" mb={6} textAlign="center" lineHeight="tall">
+                Manage your customer base and view detailed customer information.
+              </Text>
+              <Box mt="auto" w="100%">
+                <Button as={Link} href="/admin/create-customer" leftIcon={<Icon as={FaUserPlus} />} 
+                  bg="green.600" color="white"
+                  _hover={{ bg: 'green.700', transform: 'translateY(-1px)' }}
+                  _focus={{ bg: 'green.700' }}
+                  size="lg" w="100%" mb={3}
+                  boxShadow="md"
+                  borderRadius="lg">
+                  Create new customer
+                </Button>
+                <Button as={Link} href="/admin/view-customers" leftIcon={<Icon as={FaUsers} />} 
+                  bg="white" color="green.600" border="2px solid" borderColor="green.600"
+                  _hover={{ bg: 'green.50', transform: 'translateY(-1px)' }}
+                  _focus={{ bg: 'green.50' }}
+                  size="lg" w="100%"
+                  boxShadow="sm"
+                  borderRadius="lg">
+                  View customers
+                </Button>
+              </Box>
             </Box>
-            <Text fontSize="md" color="gray.600" mb={3} textAlign="center">
-              Manage your customer base and view details.
-            </Text>
-            <Button as={Link} href="/admin/create-customer" leftIcon={<Icon as={FaUserPlus} />} bg="#003f2d" color="white"
-              _hover={{ bg: '#14543a' }}
-              _focus={{ bg: '#14543a' }}
-              size="lg" w="100%" mb={2} mt={1}>
-              Create new customer
-            </Button>
-            <Button as={Link} href="/admin/view-customers" leftIcon={<Icon as={FaUsers} />} bg="#003f2d" color="white"
-              _hover={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
-              _focus={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
-              size="lg" w="100%">
-              View customers
-            </Button>
-          </Box>
-          {/* Divider */}
-          <Box display={{ base: 'none', md: 'block' }} width="1px" bg="gray.200" mx={2} borderRadius="full" />
-          {/* Projects Card */}
-          <Box
-            className="dashboard-card"
-            flex="1"
-            bg="white"
-            boxShadow="md"
-            borderRadius="2xl"
-            p={6}
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            minH="260px"
-            border="1px solid #e2e8f0"
-            boxSizing="border-box"
-            _hover={{
-              boxShadow: '0 6px 12px rgba(0,0,0,0.12)',
-              transform: 'translateY(-2px)',
-              transition: 'all 0.2s ease-in-out',
-            }}
-            mb={{ base: 4, md: 0 }}
-          >
-            <Box display="flex" alignItems="center" w="100%" mb={4}>
-              <Box w="4px" h="32px" bg="#003f2d" borderRadius="full" mr={3} />
-              <Heading as="h2" size="md" color="#003f2d" fontWeight="bold" display="flex" alignItems="center" gap={2}>
-                <Icon as={FaProjectDiagram} boxSize={6} color="#003f2d" /> Projects
-              </Heading>
+            {/* Products Card - Enhanced */}
+            <Box
+              flex="1"
+              className="dashboard-card"
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              minH="380px"
+              bg="white"
+              boxShadow="xl"
+              borderRadius="2xl"
+              p={8}
+              border="2px solid"
+              borderColor="purple.200"
+              boxSizing="border-box"
+              _hover={{
+                boxShadow: '2xl',
+                transform: 'translateY(-4px)',
+                transition: 'all 0.3s ease-in-out',
+                borderColor: 'purple.300',
+              }}
+            >
+              <Box display="flex" alignItems="center" w="100%" mb={6}>
+                <Box w="6px" h="40px" bg="purple.500" borderRadius="full" mr={4} />
+                <Heading as="h3" size="lg" color="purple.700" fontWeight="bold" display="flex" alignItems="center" gap={3}>
+                  <Icon as={FaBoxOpen} boxSize={7} color="purple.600" /> Products
+                </Heading>
+              </Box>
+              <Text fontSize="lg" color="gray.600" mb={6} textAlign="center" lineHeight="tall">
+                Manage your product catalogue and internal products.
+              </Text>
+              <Box mt="auto" w="100%">
+                <Button as={Link} href="/admin/products" leftIcon={<Icon as={FaBoxOpen} />} 
+                  bg="purple.600" color="white"
+                  _hover={{ bg: 'purple.700', transform: 'translateY(-1px)' }}
+                  _focus={{ bg: 'purple.700' }}
+                  size="lg" w="100%" mb={3}
+                  boxShadow="md"
+                  borderRadius="lg">
+                  Products
+                </Button>
+                <Button as={Link} href="/admin/internal-products" leftIcon={<Icon as={FaBoxOpen} />} 
+                  bg="white" color="purple.600" border="2px solid" borderColor="purple.600"
+                  _hover={{ bg: 'purple.50', transform: 'translateY(-1px)' }}
+                  _focus={{ bg: 'purple.50' }}
+                  size="lg" w="100%"
+                  boxShadow="sm"
+                  borderRadius="lg">
+                  Internal Products
+                </Button>
+              </Box>
             </Box>
-            <Text fontSize="md" color="gray.600" mb={3} textAlign="center">
-              Manage client projects and deliverables.
-            </Text>
-            <Button as={Link} href="/admin/manage-projects" leftIcon={<Icon as={FaProjectDiagram} />} bg="#003f2d" color="white"
-              _hover={{ bg: '#14543a' }}
-              _focus={{ bg: '#14543a' }}
-              size="lg" w="100%" mt={1}>
-              Manage Projects
-            </Button>
-          </Box>
-        </Box>
-        {/* Bottom Row - Financial and Products */}
-        <Box
-          className="dashboard-container"
-          display="flex"
-          flexDirection={{ base: 'column', md: 'row' }}
-          gap={8}
-          py={{ base: 2, md: 0 }}
-        >
-          {/* Financial Card */}
-          <Box
-            className="dashboard-card"
-            flex="1"
-            bg="white"
-            boxShadow="md"
-            borderRadius="2xl"
-            p={6}
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            minH="260px"
-            border="1px solid #e2e8f0"
-            boxSizing="border-box"
-            _hover={{
-              boxShadow: '0 6px 12px rgba(0,0,0,0.12)',
-              transform: 'translateY(-2px)',
-              transition: 'all 0.2s ease-in-out',
-            }}
-            mb={{ base: 4, md: 0 }}
-          >
-            <Box display="flex" alignItems="center" w="100%" mb={4}>
-              <Box w="4px" h="32px" bg="#003f2d" borderRadius="full" mr={3} />
-              <Heading as="h2" size="md" color="#003f2d" fontWeight="bold" display="flex" alignItems="center" gap={2}>
-                <Icon as={FaMoneyBillWave} boxSize={6} color="#003f2d" /> Financial
-              </Heading>
+            {/* Transactions Card - Merged */}
+            <Box
+              flex="1"
+              className="dashboard-card"
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              minH="380px"
+              bg="white"
+              boxShadow="xl"
+              borderRadius="2xl"
+              p={8}
+              border="2px solid"
+              borderColor="orange.200"
+              boxSizing="border-box"
+              _hover={{
+                boxShadow: '2xl',
+                transform: 'translateY(-4px)',
+                transition: 'all 0.3s ease-in-out',
+                borderColor: 'orange.300',
+              }}
+            >
+              <Box display="flex" alignItems="center" w="100%" mb={6}>
+                <Box w="6px" h="40px" bg="orange.500" borderRadius="full" mr={4} />
+                <Heading as="h3" size="lg" color="orange.700" fontWeight="bold" display="flex" alignItems="center" gap={3}>
+                  <Icon as={FaMoneyBillWave} boxSize={7} color="orange.600" /> Transactions
+                </Heading>
+              </Box>
+              <Text fontSize="lg" color="gray.600" mb={6} textAlign="center" lineHeight="tall">
+                Manage all outgoing and incoming transactions.
+              </Text>
+              <Box mt="auto" w="100%">
+                <Box mb={4}>
+                  <Text fontSize="md" color="orange.700" fontWeight="bold" mb={2}>Outgoing</Text>
+                  <Tooltip label="View and manage all invoices you have sent to clients." fontSize="sm" borderRadius="md" bg="gray.700" color="white" hasArrow>
+                    <Button as={Link} href="/admin/invoices" leftIcon={<Icon as={FaFileInvoiceDollar} />} 
+                      bg="orange.600" color="white"
+                      _hover={{ bg: 'orange.700', transform: 'translateY(-1px)' }}
+                      _focus={{ bg: 'orange.700' }}
+                      size="lg" w="100%" mb={3}
+                      boxShadow="md"
+                      borderRadius="lg">
+                      Invoices
+                    </Button>
+                  </Tooltip>
+                  <Tooltip label="View and manage all quotes sent to clients." fontSize="sm" borderRadius="md" bg="gray.700" color="white" hasArrow>
+                    <Button as={Link} href="/admin/quotes" leftIcon={<Icon as={FaFile} />} 
+                      bg="white" color="orange.600" border="2px solid" borderColor="orange.600"
+                      _hover={{ bg: 'orange.50', transform: 'translateY(-1px)' }}
+                      _focus={{ bg: 'orange.50' }}
+                      size="lg" w="100%"
+                      boxShadow="sm"
+                      borderRadius="lg">
+                      Quotes
+                    </Button>
+                  </Tooltip>
+                </Box>
+                <Box>
+                  <Text fontSize="md" color="orange.700" fontWeight="bold" mb={2}>Incoming</Text>
+                  <Tooltip label="View and manage all bills and payments you have received." fontSize="sm" borderRadius="md" bg="gray.700" color="white" hasArrow>
+                    <Button as={Link} href="/admin/billings" leftIcon={<Icon as={FaMoneyBillWave} />} 
+                      bg="white" color="orange.600" border="2px solid" borderColor="orange.600"
+                      _hover={{ bg: 'orange.50', transform: 'translateY(-1px)' }}
+                      _focus={{ bg: 'orange.50' }}
+                      size="lg" w="100%"
+                      boxShadow="sm"
+                      borderRadius="lg">
+                      Billings & Payments
+                    </Button>
+                  </Tooltip>
+                </Box>
+              </Box>
             </Box>
-            <Text fontSize="md" color="gray.600" mb={3} textAlign="center">
-              View and manage invoices and billing.
-            </Text>
-            <Button as={Link} href="/admin/invoices" leftIcon={<Icon as={FaFileInvoiceDollar} />} bg="#003f2d" color="white"
-              _hover={{ bg: '#14543a' }}
-              _focus={{ bg: '#14543a' }}
-              size="lg" w="100%" mb={2} mt={1}>
-              Invoices
-            </Button>
-            <Button as={Link} href="/admin/billings" leftIcon={<Icon as={FaMoneyBillWave} />} bg="#003f2d" color="white"
-              _hover={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
-              _focus={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
-              size="lg" w="100%" mb={2}>
-              Billings
-            </Button>
-            <Button as={Link} href="/admin/quotes" leftIcon={<Icon as={FaFile} />} bg="#003f2d" color="white"
-              _hover={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
-              _focus={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
-              size="lg" w="100%">
-              Quotes
-            </Button>
-          </Box>
-          {/* Divider */}
-          <Box display={{ base: 'none', md: 'block' }} width="1px" bg="gray.200" mx={2} borderRadius="full" />
-          {/* Products Card */}
-          <Box
-            className="dashboard-card"
-            flex="1"
-            bg="white"
-            boxShadow="md"
-            borderRadius="2xl"
-            p={6}
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            minH="260px"
-            border="1px solid #e2e8f0"
-            boxSizing="border-box"
-            _hover={{
-              boxShadow: '0 6px 12px rgba(0,0,0,0.12)',
-              transform: 'translateY(-2px)',
-              transition: 'all 0.2s ease-in-out',
-            }}
-            mb={{ base: 4, md: 0 }}
-          >
-            <Box display="flex" alignItems="center" w="100%" mb={4}>
-              <Box w="4px" h="32px" bg="#003f2d" borderRadius="full" mr={3} />
-              <Heading as="h2" size="md" color="#003f2d" fontWeight="bold" display="flex" alignItems="center" gap={2}>
-                <Icon as={FaBoxOpen} boxSize={6} color="#003f2d" /> Products
-              </Heading>
+            {/* Projects Card - Restored */}
+            <Box
+              flex="1"
+              className="dashboard-card"
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              minH="380px"
+              bg="white"
+              boxShadow="xl"
+              borderRadius="2xl"
+              p={8}
+              border="2px solid"
+              borderColor="blue.200"
+              boxSizing="border-box"
+              _hover={{
+                boxShadow: '2xl',
+                transform: 'translateY(-4px)',
+                transition: 'all 0.3s ease-in-out',
+                borderColor: 'blue.300',
+              }}
+            >
+              <Box display="flex" alignItems="center" w="100%" mb={6}>
+                <Box w="6px" h="40px" bg="blue.500" borderRadius="full" mr={4} />
+                <Heading as="h3" size="lg" color="blue.700" fontWeight="bold" display="flex" alignItems="center" gap={3}>
+                  <Icon as={FaProjectDiagram} boxSize={7} color="blue.600" /> Projects
+                </Heading>
+              </Box>
+              <Text fontSize="lg" color="gray.600" mb={6} textAlign="center" lineHeight="tall">
+                Manage client projects and track deliverables.
+              </Text>
+              <Box mt="auto" w="100%">
+                <Tooltip label="View and manage all client projects and deliverables." fontSize="sm" borderRadius="md" bg="gray.700" color="white" hasArrow>
+                  <Button as={Link} href="/admin/manage-projects" leftIcon={<Icon as={FaProjectDiagram} />} 
+                    bg="blue.600" color="white"
+                    _hover={{ bg: 'blue.700', transform: 'translateY(-1px)' }}
+                    _focus={{ bg: 'blue.700' }}
+                    size="lg" w="100%"
+                    boxShadow="md"
+                    borderRadius="lg">
+                    Manage Projects
+                  </Button>
+                </Tooltip>
+              </Box>
             </Box>
-            <Text fontSize="md" color="gray.600" mb={3} textAlign="center">
-              Manage your product catalogue and inventory.
-            </Text>
-            <Button
-              as={Link}
-              href="/admin/products"
-              leftIcon={<Icon as={FaBoxOpen} />}
-              bg="#003f2d"
-              color="white"
-              _hover={{ bg: '#14543a' }}
-              _focus={{ bg: '#14543a' }}
-              size="lg"
-              w="100%"
-              mb={2}
-              mt={1}
-              >
-              Supplier Products
-              </Button>
-            <Button
-              as={Link}
-              href="/admin/internal-products"
-              leftIcon={<Icon as={FaBoxOpen} />}
-              bg="#003f2d"
-              color="white"
-              _hover={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
-              _focus={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
-              size="lg"
-              w="100%"
-              >
-              Internal Products
-              </Button>
-          </Box>
+          </SimpleGrid>
         </Box>
         {/* Card footers with faded logo */}
         <Box w="100%" display="flex" flexDirection={{ base: 'column', md: 'row' }} gap={8} mt={8}>
