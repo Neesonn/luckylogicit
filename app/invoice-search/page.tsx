@@ -111,9 +111,9 @@ export default function InvoiceSearchPage() {
       {/* Search Form */}
       <Box mb={{ base: 6, md: 8 }} p={{ base: 4, md: 6 }} borderWidth="1px" borderRadius="xl" boxShadow="lg" bg="white">
         <Heading mb={{ base: 4, md: 6 }} size={{ base: "md", md: "lg" }} color="brand.green" textAlign="center">🔍 Find Your Invoice</Heading>
-        <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
           <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={{ base: 4, md: 6 }} mb={4}>
-                          <FormControl isRequired>
+          <FormControl isRequired>
                 <FormLabel fontWeight="semibold" color="gray.700" fontSize={{ base: "sm", md: "md" }}>Invoice Number</FormLabel>
                 <Input 
                   value={invoiceNumber} 
@@ -124,8 +124,8 @@ export default function InvoiceSearchPage() {
                   fontSize={{ base: "16px", md: "md" }}
                   _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
                 />
-              </FormControl>
-              <FormControl isRequired>
+          </FormControl>
+          <FormControl isRequired>
                 <FormLabel fontWeight="semibold" color="gray.700" fontSize={{ base: "sm", md: "md" }}>Email Address</FormLabel>
                 <Input 
                   type="email" 
@@ -137,7 +137,7 @@ export default function InvoiceSearchPage() {
                   fontSize={{ base: "16px", md: "md" }}
                   _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
                 />
-              </FormControl>
+          </FormControl>
           </Grid>
                       <Flex justify="center">
               <Button 
@@ -239,7 +239,7 @@ export default function InvoiceSearchPage() {
                         fontSize={{ base: "sm", md: "md" }}
                       >
                         📄 View Full Invoice PDF
-                      </Button>
+          </Button>
                     </Link>
                 </VStack>
               </Box>
@@ -391,7 +391,7 @@ export default function InvoiceSearchPage() {
                         </Box>
                       </Collapse>
                   </Box>
-                </VStack>
+        </VStack>
               </Box>
             </GridItem>
           </Grid>

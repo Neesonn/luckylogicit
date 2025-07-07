@@ -2,7 +2,7 @@
 import { Box, Heading, Text, Button, HStack, Tooltip, Skeleton, SkeletonText, Badge, IconButton } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FaUserPlus, FaUsers, FaFileInvoiceDollar, FaMoneyBillWave, FaBoxOpen, FaLock, FaUnlock } from 'react-icons/fa';
+import { FaUserPlus, FaUsers, FaFileInvoiceDollar, FaMoneyBillWave, FaBoxOpen, FaLock, FaUnlock, FaProjectDiagram } from 'react-icons/fa';
 import { Icon } from '@chakra-ui/react';
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
@@ -153,12 +153,14 @@ export default function AdminDashboard() {
             </Box>
           </HStack>
         </Box>
+        {/* Top Row - Customers and Projects */}
         <Box
           className="dashboard-container"
           display="flex"
           flexDirection={{ base: 'column', md: 'row' }}
           gap={8}
           py={{ base: 2, md: 0 }}
+          mb={8}
         >
           {/* Customers Card */}
           <Box
@@ -205,6 +207,52 @@ export default function AdminDashboard() {
           </Box>
           {/* Divider */}
           <Box display={{ base: 'none', md: 'block' }} width="1px" bg="gray.200" mx={2} borderRadius="full" />
+          {/* Projects Card */}
+          <Box
+            className="dashboard-card"
+            flex="1"
+            bg="white"
+            boxShadow="md"
+            borderRadius="2xl"
+            p={6}
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            minH="260px"
+            border="1px solid #e2e8f0"
+            boxSizing="border-box"
+            _hover={{
+              boxShadow: '0 6px 12px rgba(0,0,0,0.12)',
+              transform: 'translateY(-2px)',
+              transition: 'all 0.2s ease-in-out',
+            }}
+            mb={{ base: 4, md: 0 }}
+          >
+            <Box display="flex" alignItems="center" w="100%" mb={4}>
+              <Box w="4px" h="32px" bg="#003f2d" borderRadius="full" mr={3} />
+              <Heading as="h2" size="md" color="#003f2d" fontWeight="bold" display="flex" alignItems="center" gap={2}>
+                <Icon as={FaProjectDiagram} boxSize={6} color="#003f2d" /> Projects
+              </Heading>
+            </Box>
+            <Text fontSize="md" color="gray.600" mb={3} textAlign="center">
+              Manage client projects and deliverables.
+            </Text>
+            <Button as={Link} href="/admin/manage-projects" leftIcon={<Icon as={FaProjectDiagram} />} bg="#003f2d" color="white"
+              _hover={{ bg: '#14543a' }}
+              _focus={{ bg: '#14543a' }}
+              size="lg" w="100%" mt={1}>
+              Manage Projects
+            </Button>
+          </Box>
+        </Box>
+        {/* Bottom Row - Financial and Products */}
+        <Box
+          className="dashboard-container"
+          display="flex"
+          flexDirection={{ base: 'column', md: 'row' }}
+          gap={8}
+          py={{ base: 2, md: 0 }}
+        >
           {/* Financial Card */}
           <Box
             className="dashboard-card"
@@ -299,6 +347,9 @@ export default function AdminDashboard() {
         </Box>
         {/* Card footers with faded logo */}
         <Box w="100%" display="flex" flexDirection={{ base: 'column', md: 'row' }} gap={8} mt={8}>
+          <Box flex="1" display="flex" justifyContent="center" alignItems="flex-end" opacity={0.10}>
+            <Image src="/logo.png" alt="Lucky Logic Logo" width={120} height={40} style={{ objectFit: 'contain' }} />
+          </Box>
           <Box flex="1" display="flex" justifyContent="center" alignItems="flex-end" opacity={0.10}>
             <Image src="/logo.png" alt="Lucky Logic Logo" width={120} height={40} style={{ objectFit: 'contain' }} />
           </Box>
