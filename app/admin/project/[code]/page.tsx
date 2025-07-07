@@ -179,7 +179,7 @@ export default function ProjectDetailsPage() {
     description: '',
     status: 'planned',
     priority: 'medium',
-    assignee: '',
+    assignee: 'Michael Neeson',
     dueDate: '',
     estimatedHours: 0,
     actualHours: 0
@@ -1533,9 +1533,23 @@ export default function ProjectDetailsPage() {
                           _hover={{ boxShadow: "md" }}
                           transition="all 0.2s"
                         >
-                          <Text fontSize="md" color="gray.700" mb={3}>
-                            {update.text}
-                          </Text>
+                          <Box fontSize="md" color="gray.700" mb={3}>
+                            <ReactMarkdown
+                              components={{
+                                h1: (props) => <Heading as="h2" size="md" mt={4} mb={2} {...props} />,
+                                h2: (props) => <Heading as="h3" size="sm" mt={3} mb={1} {...props} />,
+                                h3: (props) => <Heading as="h4" size="xs" mt={2} mb={1} {...props} />,
+                                ul: (props) => <Box as="ul" pl={5} mb={2} style={{ listStyleType: 'disc' }} {...props} />,
+                                ol: (props) => <Box as="ol" pl={5} mb={2} style={{ listStyleType: 'decimal' }} {...props} />,
+                                li: (props) => <Box as="li" mb={1} {...props} />,
+                                p: (props) => <Box as="p" mb={2} {...props} />,
+                                code: (props) => <Box as="code" bg="gray.100" px={1} py={0.5} borderRadius="md" fontSize="sm" {...props} />,
+                                blockquote: (props) => <Box as="blockquote" pl={4} borderLeft="4px solid #CBD5E0" color="gray.500" fontStyle="italic" {...props} />,
+                              }}
+                            >
+                              {update.text}
+                            </ReactMarkdown>
+                          </Box>
                           <Text fontSize="sm" color="gray.500" mt={1}>
                             🕒 {update.timestamp} • 👤 {update.author}
                           </Text>
