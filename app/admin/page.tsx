@@ -115,7 +115,7 @@ export default function AdminDashboard() {
       <Box position="relative" zIndex={1} w="100%" maxW="1200px" mx="auto" px={4} py={8}>
         <Box mb={8} display="flex" alignItems="center" gap={3}>
           <Heading as="h1" size="2xl" color="gray.900" fontWeight="extrabold" mb={2} letterSpacing="tight">
-            Welcome back, {adminName}
+            Welcome back!, {adminName}
           </Heading>
           <IconButton
             aria-label={metricsLocked ? 'Unlock metrics' : 'Lock metrics'}
