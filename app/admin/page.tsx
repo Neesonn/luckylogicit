@@ -2,7 +2,7 @@
 import { Box, Heading, Text, Button, HStack, Tooltip, Skeleton, SkeletonText, Badge, IconButton } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FaUserPlus, FaUsers, FaFileInvoiceDollar, FaMoneyBillWave, FaBoxOpen, FaLock, FaUnlock, FaProjectDiagram } from 'react-icons/fa';
+import { FaUserPlus, FaUsers, FaFileInvoiceDollar, FaMoneyBillWave, FaBoxOpen, FaLock, FaUnlock, FaProjectDiagram, FaFile } from 'react-icons/fa';
 import { Icon } from '@chakra-ui/react';
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
@@ -292,8 +292,14 @@ export default function AdminDashboard() {
             <Button as={Link} href="/admin/billings" leftIcon={<Icon as={FaMoneyBillWave} />} bg="#003f2d" color="white"
               _hover={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
               _focus={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
-              size="lg" w="100%">
+              size="lg" w="100%" mb={2}>
               Billings
+            </Button>
+            <Button as={Link} href="/admin/quotes" leftIcon={<Icon as={FaFile} />} bg="#003f2d" color="white"
+              _hover={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
+              _focus={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
+              size="lg" w="100%">
+              Quotes
             </Button>
           </Box>
           {/* Divider */}
@@ -341,7 +347,20 @@ export default function AdminDashboard() {
               mb={2}
               mt={1}
               >
-              Products
+              Supplier Products
+              </Button>
+            <Button
+              as={Link}
+              href="/admin/internal-products"
+              leftIcon={<Icon as={FaBoxOpen} />}
+              bg="#003f2d"
+              color="white"
+              _hover={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
+              _focus={{ bg: 'white', color: '#003f2d', border: '2px solid #003f2d' }}
+              size="lg"
+              w="100%"
+              >
+              Internal Products
               </Button>
           </Box>
         </Box>

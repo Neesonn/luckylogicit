@@ -1547,7 +1547,7 @@ export default function ProjectDetailsPage() {
                                 blockquote: (props) => <Box as="blockquote" pl={4} borderLeft="4px solid #CBD5E0" color="gray.500" fontStyle="italic" {...props} />,
                               }}
                             >
-                              {update.text}
+                            {update.text}
                             </ReactMarkdown>
                           </Box>
                           <Text fontSize="sm" color="gray.500" mt={1}>
@@ -1602,7 +1602,7 @@ export default function ProjectDetailsPage() {
                     </Box>
                   )}
                 </CardBody>
-              </Card>
+                              </Card>
 
                 {/* Tasks */}
                 <Card ref={tasksSectionRef} shadow="sm" border="1px solid" borderColor="gray.200">
@@ -1658,18 +1658,18 @@ export default function ProjectDetailsPage() {
                                   <Badge colorScheme={getTaskPriorityColor(task.priority)}>{task.priority}</Badge>
                                   <Text fontSize="sm" color="gray.600">Assignee: {task.assignee}</Text>
                                   <Text fontSize="sm" color="gray.600">Due: {task.dueDate}</Text>
-                                </HStack>
-                              </Box>
+                              </HStack>
+                            </Box>
                               <HStack spacing={1}>
-                                <IconButton
-                                  aria-label="Edit task"
-                                  icon={<EditIcon />}
-                                  size="sm"
-                                  variant="ghost"
-                                  colorScheme="blue"
+                            <IconButton
+                              aria-label="Edit task"
+                              icon={<EditIcon />}
+                              size="sm"
+                              variant="ghost"
+                              colorScheme="blue"
                                   onClick={e => { e.stopPropagation(); handleEditTask(task); }}
-                                  _hover={{ bg: 'blue.50' }}
-                                />
+                              _hover={{ bg: 'blue.50' }}
+                            />
                                 <IconButton
                                   aria-label="Delete task"
                                   icon={<FaTrash />}
@@ -1692,7 +1692,7 @@ export default function ProjectDetailsPage() {
                                 />
                                 <Icon as={expandedTasks.includes(task.id) ? ChevronUpIcon : ChevronDownIcon} boxSize={5} color="gray.500" />
                               </HStack>
-                            </Flex>
+                          </Flex>
                             {expandedTasks.includes(task.id) && (
                               <Box mt={4}>
                                 <Box fontSize="sm" color="gray.600" mb={3}>
@@ -1712,39 +1712,39 @@ export default function ProjectDetailsPage() {
                                     {task.description}
                                   </ReactMarkdown>
                                 </Box>
-                                <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4} mb={3}>
-                                  <Box>
+                            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4} mb={3}>
+                              <Box>
                                     <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">Assignee</Text>
-                                    <Text fontSize="sm" fontWeight="medium">{task.assignee}</Text>
-                                  </Box>
-                                  <Box>
+                                <Text fontSize="sm" fontWeight="medium">{task.assignee}</Text>
+                              </Box>
+                              <Box>
                                     <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">Due Date</Text>
-                                    <Text fontSize="sm" fontWeight="medium">{task.dueDate}</Text>
-                                  </Box>
-                                  <Box>
+                                <Text fontSize="sm" fontWeight="medium">{task.dueDate}</Text>
+                              </Box>
+                              <Box>
                                     <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">Hours</Text>
                                     <Text fontSize="sm" fontWeight="medium">{task.actualHours}/{task.estimatedHours} hrs</Text>
-                                  </Box>
-                                </SimpleGrid>
-                                {task.status === 'in-progress' && (
+                              </Box>
+                            </SimpleGrid>
+                            {task.status === 'in-progress' && (
                                   <Box mt={2}>
                                     <Text fontSize="xs" color="gray.500" mb={1}>
                                       Progress: {task.actualHours}/{task.estimatedHours} hours ({getTaskProgress(task)}%)
-                                    </Text>
-                                    <Progress
-                                      value={getTaskProgress(task)}
-                                      colorScheme="green"
-                                      size="sm"
+                                  </Text>
+                                <Progress 
+                                  value={getTaskProgress(task)} 
+                                  colorScheme="green" 
+                                  size="sm" 
                                       borderRadius="md"
                                       height="8px"
-                                    />
-                                  </Box>
-                                )}
-                                {task.status === 'completed' && task.completedDate && (
+                                />
+                              </Box>
+                            )}
+                            {task.status === 'completed' && task.completedDate && (
                                   <Box mt={2}>
-                                    <Text fontSize="xs" color="green.600" fontWeight="medium">
+                                <Text fontSize="xs" color="green.600" fontWeight="medium">
                                       ✅ Completed on {task.completedDate}
-                                    </Text>
+                                </Text>
                                   </Box>
                                 )}
                               </Box>
@@ -1870,7 +1870,7 @@ export default function ProjectDetailsPage() {
                   <Box>
                     <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
                       Address
-                    </Text>
+                      </Text>
                     <VStack align="start" spacing={1} fontSize="md">
                       {project.customerAddressLine1 && (
                         <Text>{project.customerAddressLine1}</Text>
@@ -1885,8 +1885,8 @@ export default function ProjectDetailsPage() {
                       )}
                       {project.customerCountry && (
                         <Text>{project.customerCountry}</Text>
-                      )}
-                    </VStack>
+                    )}
+                  </VStack>
                   </Box>
                 </CardBody>
               </Card>
@@ -1927,17 +1927,17 @@ export default function ProjectDetailsPage() {
             Updates
           </Button>
           {!isEditing ? (
-            <Button 
-              leftIcon={<EditIcon />} 
+                    <Button 
+                      leftIcon={<EditIcon />} 
               bg="#003f2d" 
               color="white" 
-              size="md" 
-              onClick={handleEdit}
+                      size="md"
+                      onClick={handleEdit}
               _hover={{ bg: '#14543a' }}
               transition="all 0.2s"
-            >
+                    >
               Edit
-            </Button>
+                    </Button>
           ) : (
             <>
               <Button 
@@ -1948,7 +1948,7 @@ export default function ProjectDetailsPage() {
                 loadingText="Saving..."
               >
                 Save
-              </Button>
+                    </Button>
               <Button 
                 variant="outline" 
                 size="md" 
@@ -1956,11 +1956,11 @@ export default function ProjectDetailsPage() {
                 isDisabled={saving}
               >
                 Cancel
-              </Button>
+                    </Button>
             </>
           )}
         </HStack>
-      </Box>
+          </Box>
 
       {/* Footer */}
       <Box bg="white" borderTop="1px solid" borderColor="gray.200" py={6} mt={12}>
