@@ -462,3 +462,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 ## Support
 
 For questions or support, email [support@luckylogic.com.au](mailto:support@luckylogic.com.au)
+
+## Data Sources in Admin
+
+- **View Customers, Invoices, and Quotes** pages pull their data directly from Stripe APIs.
+- **Supplier Products** and **Projects** are managed and stored in Supabase.
