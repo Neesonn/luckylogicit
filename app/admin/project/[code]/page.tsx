@@ -69,7 +69,9 @@ import {
   FaUsers,
   FaCheckCircle,
   FaExclamationTriangle,
-  FaPauseCircle
+  FaPauseCircle,
+  FaTrash,
+  FaEdit
 } from 'react-icons/fa';
 
 // Default project data (fallback if localStorage is empty)
@@ -146,9 +148,14 @@ export default function ProjectDetailsPage() {
   const [addingTask, setAddingTask] = useState(false);
   const [editingTaskLoading, setEditingTaskLoading] = useState(false);
   const [tasks, setTasks] = useState<any[]>([]);
+  // State for editing updates
+  const [isEditUpdateModalOpen, setIsEditUpdateModalOpen] = useState(false);
+  const [editingUpdate, setEditingUpdate] = useState<any>(null);
+  const [editUpdateText, setEditUpdateText] = useState('');
+  const [editingUpdateLoading, setEditingUpdateLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch project details from localStorage
+    // Fetch project details from database
     const fetchProject = async () => {
       setLoading(true);
       try {
@@ -166,14 +173,20 @@ export default function ProjectDetailsPage() {
         if (foundProject) {
           setProject(foundProject);
           
-          // Load project updates if available
-          if (foundProject.updates) {
+          // Load project updates if available, initialize as empty array if not
+          if (foundProject.updates && Array.isArray(foundProject.updates)) {
             setProjectUpdates(foundProject.updates);
+          } else {
+            setProjectUpdates([]);
+            console.log('No updates found for project, initializing empty array');
           }
           
-          // Load tasks if available
-          if (foundProject.tasks) {
+          // Load tasks if available, initialize as empty array if not
+          if (foundProject.tasks && Array.isArray(foundProject.tasks)) {
             setTasks(foundProject.tasks);
+          } else {
+            setTasks([]);
+            console.log('No tasks found for project, initializing empty array');
           }
         } else {
           setError('Project not found');
@@ -345,6 +358,7 @@ export default function ProjectDetailsPage() {
 
   // Project update handlers
   const handleAddUpdate = () => {
+    setError(''); // Clear any previous errors
     setIsUpdateModalOpen(true);
   };
 
@@ -352,10 +366,8 @@ export default function ProjectDetailsPage() {
     if (!newUpdateText.trim()) return;
     
     setAddingUpdate(true);
+    setError(''); // Clear any previous errors
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
       const newUpdate = {
         id: Date.now(),
         text: newUpdateText.trim(),
@@ -373,24 +385,30 @@ export default function ProjectDetailsPage() {
       const updatedUpdates = [newUpdate, ...projectUpdates];
       setProjectUpdates(updatedUpdates);
       
-      // Save project updates to localStorage
-      const savedProjects = localStorage.getItem('luckyLogicProjects');
-      if (savedProjects) {
-        try {
-          const projects = JSON.parse(savedProjects);
-          const updatedProjects = projects.map((p: any) => 
-            p.code === projectCode ? { ...p, updates: updatedUpdates } : p
-          );
-          localStorage.setItem('luckyLogicProjects', JSON.stringify(updatedProjects));
-        } catch (error) {
-          console.error('Error saving project updates to localStorage:', error);
-        }
+      // Save project updates to database
+      const response = await fetch(`/api/projects/${projectCode}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          updates: updatedUpdates
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to save update to database');
       }
       
       setNewUpdateText('');
       setIsUpdateModalOpen(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to add update:', err);
+      // Revert the state if save failed
+      setProjectUpdates(projectUpdates);
+      setError(err.message || 'Failed to save update. Please try again.');
     } finally {
       setAddingUpdate(false);
     }
@@ -402,6 +420,7 @@ export default function ProjectDetailsPage() {
   };
 
   const handleAddTask = () => {
+    setError(''); // Clear any previous errors
     setIsTaskModalOpen(true);
   };
 
@@ -425,6 +444,7 @@ export default function ProjectDetailsPage() {
     }
 
     setAddingTask(true);
+    setError(''); // Clear any previous errors
     
     const taskToAdd = {
       id: Date.now(), // Use timestamp for unique ID
@@ -435,19 +455,29 @@ export default function ProjectDetailsPage() {
     const updatedTasks = [...tasks, taskToAdd];
     setTasks(updatedTasks);
     
-    // Optimized localStorage update
+    // Save tasks to database
     try {
-      const savedProjects = localStorage.getItem('luckyLogicProjects');
-      if (savedProjects) {
-        const projects = JSON.parse(savedProjects);
-        const projectIndex = projects.findIndex((p: any) => p.code === projectCode);
-        if (projectIndex !== -1) {
-          projects[projectIndex] = { ...projects[projectIndex], tasks: updatedTasks };
-          localStorage.setItem('luckyLogicProjects', JSON.stringify(projects));
-        }
+      const response = await fetch(`/api/projects/${projectCode}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tasks: updatedTasks
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to save task to database');
       }
-    } catch (error) {
-      console.error('Error saving tasks to localStorage:', error);
+    } catch (error: any) {
+      console.error('Error saving tasks to database:', error);
+      // Revert the state if save failed
+      setTasks(tasks);
+      setError(error.message || 'Failed to save task. Please try again.');
+      return;
     }
     
     setAddingTask(false);
@@ -462,6 +492,7 @@ export default function ProjectDetailsPage() {
   }, []);
 
   const handleEditTask = (task: any) => {
+    setError(''); // Clear any previous errors
     setEditingTask(task);
     setIsEditTaskModalOpen(true);
   };
@@ -477,6 +508,7 @@ export default function ProjectDetailsPage() {
     }
 
     setEditingTaskLoading(true);
+    setError(''); // Clear any previous errors
     
     const updatedTask = {
       ...editingTask,
@@ -488,19 +520,30 @@ export default function ProjectDetailsPage() {
     );
     setTasks(updatedTasks);
     
-    // Optimized localStorage update
+    // Save updated tasks to database
     try {
-      const savedProjects = localStorage.getItem('luckyLogicProjects');
-      if (savedProjects) {
-        const projects = JSON.parse(savedProjects);
-        const projectIndex = projects.findIndex((p: any) => p.code === projectCode);
-        if (projectIndex !== -1) {
-          projects[projectIndex] = { ...projects[projectIndex], tasks: updatedTasks };
-          localStorage.setItem('luckyLogicProjects', JSON.stringify(projects));
-        }
+      const response = await fetch(`/api/projects/${projectCode}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tasks: updatedTasks
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to save updated task to database');
       }
-    } catch (error) {
-      console.error('Error saving updated tasks to localStorage:', error);
+    } catch (error: any) {
+      console.error('Error saving updated tasks to database:', error);
+      // Revert the state if save failed
+      setTasks(tasks);
+      setError(error.message || 'Failed to save updated task. Please try again.');
+      setEditingTaskLoading(false);
+      return;
     }
     
     setEditingTaskLoading(false);
@@ -520,7 +563,7 @@ export default function ProjectDetailsPage() {
       case 'completed': return 'green';
       case 'in-progress': return 'orange';
       case 'planned': return 'blue';
-      case 'blocked': return 'red';
+      case 'cancelled': return 'red';
       default: return 'gray';
     }
   };
@@ -537,10 +580,96 @@ export default function ProjectDetailsPage() {
   const getTaskProgress = (task: any) => {
     if (task.status === 'completed') return 100;
     if (task.status === 'planned') return 0;
-    if (task.status === 'in-progress') {
-      return Math.round((task.actualHours / task.estimatedHours) * 100);
+    if (task.status === 'cancelled') return 0;
+    
+    // For in-progress tasks, calculate based on actual vs estimated hours
+    if (task.status === 'in-progress' && task.estimatedHours > 0) {
+      const progress = Math.min((task.actualHours / task.estimatedHours) * 100, 100);
+      return Math.round(progress);
     }
-    return 0;
+    
+    // Default progress for in-progress tasks without hours
+    return 50;
+  };
+
+  const handleDeleteTask = async (taskId: number) => {
+    if (!window.confirm('Are you sure you want to delete this task?')) return;
+    const updatedTasks = tasks.filter(task => task.id !== taskId);
+    setTasks(updatedTasks);
+    try {
+      const response = await fetch(`/api/projects/${projectCode}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tasks: updatedTasks })
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete task from database');
+      }
+    } catch (error: any) {
+      setError(error.message || 'Failed to delete task. Please try again.');
+      setTasks(tasks); // revert
+    }
+  };
+
+  const handleDeleteUpdate = async (updateId: number) => {
+    if (!window.confirm('Are you sure you want to delete this update?')) return;
+    const updatedUpdates = projectUpdates.filter(update => update.id !== updateId);
+    setProjectUpdates(updatedUpdates);
+    try {
+      const response = await fetch(`/api/projects/${projectCode}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates: updatedUpdates })
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete update from database');
+      }
+    } catch (error: any) {
+      setError(error.message || 'Failed to delete update. Please try again.');
+      setProjectUpdates(projectUpdates); // revert
+    }
+  };
+
+  const handleEditUpdate = (update: any) => {
+    setEditingUpdate(update);
+    setEditUpdateText(update.text);
+    setIsEditUpdateModalOpen(true);
+  };
+
+  const handleSaveEditUpdate = async () => {
+    if (!editingUpdate) return;
+    setEditingUpdateLoading(true);
+    const updatedUpdates = projectUpdates.map(u =>
+      u.id === editingUpdate.id ? { ...u, text: editUpdateText } : u
+    );
+    setProjectUpdates(updatedUpdates);
+    try {
+      const response = await fetch(`/api/projects/${projectCode}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates: updatedUpdates })
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to update project update in database');
+      }
+      setIsEditUpdateModalOpen(false);
+      setEditingUpdate(null);
+      setEditUpdateText('');
+    } catch (error: any) {
+      setError(error.message || 'Failed to update project update. Please try again.');
+      setProjectUpdates(projectUpdates); // revert
+    } finally {
+      setEditingUpdateLoading(false);
+    }
+  };
+
+  const handleCancelEditUpdate = () => {
+    setIsEditUpdateModalOpen(false);
+    setEditingUpdate(null);
+    setEditUpdateText('');
   };
 
   if (loading) {
@@ -615,34 +744,6 @@ export default function ProjectDetailsPage() {
             <HStack spacing={3}>
               <Button as={Link} href="/admin/manage-projects" leftIcon={<ArrowBackIcon />} variant="outline" size="md">
                 Back
-              </Button>
-              {!isEditing ? (
-                <Button leftIcon={<EditIcon />} colorScheme="blue" size="md" onClick={handleEdit}>
-                  Edit
-                </Button>
-              ) : (
-                <>
-                  <Button 
-                    colorScheme="green" 
-                    size="md" 
-                    onClick={handleSave}
-                    isLoading={saving}
-                    loadingText="Saving..."
-                  >
-                    Save
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="md" 
-                    onClick={handleCancel}
-                    isDisabled={saving}
-                  >
-                    Cancel
-                  </Button>
-                </>
-              )}
-              <Button leftIcon={<DeleteIcon />} colorScheme="red" variant="outline" size="md">
-                Delete
               </Button>
             </HStack>
           </Flex>
@@ -1015,40 +1116,62 @@ export default function ProjectDetailsPage() {
                     </HStack>
                   </CardHeader>
                   <CardBody py={6}>
-                    <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+                    <SimpleGrid columns={1} spacing={4} mb={4}>
                       <Box>
-                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        <Text fontWeight="semibold" color="gray.700" mb={1} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
                           Customer Name
                         </Text>
                         <HStack>
                           <Icon as={FaUser} color="#003f2d" boxSize={4} />
-                          <Text fontSize="lg" fontWeight="medium">{project.customer}</Text>
+                          <Text fontSize="lg" fontWeight="medium" whiteSpace="normal" wordBreak="break-word">{project.customer}</Text>
                         </HStack>
+                        {project.customer_stripe_id && (
+                          <Text fontSize="xs" color="gray.400" mt={1} whiteSpace="normal" wordBreak="break-word">
+                            Stripe ID: {project.customer_stripe_id}
+                          </Text>
+                        )}
                       </Box>
                       <Box>
-                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        <Text fontWeight="semibold" color="gray.700" mb={1} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
                           Email Address
                         </Text>
                         <HStack>
                           <Icon as={FaEnvelope} color="#003f2d" boxSize={4} />
-                          <Text fontSize="lg">{project.customerEmail}</Text>
+                          <Text fontSize="lg" whiteSpace="normal" wordBreak="break-word">{project.customerEmail}</Text>
                         </HStack>
                       </Box>
                       <Box>
-                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        <Text fontWeight="semibold" color="gray.700" mb={1} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
                           Phone Number
                         </Text>
                         <HStack>
                           <Icon as={FaPhone} color="#003f2d" boxSize={4} />
-                          <Text fontSize="lg">{project.customerPhone}</Text>
+                          <Text fontSize="lg" whiteSpace="normal" wordBreak="break-word">{project.customerPhone}</Text>
                         </HStack>
                       </Box>
                     </SimpleGrid>
-                    {project.customer_stripe_id && (
-                      <Text fontSize="sm" color="gray.400" mt={1}>
-                        Stripe ID: {project.customer_stripe_id}
+                    <Divider my={4} />
+                    <Box>
+                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        Address
                       </Text>
-                    )}
+                      <VStack align="start" spacing={1} fontSize="md">
+                        {project.customerAddressLine1 && (
+                          <Text>{project.customerAddressLine1}</Text>
+                        )}
+                        {project.customerAddressLine2 && (
+                          <Text>{project.customerAddressLine2}</Text>
+                        )}
+                        {(project.customerCity || project.customerState || project.customerPostcode) && (
+                          <Text>
+                            {[project.customerCity, project.customerState, project.customerPostcode].filter(Boolean).join(', ')}
+                          </Text>
+                        )}
+                        {project.customerCountry && (
+                          <Text>{project.customerCountry}</Text>
+                        )}
+                      </VStack>
+                    </Box>
                   </CardBody>
                 </Card>
 
@@ -1228,9 +1351,12 @@ export default function ProjectDetailsPage() {
                     </HStack>
                     <Button
                       leftIcon={<AddIcon />}
-                      colorScheme="blue"
+                      bg="#003f2d"
+                      color="white"
                       size="sm"
                       onClick={handleAddUpdate}
+                      _hover={{ bg: '#14543a' }}
+                      transition="all 0.2s"
                     >
                       Add Update
                     </Button>
@@ -1239,26 +1365,46 @@ export default function ProjectDetailsPage() {
                 <CardBody py={6}>
                   {projectUpdates.length > 0 ? (
                     <VStack spacing={4} align="stretch">
-                      {projectUpdates.map((update) => (
+                      {projectUpdates.map((update, index) => (
                         <Box
                           key={update.id}
-                          p={4}
-                          bg="gray.50"
+                          bg="white"
+                          border="1px solid #e2e8f0"
                           borderRadius="lg"
-                          border="1px solid"
-                          borderColor="gray.200"
+                          p={4}
+                          boxShadow="sm"
+                          _hover={{ boxShadow: "md" }}
+                          transition="all 0.2s"
                         >
-                          <Text fontSize="md" color="gray.700" mb={2}>
+                          <Text fontSize="md" color="gray.700" mb={3}>
                             {update.text}
                           </Text>
-                          <HStack justify="space-between" align="center">
-                            <Text fontSize="sm" color="gray.500">
-                              {update.timestamp}
-                            </Text>
-                            <Text fontSize="sm" color="gray.600" fontWeight="medium">
-                              {update.author}
-                            </Text>
+                          <Text fontSize="sm" color="gray.500" mt={1}>
+                            🕒 {update.timestamp} • 👤 {update.author}
+                          </Text>
+                          <HStack spacing={1}>
+                            <IconButton
+                              aria-label="Edit update"
+                              icon={<FaEdit />}
+                              size="sm"
+                              variant="ghost"
+                              colorScheme="blue"
+                              onClick={() => handleEditUpdate(update)}
+                              _hover={{ bg: 'blue.50' }}
+                            />
+                            <IconButton
+                              aria-label="Delete update"
+                              icon={<FaTrash />}
+                              size="sm"
+                              variant="ghost"
+                              colorScheme="red"
+                              onClick={() => handleDeleteUpdate(update.id)}
+                              _hover={{ bg: 'red.50' }}
+                            />
                           </HStack>
+                          {index < projectUpdates.length - 1 && (
+                            <Divider mt={4} borderColor="gray.200" />
+                          )}
                         </Box>
                       ))}
                     </VStack>
@@ -1273,16 +1419,19 @@ export default function ProjectDetailsPage() {
                       </Text>
                       <Button
                         leftIcon={<AddIcon />}
-                        colorScheme="blue"
+                        bg="#003f2d"
+                        color="white"
                         size="md"
                         onClick={handleAddUpdate}
+                        _hover={{ bg: '#14543a' }}
+                        transition="all 0.2s"
                       >
                         Add First Update
                       </Button>
                     </Box>
                   )}
                 </CardBody>
-                              </Card>
+              </Card>
 
                 {/* Tasks */}
                 <Card shadow="sm" border="1px solid" borderColor="gray.200">
@@ -1298,9 +1447,12 @@ export default function ProjectDetailsPage() {
                         </Text>
                         <Button
                           leftIcon={<AddIcon />}
-                          colorScheme="green"
+                          bg="#003f2d"
+                          color="white"
                           size="sm"
                           onClick={handleAddTask}
+                          _hover={{ bg: '#14543a' }}
+                          transition="all 0.2s"
                         >
                           Add Task
                         </Button>
@@ -1313,41 +1465,63 @@ export default function ProjectDetailsPage() {
                         {tasks.map((task) => (
                           <Box
                             key={task.id}
-                            p={4}
                             bg="white"
+                            border="1px solid #e2e8f0"
                             borderRadius="lg"
-                            border="1px solid"
-                            borderColor="gray.200"
-                            _hover={{ borderColor: '#14543a', boxShadow: 'sm' }}
+                            p={4}
+                            boxShadow="sm"
+                            _hover={{ boxShadow: "md", borderColor: '#14543a' }}
                             transition="all 0.2s"
                           >
-                                                      <Flex justify="space-between" align="start" mb={3}>
-                            <Box flex="1">
-                              <HStack spacing={3} mb={2}>
-                                <Text fontSize="lg" fontWeight="semibold" color="gray.800">
-                                  {task.title}
+                            <Flex justify="space-between" align="start" mb={3}>
+                              <Box flex="1">
+                                <HStack spacing={3} mb={2}>
+                                  <Text fontSize="lg" fontWeight="semibold" color="gray.800">
+                                    {task.title}
+                                  </Text>
+                                  <Badge 
+                                    colorScheme={getTaskStatusColor(task.status)} 
+                                    size="sm"
+                                    borderRadius="full"
+                                    px={2}
+                                    textTransform="lowercase"
+                                  >
+                                    {task.status.replace('-', ' ')}
+                                  </Badge>
+                                  <Badge 
+                                    colorScheme={getTaskPriorityColor(task.priority)} 
+                                    size="sm"
+                                    borderRadius="full"
+                                    px={2}
+                                    textTransform="lowercase"
+                                  >
+                                    {task.priority}
+                                  </Badge>
+                                </HStack>
+                                <Text fontSize="sm" color="gray.600" mb={3}>
+                                  {task.description}
                                 </Text>
-                                <Badge colorScheme={getTaskStatusColor(task.status)} size="sm">
-                                  {task.status.replace('-', ' ')}
-                                </Badge>
-                                <Badge colorScheme={getTaskPriorityColor(task.priority)} size="sm">
-                                  {task.priority}
-                                </Badge>
-                              </HStack>
-                              <Text fontSize="sm" color="gray.600" mb={3}>
-                                {task.description}
-                              </Text>
-                            </Box>
-                            <IconButton
-                              aria-label="Edit task"
-                              icon={<EditIcon />}
-                              size="sm"
-                              variant="ghost"
-                              colorScheme="blue"
-                              onClick={() => handleEditTask(task)}
-                              _hover={{ bg: 'blue.50' }}
-                            />
-                          </Flex>
+                              </Box>
+                              <IconButton
+                                aria-label="Edit task"
+                                icon={<EditIcon />}
+                                size="sm"
+                                variant="ghost"
+                                colorScheme="blue"
+                                onClick={() => handleEditTask(task)}
+                                _hover={{ bg: 'blue.50' }}
+                              />
+                              <IconButton
+                                aria-label="Delete task"
+                                icon={<FaTrash />}
+                                size="sm"
+                                variant="ghost"
+                                colorScheme="red"
+                                ml={2}
+                                onClick={() => handleDeleteTask(task.id)}
+                                _hover={{ bg: 'red.50' }}
+                              />
+                            </Flex>
                             
                             <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4} mb={3}>
                               <Box>
@@ -1373,28 +1547,24 @@ export default function ProjectDetailsPage() {
                             </SimpleGrid>
 
                             {task.status === 'in-progress' && (
-                              <Box>
-                                <Flex justify="space-between" align="center" mb={2}>
-                                  <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">
-                                    Progress
-                                  </Text>
-                                  <Text fontSize="xs" color="gray.600">
-                                    {getTaskProgress(task)}%
-                                  </Text>
-                                </Flex>
+                              <Box mt={2}>
+                                <Text fontSize="xs" color="gray.500" mb={1}>
+                                  Progress: {task.actualHours}/{task.estimatedHours} hours ({getTaskProgress(task)}%)
+                                </Text>
                                 <Progress 
                                   value={getTaskProgress(task)} 
                                   colorScheme="green" 
                                   size="sm" 
-                                  borderRadius="full"
+                                  borderRadius="md"
+                                  height="8px"
                                 />
                               </Box>
                             )}
 
                             {task.status === 'completed' && task.completedDate && (
-                              <Box>
+                              <Box mt={2}>
                                 <Text fontSize="xs" color="green.600" fontWeight="medium">
-                                  ✓ Completed on {task.completedDate}
+                                  ✅ Completed on {task.completedDate}
                                 </Text>
                               </Box>
                             )}
@@ -1412,9 +1582,12 @@ export default function ProjectDetailsPage() {
                         </Text>
                         <Button
                           leftIcon={<AddIcon />}
-                          colorScheme="green"
+                          bg="#003f2d"
+                          color="white"
                           size="md"
                           onClick={handleAddTask}
+                          _hover={{ bg: '#14543a' }}
+                          transition="all 0.2s"
                         >
                           Create First Task
                         </Button>
@@ -1474,43 +1647,66 @@ export default function ProjectDetailsPage() {
                 <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
                   <HStack>
                     <Icon as={FaUser} color="#003f2d" boxSize={5} />
-                    <Heading size="md" color="#003f2d" fontWeight="bold">Customer</Heading>
+                    <Heading size="md" color="#003f2d" fontWeight="bold">Customer Information</Heading>
                   </HStack>
                 </CardHeader>
                 <CardBody py={6}>
-                  <VStack spacing={4} align="stretch">
+                  <SimpleGrid columns={1} spacing={4} mb={4}>
                     <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
-                        Name
+                      <Text fontWeight="semibold" color="gray.700" mb={1} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        Customer Name
                       </Text>
-                      <Text fontSize="lg" fontWeight="medium">{project.customer}</Text>
+                      <HStack>
+                        <Icon as={FaUser} color="#003f2d" boxSize={4} />
+                        <Text fontSize="lg" fontWeight="medium" whiteSpace="normal" wordBreak="break-word">{project.customer}</Text>
+                      </HStack>
+                      {project.customer_stripe_id && (
+                        <Text fontSize="xs" color="gray.400" mt={1} whiteSpace="normal" wordBreak="break-word">
+                          Stripe ID: {project.customer_stripe_id}
+                        </Text>
+                      )}
                     </Box>
-                    <Divider />
                     <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
-                        Email
+                      <Text fontWeight="semibold" color="gray.700" mb={1} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        Email Address
                       </Text>
                       <HStack>
                         <Icon as={FaEnvelope} color="#003f2d" boxSize={4} />
-                        <Text fontSize="lg">{project.customerEmail}</Text>
+                        <Text fontSize="lg" whiteSpace="normal" wordBreak="break-word">{project.customerEmail}</Text>
                       </HStack>
                     </Box>
-                    <Divider />
                     <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
-                        Phone
+                      <Text fontWeight="semibold" color="gray.700" mb={1} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        Phone Number
                       </Text>
                       <HStack>
                         <Icon as={FaPhone} color="#003f2d" boxSize={4} />
-                        <Text fontSize="lg">{project.customerPhone}</Text>
+                        <Text fontSize="lg" whiteSpace="normal" wordBreak="break-word">{project.customerPhone}</Text>
                       </HStack>
                     </Box>
-                    {project.customer_stripe_id && (
-                      <Text fontSize="sm" color="gray.400" mt={1}>
-                        Stripe ID: {project.customer_stripe_id}
-                      </Text>
-                    )}
-                  </VStack>
+                  </SimpleGrid>
+                  <Divider my={4} />
+                  <Box>
+                    <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                      Address
+                    </Text>
+                    <VStack align="start" spacing={1} fontSize="md">
+                      {project.customerAddressLine1 && (
+                        <Text>{project.customerAddressLine1}</Text>
+                      )}
+                      {project.customerAddressLine2 && (
+                        <Text>{project.customerAddressLine2}</Text>
+                      )}
+                      {(project.customerCity || project.customerState || project.customerPostcode) && (
+                        <Text>
+                          {[project.customerCity, project.customerState, project.customerPostcode].filter(Boolean).join(', ')}
+                        </Text>
+                      )}
+                      {project.customerCountry && (
+                        <Text>{project.customerCountry}</Text>
+                      )}
+                    </VStack>
+                  </Box>
                 </CardBody>
               </Card>
 
@@ -1544,6 +1740,37 @@ export default function ProjectDetailsPage() {
         </SimpleGrid>
       </Container>
 
+      {/* Sticky Action Bar */}
+      <Box position="sticky" bottom={0} bg="white" zIndex={10} py={4} px={6} boxShadow="sm" borderTop="1px solid" borderColor="gray.200">
+        <HStack justify="center">
+          {!isEditing ? (
+            <Button leftIcon={<EditIcon />} colorScheme="green" size="md" onClick={handleEdit}>
+              Edit
+            </Button>
+          ) : (
+            <>
+              <Button 
+                colorScheme="green" 
+                size="md" 
+                onClick={handleSave}
+                isLoading={saving}
+                loadingText="Saving..."
+              >
+                Save
+              </Button>
+              <Button 
+                variant="outline" 
+                size="md" 
+                onClick={handleCancel}
+                isDisabled={saving}
+              >
+                Cancel
+              </Button>
+            </>
+          )}
+        </HStack>
+      </Box>
+
       {/* Footer */}
       <Box bg="white" borderTop="1px solid" borderColor="gray.200" py={6} mt={12}>
         <Container maxW="1400px">
@@ -1561,13 +1788,33 @@ export default function ProjectDetailsPage() {
       {/* Add Update Modal */}
       <Modal isOpen={isUpdateModalOpen} onClose={handleCancelUpdate} size="md">
         <ModalOverlay />
-        <ModalContent borderRadius="xl">
-          <ModalHeader bg="#003f2d" color="white" borderTopRadius="xl">
-            Add Project Update
+        <ModalContent 
+          borderRadius="xl"
+          mx={4}
+          bg="white"
+          shadow="lg"
+        >
+          <ModalHeader 
+            bg="#003f2d" 
+            color="white" 
+            borderTopRadius="xl"
+            py={4}
+          >
+            <HStack spacing={3}>
+              <Icon as={FaInfoCircle} boxSize={5} />
+              <Heading size="lg" fontWeight="bold">Add Project Update</Heading>
+            </HStack>
           </ModalHeader>
-          <ModalCloseButton color="white" />
+          <ModalCloseButton 
+            color="white" 
+            bg="whiteAlpha.200"
+            borderRadius="full"
+            _hover={{ bg: "whiteAlpha.300" }}
+            top={6}
+            right={6}
+          />
           
-          <ModalBody py={6}>
+          <ModalBody py={6} px={6}>
             <VStack spacing={4}>
               <FormControl>
                 <FormLabel fontSize="lg" fontWeight="medium" color="gray.700">
@@ -1582,8 +1829,14 @@ export default function ProjectDetailsPage() {
                   borderWidth="2px"
                   borderColor="gray.200"
                   borderRadius="lg"
-                  _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
-                  _hover={{ borderColor: '#14543a' }}
+                  bg="gray.50"
+                  _focus={{ 
+                    borderColor: '#14543a', 
+                    boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                    bg: 'white' 
+                  }}
+                  _hover={{ borderColor: '#14543a', bg: 'white' }}
+                  _placeholder={{ color: 'gray.400' }}
                 />
               </FormControl>
             </VStack>
@@ -1596,6 +1849,8 @@ export default function ProjectDetailsPage() {
                 variant="outline"
                 colorScheme="gray"
                 isDisabled={addingUpdate}
+                _hover={{ transform: 'scale(1.02)' }}
+                transition="all 0.2s"
               >
                 Cancel
               </Button>
@@ -1605,6 +1860,8 @@ export default function ProjectDetailsPage() {
                 isLoading={addingUpdate}
                 loadingText="Adding..."
                 isDisabled={!newUpdateText.trim()}
+                _hover={{ transform: 'scale(1.02)' }}
+                transition="all 0.2s"
               >
                 Add Update
               </Button>
@@ -1727,7 +1984,7 @@ export default function ProjectDetailsPage() {
                     <option value="planned">📋 Planned</option>
                     <option value="in-progress">🔄 In Progress</option>
                     <option value="completed">✅ Completed</option>
-                    <option value="blocked">🚫 Blocked</option>
+                    <option value="cancelled">❌ Cancelled</option>
                   </Select>
                 </Box>
 
@@ -1914,6 +2171,8 @@ export default function ProjectDetailsPage() {
                 colorScheme="gray"
                 size="md"
                 isDisabled={addingTask}
+                _hover={{ transform: 'scale(1.02)' }}
+                transition="all 0.2s"
               >
                 Cancel
               </Button>
@@ -1924,6 +2183,8 @@ export default function ProjectDetailsPage() {
                 isLoading={addingTask}
                 loadingText="Creating..."
                 isDisabled={!newTask.title.trim() || !newTask.description.trim() || !newTask.assignee.trim() || !newTask.dueDate}
+                _hover={{ transform: 'scale(1.02)' }}
+                transition="all 0.2s"
               >
                 Create Task
               </Button>
@@ -2062,7 +2323,7 @@ export default function ProjectDetailsPage() {
                       <option value="planned">📋 Planned</option>
                       <option value="in-progress">🔄 In Progress</option>
                       <option value="completed">✅ Completed</option>
-                      <option value="blocked">🚫 Blocked</option>
+                      <option value="cancelled">❌ Cancelled</option>
                     </Select>
                   </Box>
 
@@ -2250,6 +2511,8 @@ export default function ProjectDetailsPage() {
                 colorScheme="gray"
                 size="md"
                 isDisabled={editingTaskLoading}
+                _hover={{ transform: 'scale(1.02)' }}
+                transition="all 0.2s"
               >
                 Cancel
               </Button>
@@ -2260,8 +2523,49 @@ export default function ProjectDetailsPage() {
                 isLoading={editingTaskLoading}
                 loadingText="Updating..."
                 isDisabled={!editingTask?.title?.trim() || !editingTask?.description?.trim() || !editingTask?.assignee?.trim() || !editingTask?.dueDate}
+                _hover={{ transform: 'scale(1.02)' }}
+                transition="all 0.2s"
               >
                 Update Task
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Edit Update Modal */}
+      <Modal isOpen={isEditUpdateModalOpen} onClose={handleCancelEditUpdate} size="md">
+        <ModalOverlay />
+        <ModalContent borderRadius="xl">
+          <ModalHeader bg="#003f2d" color="white" borderTopRadius="xl">Edit Project Update</ModalHeader>
+          <ModalCloseButton color="white" />
+          <ModalBody py={6}>
+            <VStack spacing={4}>
+              <FormControl>
+                <FormLabel fontSize="lg" fontWeight="medium" color="gray.700">
+                  Update Details
+                </FormLabel>
+                <Textarea
+                  value={editUpdateText}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setEditUpdateText(e.target.value)}
+                  rows={4}
+                  fontSize="lg"
+                  borderWidth="2px"
+                  borderColor="gray.200"
+                  borderRadius="lg"
+                  _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
+                  _hover={{ borderColor: '#14543a' }}
+                />
+              </FormControl>
+            </VStack>
+          </ModalBody>
+          <ModalFooter bg="gray.50" borderBottomRadius="xl">
+            <HStack spacing={3}>
+              <Button onClick={handleCancelEditUpdate} variant="outline" colorScheme="gray" isDisabled={editingUpdateLoading}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveEditUpdate} colorScheme="blue" isLoading={editingUpdateLoading} loadingText="Saving..." isDisabled={!editUpdateText.trim()}>
+                Save
               </Button>
             </HStack>
           </ModalFooter>

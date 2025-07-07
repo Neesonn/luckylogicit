@@ -187,6 +187,8 @@ export default function ManageProjectsPage() {
     setError('');
     setSuccess('');
     try {
+      // Debug log for selected customer
+      console.log('Selected customer:', selectedCustomer);
       // Create full project object with all required fields
       const newProject = {
         code: formData.projectCode,
@@ -196,6 +198,12 @@ export default function ManageProjectsPage() {
         customerEmail: selectedCustomer ? selectedCustomer.email : '',
         customerPhone: selectedCustomer ? selectedCustomer.phone : '',
         customer_stripe_id: selectedCustomer ? selectedCustomer.id : '',
+        customerAddressLine1: selectedCustomer?.address?.line1 || '',
+        customerAddressLine2: selectedCustomer?.address?.line2 || '',
+        customerCity: selectedCustomer?.address?.city || '',
+        customerState: selectedCustomer?.address?.state || '',
+        customerPostcode: selectedCustomer?.address?.postal_code || '',
+        customerCountry: selectedCustomer?.address?.country || '',
         status: formData.status || 'Planned',
         startDate: formData.startDate,
         endDate: formData.endDate,
