@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { Box, Heading, Text, Spinner, Alert, AlertIcon, Table, Thead, Tbody, Tr, Th, Td, Button, Input, Select, IconButton, VStack, HStack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, FormControl, FormLabel, SimpleGrid, Badge, useToast, Tooltip, Checkbox } from '@chakra-ui/react';
+import { useEffect, useState, useMemo } from 'react';
+import { Box, Heading, Text, Spinner, Alert, AlertIcon, Table, Thead, Tbody, Tr, Th, Td, Button, Input, Select, IconButton, VStack, HStack, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, FormControl, FormLabel, SimpleGrid, Badge, useToast, Tooltip, Checkbox, Skeleton } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { EditIcon, CheckIcon, CloseIcon, ArrowBackIcon, DeleteIcon, AddIcon, SearchIcon, ChevronUpIcon, ChevronDownIcon, ExternalLinkIcon, EmailIcon, PhoneIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
@@ -8,9 +8,98 @@ import NextLink from 'next/link';
 import { useStripeData } from '../../../components/StripeDataContext';
 import GlassCard from '../../../components/GlassCard';
 import { FaAddressCard, FaUser } from 'react-icons/fa';
+import React from 'react';
 
 type SortField = 'name' | 'email' | 'created' | null;
 type SortDirection = 'asc' | 'desc';
+
+function getStatusColor(status: string) {
+  switch ((status || '').toLowerCase()) {
+    case 'planned': return 'blue';
+    case 'in progress': return 'orange';
+    case 'completed': return 'green';
+    case 'on hold': return 'red';
+    default: return 'gray';
+  }
+}
+
+function getInvoiceStatus(inv: any) {
+  if (inv.status === 'void') return 'Void';
+  if (inv.status === 'paid') return 'Paid';
+  if (inv.status === 'open' && inv.due_date && inv.due_date * 1000 < Date.now()) return 'Past Due';
+  if (inv.status === 'open') return 'Open';
+  return inv.status ? inv.status.charAt(0).toUpperCase() + inv.status.slice(1) : 'Unknown';
+}
+
+function getInvoiceStatusColor(status: string) {
+  switch ((status || '').toLowerCase()) {
+    case 'paid': return 'green.400';
+    case 'open': return 'yellow.400';
+    case 'past due': return 'red.400';
+    case 'void': return 'gray.400';
+    default: return 'gray.300';
+  }
+}
+
+function getDaysOverdue(inv: any) {
+  if (!inv.due_date) return null;
+  const due = new Date(inv.due_date * 1000);
+  const now = new Date();
+  const diff = Math.floor((now.getTime() - due.getTime()) / (1000 * 60 * 60 * 24));
+  return diff > 0 ? diff : null;
+}
+
+const ProjectCard = React.memo(({ proj }: { proj: any }) => (
+  <Box p={3} mb={2} borderWidth="1px" borderRadius="md" borderColor="gray.200" bg="gray.50">
+    <HStack justify="space-between" align="center">
+      <Box>
+        <Text fontWeight="semibold" color="gray.700">{proj.name || proj.project_name}</Text>
+        <Text fontSize="sm" color="gray.500">Code: {proj.code}</Text>
+        <Badge colorScheme={getStatusColor(proj.status)} fontSize="xs" mt={1}>{proj.status}</Badge>
+      </Box>
+      <Button as={NextLink} href={`/admin/project/${proj.code}`} size="sm" colorScheme="green" variant="outline">
+        View
+      </Button>
+    </HStack>
+  </Box>
+));
+
+const InvoiceCard = React.memo(({ inv }: { inv: any }) => (
+  <Box p={3} mb={2} borderWidth="1px" borderRadius="md" borderColor="gray.200" bg="gray.50">
+    <HStack justify="space-between" align="center">
+      <Box>
+        <Text fontWeight="semibold" color="gray.700">Invoice #{inv.number || inv.id}</Text>
+        <Text fontSize="sm" color="gray.500">{inv.created ? new Date(inv.created * 1000).toLocaleDateString() : 'Unknown date'}</Text>
+      </Box>
+      <Box textAlign="right">
+        <Text fontWeight="bold" color="brand.green" fontSize="lg">${(inv.amount_due / 100).toFixed(2)}</Text>
+        {inv.hosted_invoice_url && (
+          <Button as={NextLink} href={inv.hosted_invoice_url} target="_blank" size="sm" leftIcon={<ExternalLinkIcon />} colorScheme="green" variant="outline" mt={1}>
+            View
+          </Button>
+        )}
+      </Box>
+    </HStack>
+    <Box mb={2}>
+      <Box
+        display="inline-block"
+        px={3}
+        py={1}
+        borderRadius="md"
+        fontWeight="bold"
+        fontSize="sm"
+        color={getInvoiceStatus(inv) === 'Void' ? 'gray.800' : 'white'}
+        bg={getInvoiceStatusColor(getInvoiceStatus(inv))}
+        mb={1}
+      >
+        {getInvoiceStatus(inv)}
+        {getInvoiceStatus(inv) === 'Past Due' && getDaysOverdue(inv) !== null && (
+          <span> – {getDaysOverdue(inv)} day{getDaysOverdue(inv) !== 1 ? 's' : ''} overdue</span>
+        )}
+      </Box>
+    </Box>
+  </Box>
+));
 
 export default function ViewCustomersPage() {
   const { customers, loading, error, refresh } = useStripeData();
@@ -35,6 +124,11 @@ export default function ViewCustomersPage() {
   const [invoices, setInvoices] = useState<any[]>([]);
   const [invoicesLoading, setInvoicesLoading] = useState(false);
   const [invoicesError, setInvoicesError] = useState<string | null>(null);
+  const [customerProjects, setCustomerProjects] = useState<any[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+  const [projectsError, setProjectsError] = useState('');
+  const [projectsCache, setProjectsCache] = useState<Record<string, any[]>>({});
+  const [invoicesCache, setInvoicesCache] = useState<Record<string, any[]>>({});
 
   const countries = [
     { code: '', name: 'Choose a country...' },
@@ -384,52 +478,56 @@ export default function ViewCustomersPage() {
 
   useEffect(() => {
     if (isProfileModalOpen && selectedCustomer?.id) {
+      setProjectsLoading(true);
       setInvoicesLoading(true);
+      setProjectsError('');
       setInvoicesError(null);
-      fetch(`/api/list-stripe-invoices`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            setInvoices(data.invoices.filter((inv: any) => inv.customer === selectedCustomer.id));
-          } else {
-            setInvoicesError(data.error || 'Failed to fetch invoices');
-          }
-        })
-        .catch(() => setInvoicesError('Failed to fetch invoices'))
-        .finally(() => setInvoicesLoading(false));
+
+      // Check cache first
+      const cachedProjects = projectsCache[selectedCustomer.id];
+      const cachedInvoices = invoicesCache[selectedCustomer.id];
+      if (cachedProjects) {
+        setCustomerProjects(cachedProjects);
+        setProjectsLoading(false);
+      }
+      if (cachedInvoices) {
+        setInvoices(cachedInvoices);
+        setInvoicesLoading(false);
+      }
+      if (cachedProjects && cachedInvoices) return;
+
+      Promise.all([
+        cachedProjects ? Promise.resolve({ success: true, projects: cachedProjects }) : fetch(`/api/projects?customer_stripe_id=${selectedCustomer.id}`).then(res => res.json()),
+        cachedInvoices ? Promise.resolve({ success: true, invoices: cachedInvoices }) : fetch(`/api/list-stripe-invoices?customer_id=${selectedCustomer.id}`).then(res => res.json())
+      ]).then(([projectsData, invoicesData]) => {
+        // handle projects
+        if (projectsData.success) {
+          setCustomerProjects(projectsData.projects || []);
+          setProjectsCache(prev => ({ ...prev, [selectedCustomer.id]: projectsData.projects || [] }));
+        } else {
+          setProjectsError(projectsData.error || 'Failed to load projects');
+          setCustomerProjects([]);
+        }
+        setProjectsLoading(false);
+
+        // handle invoices
+        if (invoicesData.success) {
+          setInvoices(invoicesData.invoices || []);
+          setInvoicesCache(prev => ({ ...prev, [selectedCustomer.id]: invoicesData.invoices || [] }));
+        } else {
+          setInvoicesError(invoicesData.error || 'Failed to load invoices');
+          setInvoices([]);
+        }
+        setInvoicesLoading(false);
+      });
     } else {
+      setCustomerProjects([]);
       setInvoices([]);
-      setInvoicesError(null);
     }
   }, [isProfileModalOpen, selectedCustomer]);
 
-  // Helper function for invoice status
-  function getInvoiceStatus(inv: any) {
-    if (inv.status === 'open' && inv.due_date && inv.due_date * 1000 < Date.now()) {
-      return 'Past Due';
-    }
-    return inv.status.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
-  }
-
-  // Helper function for invoice status color
-  function getInvoiceStatusColor(status: string) {
-    if (status === 'Past Due') return 'red.500';
-    if (status === 'Open' || status === 'Paid') return 'green.500';
-    if (status === 'Void') return 'yellow.400';
-    return 'gray.400';
-  }
-
-  // Helper function for days overdue
-  function getDaysOverdue(inv: any) {
-    if (!inv.due_date) return null;
-    // Set both dates to midnight in the same timezone
-    const due = new Date(inv.due_date * 1000);
-    const today = new Date();
-    due.setHours(0,0,0,0);
-    today.setHours(0,0,0,0);
-    const diff = Math.floor((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24));
-    return diff > 0 ? diff : null;
-  }
+  const displayedProjects = useMemo(() => customerProjects.slice(0, 5), [customerProjects]);
+  const displayedInvoices = useMemo(() => invoices.slice(0, 5), [invoices]);
 
   return (
     <Box minH="100vh" bg="gray.50" px={{ base: 3, md: 4 }} py={{ base: 6, md: 10 }} display="flex" flexDirection="column" alignItems="center">
@@ -1158,10 +1256,10 @@ export default function ViewCustomersPage() {
       </Modal>
 
       {/* Profile Modal */}
-      <Modal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} isCentered size="lg">
+      <Modal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} isCentered size="3xl">
         <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(8px)" />
-        <ModalContent borderRadius="xl" bg="transparent" boxShadow="none">
-          <GlassCard p={{ base: 4, md: 8 }} maxW="lg" mx="auto" bg="whiteAlpha.900" borderColor="whiteAlpha.700" boxShadow="2xl" position="relative">
+        <ModalContent borderRadius="xl" bg="transparent" boxShadow="none" maxW="3xl">
+          <GlassCard p={{ base: 8, md: 12 }} maxW="3xl" mx="auto" bg="whiteAlpha.900" borderColor="whiteAlpha.700" boxShadow="2xl" position="relative">
             <Box position="absolute" inset={0} borderRadius="inherit" bg="white" opacity={0.85} zIndex={0} />
             <Box position="relative" zIndex={1}>
               <ModalHeader color="brand.green" fontWeight="bold" fontSize="2xl" px={0} pb={2}>
@@ -1229,51 +1327,52 @@ export default function ViewCustomersPage() {
                       </Box>
                     </HStack>
                     <Box pt={2}>
+                      <Text fontSize="lg" fontWeight="bold" color="brand.green" mb={2}>Projects</Text>
+                      {projectsLoading && customerProjects.length === 0 ? (
+                        <>
+                          {[...Array(2)].map((_, i) => (
+                            <Skeleton key={i} height="40px" mb={2} borderRadius="md" />
+                          ))}
+                        </>
+                      ) : projectsError ? (
+                        <Text color="red.500">{projectsError}</Text>
+                      ) : customerProjects.length === 0 ? (
+                        <Text color="gray.500" fontStyle="italic">No projects found for this customer.</Text>
+                      ) : (
+                        <Box maxH="200px" overflowY="auto" transition="none" opacity={projectsLoading ? 0.5 : 1}>
+                          {displayedProjects.map(proj => (
+                            <ProjectCard key={proj.id} proj={proj} />
+                          ))}
+                          {customerProjects.length > 5 && (
+                            <Button as={NextLink} href={`/admin/manage-projects?customer_stripe_id=${selectedCustomer.id}`} size="sm" colorScheme="green" variant="ghost" mt={2}>
+                              View All Projects
+                            </Button>
+                          )}
+                        </Box>
+                      )}
+                    </Box>
+                    <Box pt={2}>
                       <Text fontSize="lg" fontWeight="bold" color="brand.green" mb={2}>Billings</Text>
-                      {invoicesLoading ? (
-                        <Spinner size="md" color="brand.green" />
+                      {invoicesLoading && invoices.length === 0 ? (
+                        <>
+                          {[...Array(2)].map((_, i) => (
+                            <Skeleton key={i} height="40px" mb={2} borderRadius="md" />
+                          ))}
+                        </>
                       ) : invoicesError ? (
                         <Text color="red.500">{invoicesError}</Text>
                       ) : invoices.length === 0 ? (
                         <Text color="gray.500" fontStyle="italic">No invoices found for this customer.</Text>
                       ) : (
-                        <Box maxH="200px" overflowY="auto">
-                          {invoices.map(inv => (
-                            <Box key={inv.id} p={3} mb={2} borderWidth="1px" borderRadius="md" borderColor="gray.200" bg="gray.50">
-                              <HStack justify="space-between" align="center">
-                                <Box>
-                                  <Text fontWeight="semibold" color="gray.700">Invoice #{inv.number || inv.id}</Text>
-                                  <Text fontSize="sm" color="gray.500">{inv.created ? new Date(inv.created * 1000).toLocaleDateString() : 'Unknown date'}</Text>
-                                </Box>
-                                <Box textAlign="right">
-                                  <Text fontWeight="bold" color="brand.green" fontSize="lg">${(inv.amount_due / 100).toFixed(2)}</Text>
-                                  {inv.hosted_invoice_url && (
-                                    <Button as={NextLink} href={inv.hosted_invoice_url} target="_blank" size="sm" leftIcon={<ExternalLinkIcon />} colorScheme="green" variant="outline" mt={1}>
-                                      View
-                                    </Button>
-                                  )}
-                                </Box>
-                              </HStack>
-                              <Box mb={2}>
-                                <Box
-                                  display="inline-block"
-                                  px={3}
-                                  py={1}
-                                  borderRadius="md"
-                                  fontWeight="bold"
-                                  fontSize="sm"
-                                  color={getInvoiceStatus(inv) === 'Void' ? 'gray.800' : 'white'}
-                                  bg={getInvoiceStatusColor(getInvoiceStatus(inv))}
-                                  mb={1}
-                                >
-                                  {getInvoiceStatus(inv)}
-                                  {getInvoiceStatus(inv) === 'Past Due' && getDaysOverdue(inv) !== null && (
-                                    <span> – {getDaysOverdue(inv)} day{getDaysOverdue(inv) !== 1 ? 's' : ''} overdue</span>
-                                  )}
-                                </Box>
-                              </Box>
-                            </Box>
+                        <Box maxH="200px" overflowY="auto" transition="none" opacity={invoicesLoading ? 0.5 : 1}>
+                          {displayedInvoices.map(inv => (
+                            <InvoiceCard key={inv.id} inv={inv} />
                           ))}
+                          {invoices.length > 5 && (
+                            <Button as={NextLink} href={`https://dashboard.stripe.com/customers/${selectedCustomer.id}`} target="_blank" size="sm" colorScheme="green" variant="ghost" mt={2}>
+                              View All Invoices
+                            </Button>
+                          )}
                         </Box>
                       )}
                     </Box>

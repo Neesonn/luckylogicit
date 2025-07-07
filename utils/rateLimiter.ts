@@ -16,31 +16,30 @@ class RateLimiter {
   }
 
   isRateLimited(key: string): boolean {
-    const now = Date.now();
-    const record = this.store[key];
-
-    if (!record) {
-      this.store[key] = {
-        count: 1,
-        resetTime: now + this.windowMs,
-      };
-      return false;
-    }
-
-    if (now > record.resetTime) {
-      this.store[key] = {
-        count: 1,
-        resetTime: now + this.windowMs,
-      };
-      return false;
-    }
-
-    if (record.count >= this.maxRequests) {
-      return true;
-    }
-
-    record.count += 1;
+    // === DEVELOPMENT ONLY: DISABLE RATE LIMITING ===
     return false;
+    // === END DEVELOPMENT ONLY ===
+    // const now = Date.now();
+    // const record = this.store[key];
+    // if (!record) {
+    //   this.store[key] = {
+    //     count: 1,
+    //     resetTime: now + this.windowMs,
+    //   };
+    //   return false;
+    // }
+    // if (now > record.resetTime) {
+    //   this.store[key] = {
+    //     count: 1,
+    //     resetTime: now + this.windowMs,
+    //   };
+    //   return false;
+    // }
+    // if (record.count >= this.maxRequests) {
+    //   return true;
+    // }
+    // record.count += 1;
+    // return false;
   }
 
   getRemainingTime(key: string): number {

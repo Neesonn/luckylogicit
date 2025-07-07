@@ -152,40 +152,35 @@ export default function ProjectDetailsPage() {
     const fetchProject = async () => {
       setLoading(true);
       try {
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Fetch projects from Supabase API
+        const response = await fetch('/api/projects');
+        const data = await response.json();
         
-        // Get projects from localStorage
-        const savedProjects = localStorage.getItem('luckyLogicProjects');
-        let projects = defaultProjects;
-        
-        if (savedProjects) {
-          try {
-            projects = JSON.parse(savedProjects);
-          } catch (error) {
-            console.error('Error parsing saved projects:', error);
-            projects = defaultProjects;
-          }
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to fetch projects');
         }
         
-        const foundProject = projects.find((p: any) => p.code === projectCode);
+        // Find the specific project by code
+        const foundProject = data.projects.find((p: any) => p.code === projectCode);
+        
         if (foundProject) {
           setProject(foundProject);
           
-          // Load project updates from localStorage if available
-          if ((foundProject as any).updates) {
-            setProjectUpdates((foundProject as any).updates);
+          // Load project updates if available
+          if (foundProject.updates) {
+            setProjectUpdates(foundProject.updates);
           }
           
-          // Load tasks from localStorage if available
-          if ((foundProject as any).tasks) {
-            setTasks((foundProject as any).tasks);
+          // Load tasks if available
+          if (foundProject.tasks) {
+            setTasks(foundProject.tasks);
           }
         } else {
           setError('Project not found');
         }
-      } catch (err) {
-        setError('Failed to load project details');
+      } catch (err: any) {
+        console.error('Error fetching project:', err);
+        setError(err.message || 'Failed to load project details');
       } finally {
         setLoading(false);
       }
@@ -245,34 +240,33 @@ export default function ProjectDetailsPage() {
     setSaving(true);
     setSaveSuccess('');
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
       // Update the project data
-      const updatedProject = { ...editData };
-      setProject(updatedProject);
+      const updatedProject = { 
+        ...editData,
+        updated_at: new Date().toISOString()
+      };
       
-      // Update project in localStorage
-      const savedProjects = localStorage.getItem('luckyLogicProjects');
-      if (savedProjects) {
-        try {
-          const projects = JSON.parse(savedProjects);
-          const updatedProjects = projects.map((p: any) => 
-            p.code === projectCode ? updatedProject : p
-          );
-          localStorage.setItem('luckyLogicProjects', JSON.stringify(updatedProjects));
-        } catch (error) {
-          console.error('Error updating projects in localStorage:', error);
-        }
+      // Send update to Supabase API
+      const response = await fetch(`/api/projects/${projectCode}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedProject),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to update project');
       }
-      
+
+      setProject(updatedProject);
       setIsEditing(false);
       setSaveSuccess('Project updated successfully!');
       
       // Clear success message after 3 seconds
       setTimeout(() => setSaveSuccess(''), 3000);
-    } catch (err) {
-      setError('Failed to save project changes');
+    } catch (err: any) {
+      setError(err.message || 'Failed to save project changes');
     } finally {
       setSaving(false);
     }
@@ -604,16 +598,16 @@ export default function ProjectDetailsPage() {
               <Heading as="h1" size="2xl" color="#003f2d" fontWeight="bold">
                 {project.name}
               </Heading>
-              <HStack spacing={4}>
+              <HStack spacing={4} mt={2}>
                 <Text fontSize="lg" color="gray.600" fontWeight="medium">
                   {project.code}
                 </Text>
-                <Badge colorScheme={getStatusColor(project.status)} size="lg" px={4} py={2} fontSize="sm" fontWeight="semibold">
-                  <Icon as={getStatusIcon(project.status)} mr={2} />
-                  {project.status}
+                <Badge colorScheme={getStatusColor(isEditing ? editData.status : project.status)} size="lg" px={4} py={2} fontSize="sm" fontWeight="semibold">
+                  <Icon as={getStatusIcon(isEditing ? editData.status : project.status)} mr={2} />
+                  {isEditing ? editData.status : project.status}
                 </Badge>
-                <Badge colorScheme={getPriorityColor(project.priority)} size="lg" px={4} py={2} fontSize="sm" fontWeight="semibold">
-                  {project.priority} Priority
+                <Badge colorScheme={getPriorityColor(isEditing ? editData.priority : project.priority)} size="lg" px={4} py={2} fontSize="sm" fontWeight="semibold">
+                  {isEditing ? editData.priority : project.priority} Priority
                 </Badge>
               </HStack>
             </VStack>
@@ -914,7 +908,7 @@ export default function ProjectDetailsPage() {
                         </Text>
                       )}
                     </Box>
-                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+                    <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} alignItems="start">
                       <Box>
                         <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
                           Category
@@ -930,10 +924,8 @@ export default function ProjectDetailsPage() {
                             _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                             _hover={{ borderColor: '#14543a' }}
                           >
-                            <option value="internal">Internal</option>
-                            <option value="external">External</option>
-                            <option value="rnd">R&D</option>
-                            <option value="infrastructure">Infrastructure</option>
+                            <option value="residential">Residential</option>
+                            <option value="business">Business</option>
                           </Select>
                         ) : (
                           <Text fontSize="lg" textTransform="capitalize">{project.category}</Text>
@@ -956,6 +948,58 @@ export default function ProjectDetailsPage() {
                           />
                         ) : (
                           <Text fontSize="lg">{project.client}</Text>
+                        )}
+                      </Box>
+                      <Box>
+                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                          Status
+                        </Text>
+                        {isEditing ? (
+                          <Select
+                            value={editData.status || ''}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('status', e.target.value)}
+                            fontSize="lg"
+                            borderWidth="2px"
+                            borderColor="gray.200"
+                            borderRadius="lg"
+                            _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
+                            _hover={{ borderColor: '#14543a' }}
+                          >
+                            <option value="planned">Planned</option>
+                            <option value="in progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="on hold">On Hold</option>
+                          </Select>
+                        ) : (
+                          <Badge colorScheme={getStatusColor(project.status)} px={3} py={1} fontSize="md" fontWeight="semibold">
+                            <Icon as={getStatusIcon(project.status)} mr={2} />
+                            {project.status}
+                          </Badge>
+                        )}
+                      </Box>
+                      <Box>
+                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                          Priority
+                        </Text>
+                        {isEditing ? (
+                          <Select
+                            value={editData.priority || ''}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('priority', e.target.value)}
+                            fontSize="lg"
+                            borderWidth="2px"
+                            borderColor="gray.200"
+                            borderRadius="lg"
+                            _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
+                            _hover={{ borderColor: '#14543a' }}
+                          >
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                          </Select>
+                        ) : (
+                          <Badge colorScheme={getPriorityColor(project.priority)} px={3} py={1} fontSize="md" fontWeight="semibold">
+                            {project.priority} Priority
+                          </Badge>
                         )}
                       </Box>
                     </SimpleGrid>
@@ -1000,6 +1044,11 @@ export default function ProjectDetailsPage() {
                         </HStack>
                       </Box>
                     </SimpleGrid>
+                    {project.customer_stripe_id && (
+                      <Text fontSize="sm" color="gray.400" mt={1}>
+                        Stripe ID: {project.customer_stripe_id}
+                      </Text>
+                    )}
                   </CardBody>
                 </Card>
 
@@ -1456,6 +1505,11 @@ export default function ProjectDetailsPage() {
                         <Text fontSize="lg">{project.customerPhone}</Text>
                       </HStack>
                     </Box>
+                    {project.customer_stripe_id && (
+                      <Text fontSize="sm" color="gray.400" mt={1}>
+                        Stripe ID: {project.customer_stripe_id}
+                      </Text>
+                    )}
                   </VStack>
                 </CardBody>
               </Card>

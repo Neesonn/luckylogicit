@@ -49,51 +49,7 @@ import { ArrowBackIcon, AddIcon } from '@chakra-ui/icons';
 import { useState, useEffect } from 'react';
 import { FaInfoCircle, FaRegCalendarAlt, FaUserTie, FaMoneyBillWave, FaUser } from 'react-icons/fa';
 
-// Mock customer data (replace with real fetch/API call)
-const mockCustomers = [
-  {
-    id: 1,
-    name: 'Alice Smith',
-    email: 'alice@example.com',
-    phone: '0412 345 678',
-    address: {
-      line1: '123 Main St',
-      line2: '',
-      city: 'Sydney',
-      state: 'NSW',
-      postalCode: '2000',
-      country: 'Australia',
-    },
-  },
-  {
-    id: 2,
-    name: 'Bob Johnson',
-    email: 'bob@example.com',
-    phone: '0400 111 222',
-    address: {
-      line1: '456 King St',
-      line2: 'Apt 5',
-      city: 'Melbourne',
-      state: 'VIC',
-      postalCode: '3000',
-      country: 'Australia',
-    },
-  },
-  {
-    id: 3,
-    name: 'Charlie Lee',
-    email: 'charlie@example.com',
-    phone: '0433 222 333',
-    address: {
-      line1: '789 Queen St',
-      line2: '',
-      city: 'Brisbane',
-      state: 'QLD',
-      postalCode: '4000',
-      country: 'Australia',
-    },
-  },
-];
+// Customer search functionality using live Stripe data
 
 export default function ManageProjectsPage() {
   const router = useRouter();
@@ -110,7 +66,7 @@ export default function ManageProjectsPage() {
     startDate: '',
     endDate: '',
     priority: '',
-    projectOwner: '',
+    projectOwner: 'Michael Neeson',
     client: '',
     budget: '',
     category: '',
@@ -122,53 +78,72 @@ export default function ManageProjectsPage() {
   });
 
   const [customerQuery, setCustomerQuery] = useState('');
-  const [customerResults, setCustomerResults] = useState<typeof mockCustomers>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<typeof mockCustomers[0] | null>(null);
+  const [customerResults, setCustomerResults] = useState<any[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<any | null>(null);
+  const [customerSearchLoading, setCustomerSearchLoading] = useState(false);
 
   // Place projects state here
   const [projects, setProjects] = useState<any[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
+  const [projectsError, setProjectsError] = useState('');
 
-  // Load projects from localStorage on component mount
+  // Load projects from Supabase on component mount
   useEffect(() => {
-    const savedProjects = localStorage.getItem('luckyLogicProjects');
-    if (savedProjects) {
+    const fetchProjects = async () => {
+      setProjectsLoading(true);
+      setProjectsError('');
       try {
-        const parsedProjects = JSON.parse(savedProjects);
-        setProjects(parsedProjects);
+        const response = await fetch('/api/projects');
+        const data = await response.json();
+        
+        if (data.success) {
+          setProjects(data.projects || []);
+        } else {
+          setProjectsError(data.error || 'Failed to load projects');
+          setProjects([]);
+        }
       } catch (error) {
-        console.error('Error parsing saved projects:', error);
-        // Fallback to default projects if parsing fails
-        setProjects([
-          { code: 'LLPR-010', name: 'Demo Project', customer: 'Alice Smith', status: 'Planned', startDate: '2024-06-01', priority: 'High' },
-          { code: 'LLPR-011', name: 'Website Redesign', customer: 'Bob Johnson', status: 'In Progress', startDate: '2024-06-10', priority: 'Medium' },
-        ]);
+        console.error('Error fetching projects:', error);
+        setProjectsError('Failed to load projects');
+        setProjects([]);
+      } finally {
+        setProjectsLoading(false);
       }
-    } else {
-      // Initialize with default projects if no saved data
-      setProjects([
-        { code: 'LLPR-010', name: 'Demo Project', customer: 'Alice Smith', status: 'Planned', startDate: '2024-06-01', priority: 'High' },
-        { code: 'LLPR-011', name: 'Website Redesign', customer: 'Bob Johnson', status: 'In Progress', startDate: '2024-06-10', priority: 'Medium' },
-      ]);
-    }
+    };
+
+    fetchProjects();
   }, []);
 
-  // Save projects to localStorage whenever projects state changes
+  // Live customer search using Stripe API
   useEffect(() => {
-    if (projects.length > 0) {
-      localStorage.setItem('luckyLogicProjects', JSON.stringify(projects));
-    }
-  }, [projects]);
+    const searchCustomers = async () => {
+      if (customerQuery.trim() === '') {
+        setCustomerResults([]);
+        return;
+      }
 
-  useEffect(() => {
-    if (customerQuery.trim() === '') {
-      setCustomerResults([]);
-      return;
-    }
-    setCustomerResults(
-      mockCustomers.filter(c =>
-        c.name.toLowerCase().includes(customerQuery.toLowerCase())
-      )
-    );
+      setCustomerSearchLoading(true);
+      try {
+        const response = await fetch(`/api/search-customers?name=${encodeURIComponent(customerQuery)}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setCustomerResults(data.customers || []);
+        } else {
+          console.error('Failed to search customers:', data.error);
+          setCustomerResults([]);
+        }
+      } catch (error) {
+        console.error('Error searching customers:', error);
+        setCustomerResults([]);
+      } finally {
+        setCustomerSearchLoading(false);
+      }
+    };
+
+    // Debounce the search to avoid too many API calls
+    const timeoutId = setTimeout(searchCustomers, 300);
+    return () => clearTimeout(timeoutId);
   }, [customerQuery]);
 
   useEffect(() => {
@@ -190,11 +165,9 @@ export default function ManageProjectsPage() {
 
   const clearAllProjects = () => {
     if (window.confirm('Are you sure you want to clear all projects? This action cannot be undone.')) {
-      localStorage.removeItem('luckyLogicProjects');
-      setProjects([
-        { code: 'LLPR-010', name: 'Demo Project', customer: 'Alice Smith', status: 'Planned', startDate: '2024-06-01', priority: 'High' },
-        { code: 'LLPR-011', name: 'Website Redesign', customer: 'Bob Johnson', status: 'In Progress', startDate: '2024-06-10', priority: 'Medium' },
-      ]);
+      // Note: This would need a DELETE endpoint in production
+      // For now, just clear the local state
+      setProjects([]);
     }
   };
 
@@ -214,8 +187,6 @@ export default function ManageProjectsPage() {
     setError('');
     setSuccess('');
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
       // Create full project object with all required fields
       const newProject = {
         code: formData.projectCode,
@@ -224,6 +195,7 @@ export default function ManageProjectsPage() {
         customer: selectedCustomer ? selectedCustomer.name : 'Unassigned',
         customerEmail: selectedCustomer ? selectedCustomer.email : '',
         customerPhone: selectedCustomer ? selectedCustomer.phone : '',
+        customer_stripe_id: selectedCustomer ? selectedCustomer.id : '',
         status: formData.status || 'Planned',
         startDate: formData.startDate,
         endDate: formData.endDate,
@@ -234,17 +206,26 @@ export default function ManageProjectsPage() {
         category: formData.category || 'internal',
         estimatedHours: Number(formData.estimatedHours) || 0,
         createdBy: formData.createdBy,
-        progress: 0,
-        tasksCompleted: 0,
-        totalTasks: 0,
-        budgetUsed: 0,
         team: [formData.projectOwner || 'Admin'],
         tasks: [], // Empty tasks array for new projects
         updates: [], // Empty updates array for new projects
       };
 
+      // Send to Supabase API
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProject),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Something went wrong');
+      }
+
       // Add new project to state
-      setProjects(prev => [...prev, newProject]);
+      setProjects(prev => [result.project, ...prev]);
       setSuccess('Project created successfully!');
       setTimeout(() => {
         onClose();
@@ -252,8 +233,8 @@ export default function ManageProjectsPage() {
         resetForm();
         setSelectedCustomer(null);
       }, 1000);
-    } catch (err) {
-      setError('Failed to create project. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to create project. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -267,7 +248,7 @@ export default function ManageProjectsPage() {
       startDate: '',
       endDate: '',
       priority: '',
-      projectOwner: '',
+      projectOwner: 'Michael Neeson',
       client: '',
       budget: '',
       category: '',
@@ -284,7 +265,7 @@ export default function ManageProjectsPage() {
   return (
     <Box minH="100vh" display="flex" flexDirection="column" alignItems="center" justifyContent="center" bg="gray.50" px={{ base: 3, md: 4 }} py={{ base: 4, md: 0 }}>
       <Box textAlign="center" mb={{ base: 6, md: 8 }} px={{ base: 2, md: 0 }}>
-        <Heading as="h1" size={{ base: "xl", md: "2xl" }} mb={3} color="brand.green" fontWeight="bold">
+        <Heading as="h1" size={{ base: 'lg', md: '2xl' }} mb={3} color="brand.green" fontWeight="bold">
           Manage Projects
         </Heading>
         <Text fontSize={{ base: "md", md: "lg" }} color="gray.600" maxW="500px" mb={6}>
@@ -294,9 +275,9 @@ export default function ManageProjectsPage() {
           onClick={onOpen}
           bg="#003f2d" 
           color="white" 
-          size="lg"
-          px={8}
-          py={3}
+          size={{ base: 'md', md: 'lg' }}
+          px={{ base: 4, md: 8 }}
+          py={{ base: 2, md: 3 }}
           fontSize="md"
           fontWeight="semibold"
           leftIcon={<AddIcon />}
@@ -316,22 +297,39 @@ export default function ManageProjectsPage() {
       <VStack spacing={{ base: 6, md: 8 }} w="100%" maxW="1200px" bg="white" p={{ base: 6, md: 8 }} borderRadius="xl" boxShadow="xl" align="stretch" mb={6}>
         
         {/* Projects Table */}
-        <Box bg="white" borderRadius="xl" boxShadow="md" border="1px solid #e2e8f0" p={6} overflow="visible">
+        <Box bg="white" borderRadius="xl" boxShadow="md" border="1px solid #e2e8f0" p={6} overflowX={{ base: 'auto', md: 'visible' }}>
           <Heading size="md" color="#14543a" fontWeight="bold" mb={4} display="flex" alignItems="center" gap={2}>
             <FaInfoCircle /> Projects
           </Heading>
-          <Table variant="simple" size="md" w="100%">
-            <Thead bg="#003f2d">
-              <Tr>
-                <Th w="12%" whiteSpace="nowrap" color="white" fontWeight="bold">Project Code</Th>
-                <Th w="28%" whiteSpace="nowrap" color="white" fontWeight="bold">Name</Th>
-                <Th w="22%" whiteSpace="nowrap" color="white" fontWeight="bold">Customer</Th>
-                <Th w="12%" whiteSpace="nowrap" color="white" fontWeight="bold">Status</Th>
-                <Th w="16%" whiteSpace="nowrap" color="white" fontWeight="bold">Start Date</Th>
-                <Th w="10%" whiteSpace="nowrap" color="white" fontWeight="bold">Priority</Th>
-              </Tr>
-            </Thead>
-                          <Tbody>
+          
+          {projectsLoading ? (
+            <Box textAlign="center" py={8}>
+              <Spinner size="lg" color="#003f2d" />
+              <Text mt={4} color="gray.600">Loading projects...</Text>
+            </Box>
+          ) : projectsError ? (
+            <Alert status="error" borderRadius="md">
+              <AlertIcon />
+              {projectsError}
+            </Alert>
+          ) : projects.length === 0 ? (
+            <Box textAlign="center" py={8}>
+              <Text color="gray.500" fontSize="lg">No projects found</Text>
+              <Text color="gray.400" fontSize="md" mt={2}>Create your first project to get started</Text>
+            </Box>
+          ) : (
+            <Table variant="simple" size="md" w="100%" minW={{ base: '600px', md: '100%' }}>
+              <Thead bg="#003f2d">
+                <Tr>
+                  <Th w="12%" whiteSpace="nowrap" color="white" fontWeight="bold">Project Code</Th>
+                  <Th w="28%" whiteSpace="nowrap" color="white" fontWeight="bold">Name</Th>
+                  <Th w="22%" whiteSpace="nowrap" color="white" fontWeight="bold">Customer</Th>
+                  <Th w="12%" whiteSpace="nowrap" color="white" fontWeight="bold">Status</Th>
+                  <Th w="16%" whiteSpace="nowrap" color="white" fontWeight="bold">Start Date</Th>
+                  <Th w="10%" whiteSpace="nowrap" color="white" fontWeight="bold">Priority</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
                 {projects.map((proj, idx) => (
                   <Tr key={proj.code + idx} _hover={{ bg: 'gray.50' }} cursor="pointer">
                     <Td fontWeight="bold">
@@ -349,12 +347,13 @@ export default function ManageProjectsPage() {
                   </Tr>
                 ))}
               </Tbody>
-          </Table>
+            </Table>
+          )}
         </Box>
         
       </VStack>
       
-      <HStack spacing={4} mt={6}>
+      <HStack spacing={4} mt={6} flexWrap="wrap" justifyContent={{ base: 'center', md: 'flex-start' }}>
         <Button onClick={handleLogout} colorScheme="red" variant="outline" size={{ base: "sm", md: "md" }}>
           Logout
         </Button>
@@ -369,49 +368,16 @@ export default function ManageProjectsPage() {
       {/* Create Project Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="xl" scrollBehavior="inside">
         <ModalOverlay />
-        <ModalContent maxW="800px" p={2} borderRadius="2xl">
+        <ModalContent maxW={{ base: '98vw', md: '800px' }} p={2} borderRadius="2xl">
           <ModalHeader bg="#003f2d" color="white" borderTopRadius="2xl" fontSize="2xl" fontWeight="bold">
             Create New Project
           </ModalHeader>
           <ModalCloseButton color="white" />
           
           <ModalBody py={6}>
-            <VStack spacing={0} align="stretch">
+            <VStack spacing={0} align="stretch" w="100%">
               {error && <Alert status="error" borderRadius="md"><AlertIcon />{error}</Alert>}
               {success && <Alert status="success" borderRadius="md"><AlertIcon />{success}</Alert>}
-              
-              <Box textAlign="center" mb={4}>
-                <Button
-                  colorScheme="blue"
-                  variant="outline"
-                  size="md"
-                  onClick={() => {
-                    // Pick the first customer for demo
-                    setSelectedCustomer(mockCustomers[0]);
-                    setFormData(prev => ({
-                      ...prev,
-                      projectName: 'Sample Project',
-                      description: 'This is a sample project for testing.',
-                      status: 'planned',
-                      startDate: '2024-07-01',
-                      endDate: '2024-07-15',
-                      priority: 'High',
-                      projectOwner: 'Alice Smith',
-                      client: 'Acme Corp',
-                      budget: '5000',
-                      category: 'internal',
-                      estimatedHours: '40',
-                    }));
-                  }}
-                  _hover={{
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 12px rgba(66, 153, 225, 0.3)'
-                  }}
-                  transition="all 0.2s ease-in-out"
-                >
-                  Generate Dummy Data
-                </Button>
-              </Box>
               
               {/* General Information */}
               <Box bg="white" borderRadius="xl" boxShadow="md" border="1px solid #e2e8f0" p={6} mb={6}>
@@ -452,7 +418,7 @@ export default function ManageProjectsPage() {
                     <Text fontSize="xs" color="gray.500" mt={1}>auto-generated</Text>
                   </FormControl>
                 </SimpleGrid>
-                <FormControl mb={4}>
+                <FormControl mb={4} w="100%">
                   <FormLabel fontSize="lg" fontWeight="medium" color="gray.700">Project Name</FormLabel>
                   <Input
                     value={formData.projectName}
@@ -464,9 +430,10 @@ export default function ManageProjectsPage() {
                     borderRadius="lg"
                     _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                     _hover={{ borderColor: '#14543a' }}
+                    w="100%"
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl w="100%">
                   <FormLabel fontSize="lg" fontWeight="medium" color="gray.700">Description</FormLabel>
                   <Textarea
                     value={formData.description}
@@ -479,6 +446,7 @@ export default function ManageProjectsPage() {
                     borderRadius="lg"
                     _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                     _hover={{ borderColor: '#14543a' }}
+                    w="100%"
                   />
                 </FormControl>
               </Box>
@@ -489,7 +457,7 @@ export default function ManageProjectsPage() {
                   <FaUser /> Customer Information
                 </Heading>
                 {/* Searchable Customer Selector */}
-                <FormControl mb={4} position="relative">
+                <FormControl mb={4} position="relative" w="100%">
                   <FormLabel fontSize="lg" fontWeight="medium" color="gray.700">Customer Name</FormLabel>
                   <Input
                     value={selectedCustomer ? selectedCustomer.name : customerQuery}
@@ -509,9 +477,18 @@ export default function ManageProjectsPage() {
                     _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                     _hover={{ borderColor: '#14543a' }}
                     autoComplete="off"
+                    w="100%"
                   />
+                  {/* Loading indicator */}
+                  {customerQuery && !selectedCustomer && customerSearchLoading && (
+                    <Box position="absolute" zIndex={10} bg="white" border="1px solid #e2e8f0" borderRadius="md" mt={1} w="100%" p={4} textAlign="center">
+                      <Spinner size="sm" mr={2} />
+                      Searching customers...
+                    </Box>
+                  )}
+                  
                   {/* Dropdown results */}
-                  {customerQuery && !selectedCustomer && customerResults.length > 0 && (
+                  {customerQuery && !selectedCustomer && !customerSearchLoading && customerResults.length > 0 && (
                     <Box position="absolute" zIndex={10} bg="white" border="1px solid #e2e8f0" borderRadius="md" mt={1} w="100%" boxShadow="lg" maxH="180px" overflowY="auto">
                       {customerResults.map(c => (
                         <Box
@@ -527,9 +504,17 @@ export default function ManageProjectsPage() {
                             setFormData(prev => ({ ...prev, client: c.name }));
                           }}
                         >
-                          {c.name}
+                          <Text fontWeight="medium">{c.name}</Text>
+                          {c.email && <Text fontSize="sm" color="gray.600">{c.email}</Text>}
                         </Box>
                       ))}
+                    </Box>
+                  )}
+                  
+                  {/* No results */}
+                  {customerQuery && !selectedCustomer && !customerSearchLoading && customerResults.length === 0 && (
+                    <Box position="absolute" zIndex={10} bg="white" border="1px solid #e2e8f0" borderRadius="md" mt={1} w="100%" p={4} textAlign="center" color="gray.500">
+                      No customers found
                     </Box>
                   )}
                 </FormControl>
@@ -538,41 +523,46 @@ export default function ManageProjectsPage() {
                   <Box mt={2}>
                     <FormControl mb={2}>
                       <FormLabel fontSize="md" color="gray.600">Email</FormLabel>
-                      <Input value={selectedCustomer.email} isReadOnly bg="gray.100" fontSize="md" />
+                      <Input value={selectedCustomer.email} isReadOnly bg="gray.100" fontSize="md" w="100%" />
                     </FormControl>
                     <FormControl mb={2}>
                       <FormLabel fontSize="md" color="gray.600">Mobile Number</FormLabel>
-                      <Input value={selectedCustomer.phone} isReadOnly bg="gray.100" fontSize="md" />
+                      <Input value={selectedCustomer.phone} isReadOnly bg="gray.100" fontSize="md" w="100%" />
                     </FormControl>
                     <Box borderWidth="2px" borderColor="gray.200" borderRadius="lg" p={4} bg="gray.50" mb={2}>
                       <Heading as="h3" size="sm" mb={3} color="#14543a" fontWeight="semibold">Address Information</Heading>
                       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                         <FormControl>
                           <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>Address Line 1</FormLabel>
-                          <Input value={selectedCustomer.address.line1 || ''} isReadOnly bg="gray.100" fontSize="md" />
+                          <Input value={selectedCustomer.address.line1 || ''} isReadOnly bg="gray.100" fontSize="md" w="100%" />
                         </FormControl>
                         <FormControl>
                           <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>Address Line 2</FormLabel>
-                          <Input value={selectedCustomer.address.line2 || ''} isReadOnly bg="gray.100" fontSize="md" />
+                          <Input value={selectedCustomer.address.line2 || ''} isReadOnly bg="gray.100" fontSize="md" w="100%" />
                         </FormControl>
                         <FormControl>
                           <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>Suburb / City</FormLabel>
-                          <Input value={selectedCustomer.address.city || ''} isReadOnly bg="gray.100" fontSize="md" />
+                          <Input value={selectedCustomer.address.city || ''} isReadOnly bg="gray.100" fontSize="md" w="100%" />
                         </FormControl>
                         <FormControl>
                           <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>Postal Code</FormLabel>
-                          <Input value={selectedCustomer.address.postalCode || ''} isReadOnly bg="gray.100" fontSize="md" />
+                          <Input value={selectedCustomer.address.postalCode || ''} isReadOnly bg="gray.100" fontSize="md" w="100%" />
                         </FormControl>
                         <FormControl>
                           <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>State</FormLabel>
-                          <Input value={selectedCustomer.address.state || ''} isReadOnly bg="gray.100" fontSize="md" />
+                          <Input value={selectedCustomer.address.state || ''} isReadOnly bg="gray.100" fontSize="md" w="100%" />
                         </FormControl>
                         <FormControl>
                           <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>Country</FormLabel>
-                          <Input value={selectedCustomer.address.country || ''} isReadOnly bg="gray.100" fontSize="md" />
+                          <Input value={selectedCustomer.address.country || ''} isReadOnly bg="gray.100" fontSize="md" w="100%" />
                         </FormControl>
                       </SimpleGrid>
                     </Box>
+                    {selectedCustomer && selectedCustomer.id && (
+                      <Text fontSize="sm" color="gray.400" mt={1}>
+                        Stripe ID: {selectedCustomer.id}
+                      </Text>
+                    )}
                   </Box>
                 )}
               </Box>
@@ -595,6 +585,7 @@ export default function ManageProjectsPage() {
                       borderRadius="lg"
                       _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                       _hover={{ borderColor: '#14543a' }}
+                      w="100%"
                     />
                   </FormControl>
                   <FormControl>
@@ -609,6 +600,7 @@ export default function ManageProjectsPage() {
                       borderRadius="lg"
                       _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                       _hover={{ borderColor: '#14543a' }}
+                      w="100%"
                     />
                   </FormControl>
                   <FormControl>
@@ -623,6 +615,7 @@ export default function ManageProjectsPage() {
                       borderRadius="lg"
                       _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                       _hover={{ borderColor: '#14543a' }}
+                      w="100%"
                     >
                       <option value="low">Low</option>
                       <option value="medium">Medium</option>
@@ -642,6 +635,7 @@ export default function ManageProjectsPage() {
                     borderRadius="lg"
                     _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                     _hover={{ borderColor: '#14543a' }}
+                    w="100%"
                   >
                     <option value="planned">Planned</option>
                     <option value="in-progress">In Progress</option>
@@ -669,6 +663,7 @@ export default function ManageProjectsPage() {
                       borderRadius="lg"
                       _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                       _hover={{ borderColor: '#14543a' }}
+                      w="100%"
                     />
                   </FormControl>
                   <FormControl>
@@ -684,6 +679,7 @@ export default function ManageProjectsPage() {
                       bg={selectedCustomer ? "gray.50" : "white"}
                       _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                       _hover={{ borderColor: '#14543a' }}
+                      w="100%"
                     />
                     {selectedCustomer && (
                       <Text fontSize="xs" color="gray.500" mt={1}>Auto-populated from selected customer</Text>
@@ -701,11 +697,10 @@ export default function ManageProjectsPage() {
                       borderRadius="lg"
                       _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                       _hover={{ borderColor: '#14543a' }}
+                      w="100%"
                     >
-                      <option value="internal">Internal</option>
-                      <option value="external">External</option>
-                      <option value="rnd">R&D</option>
-                      <option value="infrastructure">Infrastructure</option>
+                      <option value="residential">Residential</option>
+                      <option value="business">Business</option>
                     </Select>
                   </FormControl>
                 </SimpleGrid>
@@ -736,6 +731,7 @@ export default function ManageProjectsPage() {
                           borderRadius="lg"
                           _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                           _hover={{ borderColor: '#14543a' }}
+                          w="100%"
                         />
                       </NumberInput>
                     </InputGroup>
@@ -758,6 +754,7 @@ export default function ManageProjectsPage() {
                           borderRadius="lg"
                           _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                           _hover={{ borderColor: '#14543a' }}
+                          w="100%"
                         />
                       </NumberInput>
                       <InputRightAddon children="hrs" />

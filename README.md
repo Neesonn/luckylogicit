@@ -29,6 +29,8 @@ Lucky Logic provides comprehensive residential IT support and computer services 
 - **Product Catalogue Management** - Complete product inventory with Supabase backend
 - **Bulk Operations** - Multi-select and bulk delete functionality for customers
 - **Advanced Filtering & Search** - Sort, filter, and search customers by various criteria
+- **Mobile-Optimized Projects Management** - The /admin/manage-projects page is fully responsive: the projects table is horizontally scrollable on mobile, all forms and modals are full width, and controls/buttons are stacked or wrapped for easy use on any device.
+- **Fast, Responsive Customer Profile Modal** - The customer profile modal now loads projects and invoices in parallel, uses skeleton loaders, caches results per customer, and is visually optimized for both desktop and mobile, ensuring a smooth and fast experience.
 
 ### **Contact System**
 - **Formspree Integration** - Reliable, production-ready contact form
