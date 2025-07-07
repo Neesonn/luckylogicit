@@ -36,11 +36,20 @@ import {
   Select,
   CircularProgress,
   CircularProgressLabel,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  FormControl,
+  FormLabel,
 } from '@chakra-ui/react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowBackIcon, EditIcon, DeleteIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { useState, useEffect } from 'react';
+import { ArrowBackIcon, EditIcon, DeleteIcon, ChevronRightIcon, AddIcon } from '@chakra-ui/icons';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   FaInfoCircle, 
   FaRegCalendarAlt, 
@@ -63,8 +72,8 @@ import {
   FaPauseCircle
 } from 'react-icons/fa';
 
-// Mock project data (replace with real API call)
-const mockProjects = [
+// Default project data (fallback if localStorage is empty)
+const defaultProjects = [
   {
     code: 'LLPR-010',
     name: 'Demo Project',
@@ -82,10 +91,6 @@ const mockProjects = [
     category: 'internal',
     estimatedHours: 40,
     createdBy: 'Admin',
-    progress: 25,
-    tasksCompleted: 3,
-    totalTasks: 12,
-    budgetUsed: 1250,
     team: ['John Doe', 'Jane Smith', 'Mike Johnson'],
   },
   {
@@ -105,10 +110,6 @@ const mockProjects = [
     category: 'external',
     estimatedHours: 120,
     createdBy: 'Admin',
-    progress: 45,
-    tasksCompleted: 8,
-    totalTasks: 18,
-    budgetUsed: 6750,
     team: ['Jane Smith', 'Alex Brown', 'Sarah Wilson'],
   },
 ];
@@ -125,18 +126,61 @@ export default function ProjectDetailsPage() {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState('');
   const [progressAnimation, setProgressAnimation] = useState(0);
+  const [projectUpdates, setProjectUpdates] = useState<any[]>([]);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [newUpdateText, setNewUpdateText] = useState('');
+  const [addingUpdate, setAddingUpdate] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    status: 'planned',
+    priority: 'medium',
+    assignee: '',
+    dueDate: '',
+    estimatedHours: 0,
+    actualHours: 0
+  });
+  const [editingTask, setEditingTask] = useState<any>(null);
+  const [addingTask, setAddingTask] = useState(false);
+  const [editingTaskLoading, setEditingTaskLoading] = useState(false);
+  const [tasks, setTasks] = useState<any[]>([]);
 
   useEffect(() => {
-    // Simulate API call to fetch project details
+    // Fetch project details from localStorage
     const fetchProject = async () => {
       setLoading(true);
       try {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        const foundProject = mockProjects.find(p => p.code === projectCode);
+        // Get projects from localStorage
+        const savedProjects = localStorage.getItem('luckyLogicProjects');
+        let projects = defaultProjects;
+        
+        if (savedProjects) {
+          try {
+            projects = JSON.parse(savedProjects);
+          } catch (error) {
+            console.error('Error parsing saved projects:', error);
+            projects = defaultProjects;
+          }
+        }
+        
+        const foundProject = projects.find((p: any) => p.code === projectCode);
         if (foundProject) {
           setProject(foundProject);
+          
+          // Load project updates from localStorage if available
+          if ((foundProject as any).updates) {
+            setProjectUpdates((foundProject as any).updates);
+          }
+          
+          // Load tasks from localStorage if available
+          if ((foundProject as any).tasks) {
+            setTasks((foundProject as any).tasks);
+          }
         } else {
           setError('Project not found');
         }
@@ -205,7 +249,23 @@ export default function ProjectDetailsPage() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Update the project data
-      setProject({ ...editData });
+      const updatedProject = { ...editData };
+      setProject(updatedProject);
+      
+      // Update project in localStorage
+      const savedProjects = localStorage.getItem('luckyLogicProjects');
+      if (savedProjects) {
+        try {
+          const projects = JSON.parse(savedProjects);
+          const updatedProjects = projects.map((p: any) => 
+            p.code === projectCode ? updatedProject : p
+          );
+          localStorage.setItem('luckyLogicProjects', JSON.stringify(updatedProjects));
+        } catch (error) {
+          console.error('Error updating projects in localStorage:', error);
+        }
+      }
+      
       setIsEditing(false);
       setSaveSuccess('Project updated successfully!');
       
@@ -233,29 +293,261 @@ export default function ProjectDetailsPage() {
   };
 
   const getBudgetUsagePercentage = () => {
-    return Math.round((project.budgetUsed / project.budget) * 100);
+    if (!project || !project.budget) return 0;
+    // Calculate budget used from actual hours worked on tasks
+    const actualHours = tasks.reduce((total, task) => total + (task.actualHours || 0), 0);
+    const hourlyRate = project.budget / project.estimatedHours; // Calculate hourly rate
+    const budgetUsed = actualHours * hourlyRate;
+    return Math.round((budgetUsed / project.budget) * 100);
   };
 
   const getTaskCompletionPercentage = () => {
-    return Math.round((project.tasksCompleted / project.totalTasks) * 100);
+    if (!tasks || tasks.length === 0) return 0;
+    const completedTasks = tasks.filter(task => task.status === 'completed').length;
+    return Math.round((completedTasks / tasks.length) * 100);
   };
 
   const getTimeRemainingPercentage = () => {
-    // Calculate based on project duration (simplified)
-    const totalDays = 15; // This would be calculated from start/end dates
-    const remainingDays = 8;
+    if (!project || !project.startDate || !project.endDate) return 0;
+    
+    const startDate = new Date(project.startDate);
+    const endDate = new Date(project.endDate);
+    const today = new Date();
+    
+    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const elapsedDays = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const remainingDays = Math.max(0, totalDays - elapsedDays);
+    
     return Math.round(((totalDays - remainingDays) / totalDays) * 100);
+  };
+
+  const getProjectDuration = () => {
+    if (!project || !project.startDate || !project.endDate) return 'N/A';
+    
+    const startDate = new Date(project.startDate);
+    const endDate = new Date(project.endDate);
+    
+    // Calculate the difference in days (inclusive of both start and end dates)
+    const durationInDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    
+    return `${durationInDays} day${durationInDays !== 1 ? 's' : ''}`;
+  };
+
+  const getProjectProgress = () => {
+    if (!tasks || tasks.length === 0) return 0;
+    const completedTasks = tasks.filter(task => task.status === 'completed').length;
+    return Math.round((completedTasks / tasks.length) * 100);
   };
 
   // Animate progress bar on load
   useEffect(() => {
     if (project) {
       const timer = setTimeout(() => {
-        setProgressAnimation(project.progress);
+        setProgressAnimation(getProjectProgress());
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [project]);
+  }, [project, tasks]);
+
+  // Project update handlers
+  const handleAddUpdate = () => {
+    setIsUpdateModalOpen(true);
+  };
+
+  const handleSaveUpdate = async () => {
+    if (!newUpdateText.trim()) return;
+    
+    setAddingUpdate(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const newUpdate = {
+        id: Date.now(),
+        text: newUpdateText.trim(),
+        timestamp: new Date().toLocaleString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        }),
+        author: 'Current User' // This would be the logged-in user
+      };
+      
+      const updatedUpdates = [newUpdate, ...projectUpdates];
+      setProjectUpdates(updatedUpdates);
+      
+      // Save project updates to localStorage
+      const savedProjects = localStorage.getItem('luckyLogicProjects');
+      if (savedProjects) {
+        try {
+          const projects = JSON.parse(savedProjects);
+          const updatedProjects = projects.map((p: any) => 
+            p.code === projectCode ? { ...p, updates: updatedUpdates } : p
+          );
+          localStorage.setItem('luckyLogicProjects', JSON.stringify(updatedProjects));
+        } catch (error) {
+          console.error('Error saving project updates to localStorage:', error);
+        }
+      }
+      
+      setNewUpdateText('');
+      setIsUpdateModalOpen(false);
+    } catch (err) {
+      console.error('Failed to add update:', err);
+    } finally {
+      setAddingUpdate(false);
+    }
+  };
+
+  const handleCancelUpdate = () => {
+    setNewUpdateText('');
+    setIsUpdateModalOpen(false);
+  };
+
+  const handleAddTask = () => {
+    setIsTaskModalOpen(true);
+  };
+
+  const handleCancelTask = () => {
+    setNewTask({
+      title: '',
+      description: '',
+      status: 'planned',
+      priority: 'medium',
+      assignee: '',
+      dueDate: '',
+      estimatedHours: 0,
+      actualHours: 0
+    });
+    setIsTaskModalOpen(false);
+  };
+
+  const handleSaveTask = async () => {
+    if (!newTask.title.trim() || !newTask.description.trim() || !newTask.assignee.trim() || !newTask.dueDate) {
+      return;
+    }
+
+    setAddingTask(true);
+    
+    const taskToAdd = {
+      id: Date.now(), // Use timestamp for unique ID
+      ...newTask,
+      completedDate: newTask.status === 'completed' ? new Date().toISOString().split('T')[0] : null
+    };
+    
+    const updatedTasks = [...tasks, taskToAdd];
+    setTasks(updatedTasks);
+    
+    // Optimized localStorage update
+    try {
+      const savedProjects = localStorage.getItem('luckyLogicProjects');
+      if (savedProjects) {
+        const projects = JSON.parse(savedProjects);
+        const projectIndex = projects.findIndex((p: any) => p.code === projectCode);
+        if (projectIndex !== -1) {
+          projects[projectIndex] = { ...projects[projectIndex], tasks: updatedTasks };
+          localStorage.setItem('luckyLogicProjects', JSON.stringify(projects));
+        }
+      }
+    } catch (error) {
+      console.error('Error saving tasks to localStorage:', error);
+    }
+    
+    setAddingTask(false);
+    handleCancelTask();
+  };
+
+  const handleTaskInputChange = useCallback((field: string, value: any) => {
+    setNewTask(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  }, []);
+
+  const handleEditTask = (task: any) => {
+    setEditingTask(task);
+    setIsEditTaskModalOpen(true);
+  };
+
+  const handleCancelEditTask = () => {
+    setEditingTask(null);
+    setIsEditTaskModalOpen(false);
+  };
+
+  const handleSaveEditTask = async () => {
+    if (!editingTask.title.trim() || !editingTask.description.trim() || !editingTask.assignee.trim() || !editingTask.dueDate) {
+      return;
+    }
+
+    setEditingTaskLoading(true);
+    
+    const updatedTask = {
+      ...editingTask,
+      completedDate: editingTask.status === 'completed' ? new Date().toISOString().split('T')[0] : null
+    };
+    
+    const updatedTasks = tasks.map(task => 
+      task.id === editingTask.id ? updatedTask : task
+    );
+    setTasks(updatedTasks);
+    
+    // Optimized localStorage update
+    try {
+      const savedProjects = localStorage.getItem('luckyLogicProjects');
+      if (savedProjects) {
+        const projects = JSON.parse(savedProjects);
+        const projectIndex = projects.findIndex((p: any) => p.code === projectCode);
+        if (projectIndex !== -1) {
+          projects[projectIndex] = { ...projects[projectIndex], tasks: updatedTasks };
+          localStorage.setItem('luckyLogicProjects', JSON.stringify(projects));
+        }
+      }
+    } catch (error) {
+      console.error('Error saving updated tasks to localStorage:', error);
+    }
+    
+    setEditingTaskLoading(false);
+    handleCancelEditTask();
+  };
+
+  const handleEditTaskInputChange = useCallback((field: string, value: any) => {
+    setEditingTask((prev: any) => ({
+      ...prev,
+      [field]: value
+    }));
+  }, []);
+
+  // Task helper functions
+  const getTaskStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed': return 'green';
+      case 'in-progress': return 'orange';
+      case 'planned': return 'blue';
+      case 'blocked': return 'red';
+      default: return 'gray';
+    }
+  };
+
+  const getTaskPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'red';
+      case 'medium': return 'orange';
+      case 'low': return 'green';
+      default: return 'gray';
+    }
+  };
+
+  const getTaskProgress = (task: any) => {
+    if (task.status === 'completed') return 100;
+    if (task.status === 'planned') return 0;
+    if (task.status === 'in-progress') {
+      return Math.round((task.actualHours / task.estimatedHours) * 100);
+    }
+    return 0;
+  };
 
   if (loading) {
     return (
@@ -379,7 +671,7 @@ export default function ProjectDetailsPage() {
               </Flex>
               <Progress 
                 value={progressAnimation} 
-                colorScheme={getProgressColor(project.progress)} 
+                colorScheme={getProgressColor(getProjectProgress())} 
                 size="lg" 
                 borderRadius="full"
                 transition="all 1s ease-in-out"
@@ -423,7 +715,7 @@ export default function ProjectDetailsPage() {
                     </CircularProgressLabel>
                   </CircularProgress>
                   <Text color="#003f2d" fontSize="lg" fontWeight="bold" mb={1}>
-                    {project.tasksCompleted}/{project.totalTasks}
+                    {tasks.filter(task => task.status === 'completed').length}/{tasks.length}
                   </Text>
                   <Text color="gray.500" fontSize="sm">
                     {getTaskCompletionPercentage() >= 75 ? 'On track' : 
@@ -460,7 +752,12 @@ export default function ProjectDetailsPage() {
                     </CircularProgressLabel>
                   </CircularProgress>
                   <Text color="#003f2d" fontSize="lg" fontWeight="bold" mb={1}>
-                    ${project.budgetUsed.toLocaleString()}
+                    ${(() => {
+                      const actualHours = tasks.reduce((total, task) => total + (task.actualHours || 0), 0);
+                      const hourlyRate = project.budget / project.estimatedHours;
+                      const budgetUsed = actualHours * hourlyRate;
+                      return Math.round(budgetUsed).toLocaleString();
+                    })()}
                   </Text>
                   <Text color="gray.500" fontSize="sm">
                     ${project.budget.toLocaleString()} total
@@ -496,10 +793,31 @@ export default function ProjectDetailsPage() {
                     </CircularProgressLabel>
                   </CircularProgress>
                   <Text color="#003f2d" fontSize="lg" fontWeight="bold" mb={1}>
-                    8 days
+                    {(() => {
+                      if (!project || !project.startDate || !project.endDate) return 'N/A';
+                      const startDate = new Date(project.startDate);
+                      const endDate = new Date(project.endDate);
+                      const today = new Date();
+                      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                      const elapsedDays = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                      const remainingDays = Math.max(0, totalDays - elapsedDays);
+                      return `${remainingDays} days`;
+                    })()}
                   </Text>
                   <Text color="gray.500" fontSize="sm">
-                    On schedule
+                    {(() => {
+                      if (!project || !project.startDate || !project.endDate) return 'N/A';
+                      const startDate = new Date(project.startDate);
+                      const endDate = new Date(project.endDate);
+                      const today = new Date();
+                      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                      const elapsedDays = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                      const remainingDays = Math.max(0, totalDays - elapsedDays);
+                      const percentage = Math.round(((totalDays - remainingDays) / totalDays) * 100);
+                      if (percentage >= 75) return 'Behind schedule';
+                      if (percentage >= 50) return 'On schedule';
+                      return 'Ahead of schedule';
+                    })()}
                   </Text>
                 </Box>
                 
@@ -533,10 +851,10 @@ export default function ProjectDetailsPage() {
                     </CircularProgress>
                   </Box>
                   <Text color="#003f2d" fontSize="lg" fontWeight="bold" mb={1}>
-                    Active
+                    {project.team.length} Members
                   </Text>
                   <Text color="gray.500" fontSize="sm">
-                    Team size
+                    {project.team.length > 5 ? 'Large team' : project.team.length > 2 ? 'Medium team' : 'Small team'}
                   </Text>
                 </Box>
               </SimpleGrid>
@@ -757,7 +1075,7 @@ export default function ProjectDetailsPage() {
                         </Text>
                         <HStack>
                           <Icon as={FaHourglassHalf} color="#003f2d" />
-                          <Text fontSize="lg">15 days</Text>
+                          <Text fontSize="lg">{getProjectDuration()}</Text>
                         </HStack>
                       </Box>
                     </VStack>
@@ -850,8 +1168,213 @@ export default function ProjectDetailsPage() {
                   </CardBody>
                 </Card>
               </SimpleGrid>
-            </VStack>
-          </Box>
+
+              {/* Project Updates */}
+              <Card shadow="sm" border="1px solid" borderColor="gray.200">
+                <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
+                  <Flex justify="space-between" align="center">
+                    <HStack>
+                      <Icon as={FaTasks} color="#003f2d" boxSize={5} />
+                      <Heading size="md" color="#003f2d" fontWeight="bold">Project Updates</Heading>
+                    </HStack>
+                    <Button
+                      leftIcon={<AddIcon />}
+                      colorScheme="blue"
+                      size="sm"
+                      onClick={handleAddUpdate}
+                    >
+                      Add Update
+                    </Button>
+                  </Flex>
+                </CardHeader>
+                <CardBody py={6}>
+                  {projectUpdates.length > 0 ? (
+                    <VStack spacing={4} align="stretch">
+                      {projectUpdates.map((update) => (
+                        <Box
+                          key={update.id}
+                          p={4}
+                          bg="gray.50"
+                          borderRadius="lg"
+                          border="1px solid"
+                          borderColor="gray.200"
+                        >
+                          <Text fontSize="md" color="gray.700" mb={2}>
+                            {update.text}
+                          </Text>
+                          <HStack justify="space-between" align="center">
+                            <Text fontSize="sm" color="gray.500">
+                              {update.timestamp}
+                            </Text>
+                            <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                              {update.author}
+                            </Text>
+                          </HStack>
+                        </Box>
+                      ))}
+                    </VStack>
+                  ) : (
+                    <Box textAlign="center" py={8}>
+                      <Icon as={FaInfoCircle} color="gray.300" boxSize={12} mb={4} />
+                      <Text color="gray.500" fontSize="lg" fontWeight="medium" mb={2}>
+                        No updates yet
+                      </Text>
+                      <Text color="gray.400" fontSize="sm" mb={4}>
+                        Start tracking project progress by adding your first update.
+                      </Text>
+                      <Button
+                        leftIcon={<AddIcon />}
+                        colorScheme="blue"
+                        size="md"
+                        onClick={handleAddUpdate}
+                      >
+                        Add First Update
+                      </Button>
+                    </Box>
+                  )}
+                </CardBody>
+                              </Card>
+
+                {/* Tasks */}
+                <Card shadow="sm" border="1px solid" borderColor="gray.200">
+                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
+                    <Flex justify="space-between" align="center">
+                      <HStack>
+                        <Icon as={FaTasks} color="#003f2d" boxSize={5} />
+                        <Heading size="md" color="#003f2d" fontWeight="bold">Tasks</Heading>
+                      </HStack>
+                      <HStack spacing={2}>
+                        <Text fontSize="sm" color="gray.600">
+                          {tasks.filter(t => t.status === 'completed').length}/{tasks.length} completed
+                        </Text>
+                        <Button
+                          leftIcon={<AddIcon />}
+                          colorScheme="green"
+                          size="sm"
+                          onClick={handleAddTask}
+                        >
+                          Add Task
+                        </Button>
+                      </HStack>
+                    </Flex>
+                  </CardHeader>
+                  <CardBody py={6}>
+                    {tasks.length > 0 ? (
+                      <VStack spacing={4} align="stretch">
+                        {tasks.map((task) => (
+                          <Box
+                            key={task.id}
+                            p={4}
+                            bg="white"
+                            borderRadius="lg"
+                            border="1px solid"
+                            borderColor="gray.200"
+                            _hover={{ borderColor: '#14543a', boxShadow: 'sm' }}
+                            transition="all 0.2s"
+                          >
+                                                      <Flex justify="space-between" align="start" mb={3}>
+                            <Box flex="1">
+                              <HStack spacing={3} mb={2}>
+                                <Text fontSize="lg" fontWeight="semibold" color="gray.800">
+                                  {task.title}
+                                </Text>
+                                <Badge colorScheme={getTaskStatusColor(task.status)} size="sm">
+                                  {task.status.replace('-', ' ')}
+                                </Badge>
+                                <Badge colorScheme={getTaskPriorityColor(task.priority)} size="sm">
+                                  {task.priority}
+                                </Badge>
+                              </HStack>
+                              <Text fontSize="sm" color="gray.600" mb={3}>
+                                {task.description}
+                              </Text>
+                            </Box>
+                            <IconButton
+                              aria-label="Edit task"
+                              icon={<EditIcon />}
+                              size="sm"
+                              variant="ghost"
+                              colorScheme="blue"
+                              onClick={() => handleEditTask(task)}
+                              _hover={{ bg: 'blue.50' }}
+                            />
+                          </Flex>
+                            
+                            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4} mb={3}>
+                              <Box>
+                                <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">
+                                  Assignee
+                                </Text>
+                                <Text fontSize="sm" fontWeight="medium">{task.assignee}</Text>
+                              </Box>
+                              <Box>
+                                <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">
+                                  Due Date
+                                </Text>
+                                <Text fontSize="sm" fontWeight="medium">{task.dueDate}</Text>
+                              </Box>
+                              <Box>
+                                <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">
+                                  Hours
+                                </Text>
+                                <Text fontSize="sm" fontWeight="medium">
+                                  {task.actualHours}/{task.estimatedHours} hrs
+                                </Text>
+                              </Box>
+                            </SimpleGrid>
+
+                            {task.status === 'in-progress' && (
+                              <Box>
+                                <Flex justify="space-between" align="center" mb={2}>
+                                  <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wide">
+                                    Progress
+                                  </Text>
+                                  <Text fontSize="xs" color="gray.600">
+                                    {getTaskProgress(task)}%
+                                  </Text>
+                                </Flex>
+                                <Progress 
+                                  value={getTaskProgress(task)} 
+                                  colorScheme="green" 
+                                  size="sm" 
+                                  borderRadius="full"
+                                />
+                              </Box>
+                            )}
+
+                            {task.status === 'completed' && task.completedDate && (
+                              <Box>
+                                <Text fontSize="xs" color="green.600" fontWeight="medium">
+                                  ✓ Completed on {task.completedDate}
+                                </Text>
+                              </Box>
+                            )}
+                          </Box>
+                        ))}
+                      </VStack>
+                    ) : (
+                      <Box textAlign="center" py={8}>
+                        <Icon as={FaTasks} color="gray.300" boxSize={12} mb={4} />
+                        <Text color="gray.500" fontSize="lg" fontWeight="medium" mb={2}>
+                          No tasks yet
+                        </Text>
+                        <Text color="gray.400" fontSize="sm" mb={4}>
+                          Get started by creating your first task for this project.
+                        </Text>
+                        <Button
+                          leftIcon={<AddIcon />}
+                          colorScheme="green"
+                          size="md"
+                          onClick={handleAddTask}
+                        >
+                          Create First Task
+                        </Button>
+                      </Box>
+                    )}
+                  </CardBody>
+                </Card>
+              </VStack>
+            </Box>
 
           {/* Sidebar */}
           <Box>
@@ -944,7 +1467,13 @@ export default function ProjectDetailsPage() {
                 </CardHeader>
                 <CardBody py={6}>
                   <VStack spacing={3} align="stretch">
-                    <Button leftIcon={<EditIcon />} colorScheme="blue" variant="outline" size="md">
+                    <Button 
+                      leftIcon={<EditIcon />} 
+                      colorScheme="blue" 
+                      variant="outline" 
+                      size="md"
+                      onClick={handleEdit}
+                    >
                       Edit Project
                     </Button>
                     <Button leftIcon={<FaTasks />} colorScheme="green" variant="outline" size="md">
@@ -974,6 +1503,716 @@ export default function ProjectDetailsPage() {
           </Flex>
         </Container>
       </Box>
+
+      {/* Add Update Modal */}
+      <Modal isOpen={isUpdateModalOpen} onClose={handleCancelUpdate} size="md">
+        <ModalOverlay />
+        <ModalContent borderRadius="xl">
+          <ModalHeader bg="#003f2d" color="white" borderTopRadius="xl">
+            Add Project Update
+          </ModalHeader>
+          <ModalCloseButton color="white" />
+          
+          <ModalBody py={6}>
+            <VStack spacing={4}>
+              <FormControl>
+                <FormLabel fontSize="lg" fontWeight="medium" color="gray.700">
+                  Update Details
+                </FormLabel>
+                <Textarea
+                  value={newUpdateText}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewUpdateText(e.target.value)}
+                  placeholder="Enter project update details..."
+                  rows={4}
+                  fontSize="lg"
+                  borderWidth="2px"
+                  borderColor="gray.200"
+                  borderRadius="lg"
+                  _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
+                  _hover={{ borderColor: '#14543a' }}
+                />
+              </FormControl>
+            </VStack>
+          </ModalBody>
+
+          <ModalFooter bg="gray.50" borderBottomRadius="xl">
+            <HStack spacing={3}>
+              <Button
+                onClick={handleCancelUpdate}
+                variant="outline"
+                colorScheme="gray"
+                isDisabled={addingUpdate}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveUpdate}
+                colorScheme="blue"
+                isLoading={addingUpdate}
+                loadingText="Adding..."
+                isDisabled={!newUpdateText.trim()}
+              >
+                Add Update
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Add Task Modal */}
+      <Modal isOpen={isTaskModalOpen} onClose={handleCancelTask} size="xl">
+        <ModalOverlay />
+        <ModalContent 
+          borderRadius="xl" 
+          mx={4}
+          bg="white"
+          shadow="lg"
+        >
+          <ModalHeader 
+            bg="#003f2d" 
+            color="white" 
+            borderTopRadius="xl"
+            py={4}
+          >
+            <HStack spacing={3}>
+              <Icon as={FaTasks} boxSize={5} />
+              <Heading size="lg" fontWeight="bold">Create New Task</Heading>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton 
+            color="white" 
+            bg="whiteAlpha.200"
+            borderRadius="full"
+            _hover={{ bg: "whiteAlpha.300" }}
+            top={6}
+            right={6}
+          />
+          
+          <ModalBody py={6} px={6}>
+            <VStack spacing={6} align="stretch">
+              {/* Task Title */}
+              <Box>
+                                  <FormLabel fontSize="sm" fontWeight="medium" color="gray.700" mb={2}>
+                    Task Title *
+                  </FormLabel>
+                  <Input
+                    value={newTask.title}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTaskInputChange('title', e.target.value)}
+                    placeholder="Enter task title..."
+                    size="md"
+                    borderWidth="1px"
+                    borderColor="gray.300"
+                    borderRadius="md"
+                    _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 1px #14543a' }}
+                  />
+              </Box>
+
+              {/* Description */}
+              <Box>
+                <FormLabel 
+                  fontSize="sm" 
+                  fontWeight="bold" 
+                  color="gray.700" 
+                  textTransform="uppercase" 
+                  letterSpacing="wide"
+                  mb={3}
+                >
+                  Description *
+                </FormLabel>
+                <Textarea
+                  value={newTask.description}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleTaskInputChange('description', e.target.value)}
+                  placeholder="Provide detailed description of the task..."
+                  rows={4}
+                  size="lg"
+                  fontSize="md"
+                  borderWidth="2px"
+                  borderColor="gray.200"
+                  borderRadius="xl"
+                  bg="gray.50"
+                  resize="vertical"
+                  _focus={{ 
+                    borderColor: '#14543a', 
+                    boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                    bg: 'white' 
+                  }}
+                  _hover={{ borderColor: '#14543a', bg: 'white' }}
+                  _placeholder={{ color: 'gray.400' }}
+                />
+              </Box>
+
+              {/* Status and Priority */}
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+                <Box>
+                  <FormLabel 
+                    fontSize="sm" 
+                    fontWeight="bold" 
+                    color="gray.700" 
+                    textTransform="uppercase" 
+                    letterSpacing="wide"
+                    mb={3}
+                  >
+                    Status *
+                  </FormLabel>
+                  <Select
+                    value={newTask.status}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleTaskInputChange('status', e.target.value)}
+                    size="lg"
+                    fontSize="md"
+                    borderWidth="2px"
+                    borderColor="gray.200"
+                    borderRadius="xl"
+                    bg="gray.50"
+                    _focus={{ 
+                      borderColor: '#14543a', 
+                      boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                      bg: 'white' 
+                    }}
+                    _hover={{ borderColor: '#14543a', bg: 'white' }}
+                  >
+                    <option value="planned">📋 Planned</option>
+                    <option value="in-progress">🔄 In Progress</option>
+                    <option value="completed">✅ Completed</option>
+                    <option value="blocked">🚫 Blocked</option>
+                  </Select>
+                </Box>
+
+                <Box>
+                  <FormLabel 
+                    fontSize="sm" 
+                    fontWeight="bold" 
+                    color="gray.700" 
+                    textTransform="uppercase" 
+                    letterSpacing="wide"
+                    mb={3}
+                  >
+                    Priority *
+                  </FormLabel>
+                  <Select
+                    value={newTask.priority}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleTaskInputChange('priority', e.target.value)}
+                    size="lg"
+                    fontSize="md"
+                    borderWidth="2px"
+                    borderColor="gray.200"
+                    borderRadius="xl"
+                    bg="gray.50"
+                    _focus={{ 
+                      borderColor: '#14543a', 
+                      boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                      bg: 'white' 
+                    }}
+                    _hover={{ borderColor: '#14543a', bg: 'white' }}
+                  >
+                    <option value="low">🟢 Low</option>
+                    <option value="medium">🟡 Medium</option>
+                    <option value="high">🔴 High</option>
+                  </Select>
+                </Box>
+              </SimpleGrid>
+
+              {/* Assignee and Due Date */}
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+                <Box>
+                  <FormLabel 
+                    fontSize="sm" 
+                    fontWeight="bold" 
+                    color="gray.700" 
+                    textTransform="uppercase" 
+                    letterSpacing="wide"
+                    mb={3}
+                  >
+                    Assignee *
+                  </FormLabel>
+                  <Input
+                    value={newTask.assignee}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTaskInputChange('assignee', e.target.value)}
+                    placeholder="Enter team member name..."
+                    size="lg"
+                    fontSize="md"
+                    borderWidth="2px"
+                    borderColor="gray.200"
+                    borderRadius="xl"
+                    bg="gray.50"
+                    _focus={{ 
+                      borderColor: '#14543a', 
+                      boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                      bg: 'white' 
+                    }}
+                    _hover={{ borderColor: '#14543a', bg: 'white' }}
+                    _placeholder={{ color: 'gray.400' }}
+                  />
+                </Box>
+
+                <Box>
+                  <FormLabel 
+                    fontSize="sm" 
+                    fontWeight="bold" 
+                    color="gray.700" 
+                    textTransform="uppercase" 
+                    letterSpacing="wide"
+                    mb={3}
+                  >
+                    Due Date *
+                  </FormLabel>
+                  <Input
+                    type="date"
+                    value={newTask.dueDate}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTaskInputChange('dueDate', e.target.value)}
+                    size="lg"
+                    fontSize="md"
+                    borderWidth="2px"
+                    borderColor="gray.200"
+                    borderRadius="xl"
+                    bg="gray.50"
+                    _focus={{ 
+                      borderColor: '#14543a', 
+                      boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                      bg: 'white' 
+                    }}
+                    _hover={{ borderColor: '#14543a', bg: 'white' }}
+                  />
+                </Box>
+              </SimpleGrid>
+
+              {/* Hours Tracking */}
+              <Box>
+                <Text 
+                  fontSize="sm" 
+                  fontWeight="bold" 
+                  color="gray.700" 
+                  textTransform="uppercase" 
+                  letterSpacing="wide"
+                  mb={4}
+                >
+                  Time Tracking
+                </Text>
+                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+                  <Box>
+                    <FormLabel 
+                      fontSize="xs" 
+                      fontWeight="semibold" 
+                      color="gray.600"
+                      mb={2}
+                    >
+                      Estimated Hours
+                    </FormLabel>
+                    <Input
+                      type="number"
+                      value={newTask.estimatedHours}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTaskInputChange('estimatedHours', parseFloat(e.target.value) || 0)}
+                      placeholder="0"
+                      size="md"
+                      fontSize="md"
+                      borderWidth="2px"
+                      borderColor="gray.200"
+                      borderRadius="lg"
+                      bg="gray.50"
+                      _focus={{ 
+                        borderColor: '#14543a', 
+                        boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                        bg: 'white' 
+                      }}
+                      _hover={{ borderColor: '#14543a', bg: 'white' }}
+                      _placeholder={{ color: 'gray.400' }}
+                    />
+                  </Box>
+
+                  <Box>
+                    <FormLabel 
+                      fontSize="xs" 
+                      fontWeight="semibold" 
+                      color="gray.600"
+                      mb={2}
+                    >
+                      Actual Hours (if started)
+                    </FormLabel>
+                    <Input
+                      type="number"
+                      value={newTask.actualHours}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTaskInputChange('actualHours', parseFloat(e.target.value) || 0)}
+                      placeholder="0"
+                      size="md"
+                      fontSize="md"
+                      borderWidth="2px"
+                      borderColor="gray.200"
+                      borderRadius="lg"
+                      bg="gray.50"
+                      _focus={{ 
+                        borderColor: '#14543a', 
+                        boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                        bg: 'white' 
+                      }}
+                      _hover={{ borderColor: '#14543a', bg: 'white' }}
+                      _placeholder={{ color: 'gray.400' }}
+                    />
+                  </Box>
+                </SimpleGrid>
+              </Box>
+            </VStack>
+          </ModalBody>
+
+          <ModalFooter bg="gray.50" borderTop="1px solid" borderColor="gray.200">
+            <HStack spacing={3} w="full" justify="flex-end">
+              <Button
+                onClick={handleCancelTask}
+                variant="outline"
+                colorScheme="gray"
+                size="md"
+                isDisabled={addingTask}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveTask}
+                colorScheme="green"
+                size="md"
+                isLoading={addingTask}
+                loadingText="Creating..."
+                isDisabled={!newTask.title.trim() || !newTask.description.trim() || !newTask.assignee.trim() || !newTask.dueDate}
+              >
+                Create Task
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Edit Task Modal */}
+      <Modal isOpen={isEditTaskModalOpen} onClose={handleCancelEditTask} size="xl">
+        <ModalOverlay />
+        <ModalContent 
+          borderRadius="xl" 
+          mx={4}
+          bg="white"
+          shadow="lg"
+        >
+          <ModalHeader 
+            bg="#003f2d" 
+            color="white" 
+            borderTopRadius="xl"
+            py={4}
+          >
+            <HStack spacing={3}>
+              <Icon as={FaTasks} boxSize={5} />
+              <Heading size="lg" fontWeight="bold">Edit Task</Heading>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton 
+            color="white" 
+            bg="whiteAlpha.200"
+            borderRadius="full"
+            _hover={{ bg: "whiteAlpha.300" }}
+            top={6}
+            right={6}
+          />
+          
+          <ModalBody py={6} px={6}>
+            {editingTask && (
+              <VStack spacing={6} align="stretch">
+                {/* Task Title */}
+                <Box>
+                  <FormLabel 
+                    fontSize="sm" 
+                    fontWeight="bold" 
+                    color="gray.700" 
+                    textTransform="uppercase" 
+                    letterSpacing="wide"
+                    mb={3}
+                  >
+                    Task Title *
+                  </FormLabel>
+                  <Input
+                    value={editingTask.title}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEditTaskInputChange('title', e.target.value)}
+                    placeholder="Enter a descriptive task title..."
+                    size="lg"
+                    fontSize="md"
+                    borderWidth="2px"
+                    borderColor="gray.200"
+                    borderRadius="xl"
+                    bg="gray.50"
+                    _focus={{ 
+                      borderColor: '#14543a', 
+                      boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                      bg: 'white' 
+                    }}
+                    _hover={{ borderColor: '#14543a', bg: 'white' }}
+                    _placeholder={{ color: 'gray.400' }}
+                  />
+                </Box>
+
+                {/* Description */}
+                <Box>
+                  <FormLabel 
+                    fontSize="sm" 
+                    fontWeight="bold" 
+                    color="gray.700" 
+                    textTransform="uppercase" 
+                    letterSpacing="wide"
+                    mb={3}
+                  >
+                    Description *
+                  </FormLabel>
+                  <Textarea
+                    value={editingTask.description}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleEditTaskInputChange('description', e.target.value)}
+                    placeholder="Provide detailed description of the task..."
+                    rows={4}
+                    size="lg"
+                    fontSize="md"
+                    borderWidth="2px"
+                    borderColor="gray.200"
+                    borderRadius="xl"
+                    bg="gray.50"
+                    resize="vertical"
+                    _focus={{ 
+                      borderColor: '#14543a', 
+                      boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                      bg: 'white' 
+                    }}
+                    _hover={{ borderColor: '#14543a', bg: 'white' }}
+                    _placeholder={{ color: 'gray.400' }}
+                  />
+                </Box>
+
+                {/* Status and Priority */}
+                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+                  <Box>
+                    <FormLabel 
+                      fontSize="sm" 
+                      fontWeight="bold" 
+                      color="gray.700" 
+                      textTransform="uppercase" 
+                      letterSpacing="wide"
+                      mb={3}
+                    >
+                      Status *
+                    </FormLabel>
+                    <Select
+                      value={editingTask.status}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleEditTaskInputChange('status', e.target.value)}
+                      size="lg"
+                      fontSize="md"
+                      borderWidth="2px"
+                      borderColor="gray.200"
+                      borderRadius="xl"
+                      bg="gray.50"
+                      _focus={{ 
+                        borderColor: '#14543a', 
+                        boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                        bg: 'white' 
+                      }}
+                      _hover={{ borderColor: '#14543a', bg: 'white' }}
+                    >
+                      <option value="planned">📋 Planned</option>
+                      <option value="in-progress">🔄 In Progress</option>
+                      <option value="completed">✅ Completed</option>
+                      <option value="blocked">🚫 Blocked</option>
+                    </Select>
+                  </Box>
+
+                  <Box>
+                    <FormLabel 
+                      fontSize="sm" 
+                      fontWeight="bold" 
+                      color="gray.700" 
+                      textTransform="uppercase" 
+                      letterSpacing="wide"
+                      mb={3}
+                    >
+                      Priority *
+                    </FormLabel>
+                    <Select
+                      value={editingTask.priority}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleEditTaskInputChange('priority', e.target.value)}
+                      size="lg"
+                      fontSize="md"
+                      borderWidth="2px"
+                      borderColor="gray.200"
+                      borderRadius="xl"
+                      bg="gray.50"
+                      _focus={{ 
+                        borderColor: '#14543a', 
+                        boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                        bg: 'white' 
+                      }}
+                      _hover={{ borderColor: '#14543a', bg: 'white' }}
+                    >
+                      <option value="low">🟢 Low</option>
+                      <option value="medium">🟡 Medium</option>
+                      <option value="high">🔴 High</option>
+                    </Select>
+                  </Box>
+                </SimpleGrid>
+
+                {/* Assignee and Due Date */}
+                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+                  <Box>
+                    <FormLabel 
+                      fontSize="sm" 
+                      fontWeight="bold" 
+                      color="gray.700" 
+                      textTransform="uppercase" 
+                      letterSpacing="wide"
+                      mb={3}
+                    >
+                      Assignee *
+                    </FormLabel>
+                    <Input
+                      value={editingTask.assignee}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEditTaskInputChange('assignee', e.target.value)}
+                      placeholder="Enter team member name..."
+                      size="lg"
+                      fontSize="md"
+                      borderWidth="2px"
+                      borderColor="gray.200"
+                      borderRadius="xl"
+                      bg="gray.50"
+                      _focus={{ 
+                        borderColor: '#14543a', 
+                        boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                        bg: 'white' 
+                      }}
+                      _hover={{ borderColor: '#14543a', bg: 'white' }}
+                      _placeholder={{ color: 'gray.400' }}
+                    />
+                  </Box>
+
+                  <Box>
+                    <FormLabel 
+                      fontSize="sm" 
+                      fontWeight="bold" 
+                      color="gray.700" 
+                      textTransform="uppercase" 
+                      letterSpacing="wide"
+                      mb={3}
+                    >
+                      Due Date *
+                    </FormLabel>
+                    <Input
+                      type="date"
+                      value={editingTask.dueDate}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEditTaskInputChange('dueDate', e.target.value)}
+                      size="lg"
+                      fontSize="md"
+                      borderWidth="2px"
+                      borderColor="gray.200"
+                      borderRadius="xl"
+                      bg="gray.50"
+                      _focus={{ 
+                        borderColor: '#14543a', 
+                        boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                        bg: 'white' 
+                      }}
+                      _hover={{ borderColor: '#14543a', bg: 'white' }}
+                    />
+                  </Box>
+                </SimpleGrid>
+
+                {/* Hours Tracking */}
+                <Box>
+                  <Text 
+                    fontSize="sm" 
+                    fontWeight="bold" 
+                    color="gray.700" 
+                    textTransform="uppercase" 
+                    letterSpacing="wide"
+                    mb={4}
+                  >
+                    Time Tracking
+                  </Text>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+                    <Box>
+                      <FormLabel 
+                        fontSize="xs" 
+                        fontWeight="semibold" 
+                        color="gray.600"
+                        mb={2}
+                      >
+                        Estimated Hours
+                      </FormLabel>
+                      <Input
+                        type="number"
+                        value={editingTask.estimatedHours}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEditTaskInputChange('estimatedHours', parseFloat(e.target.value) || 0)}
+                        placeholder="0"
+                        size="md"
+                        fontSize="md"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        borderRadius="lg"
+                        bg="gray.50"
+                        _focus={{ 
+                          borderColor: '#14543a', 
+                          boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                          bg: 'white' 
+                        }}
+                        _hover={{ borderColor: '#14543a', bg: 'white' }}
+                        _placeholder={{ color: 'gray.400' }}
+                      />
+                    </Box>
+
+                    <Box>
+                      <FormLabel 
+                        fontSize="xs" 
+                        fontWeight="semibold" 
+                        color="gray.600"
+                        mb={2}
+                      >
+                        Actual Hours (if started)
+                      </FormLabel>
+                      <Input
+                        type="number"
+                        value={editingTask.actualHours}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEditTaskInputChange('actualHours', parseFloat(e.target.value) || 0)}
+                        placeholder="0"
+                        size="md"
+                        fontSize="md"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        borderRadius="lg"
+                        bg="gray.50"
+                        _focus={{ 
+                          borderColor: '#14543a', 
+                          boxShadow: '0 0 0 3px rgba(20, 84, 58, 0.1)', 
+                          bg: 'white' 
+                        }}
+                        _hover={{ borderColor: '#14543a', bg: 'white' }}
+                        _placeholder={{ color: 'gray.400' }}
+                      />
+                    </Box>
+                  </SimpleGrid>
+                </Box>
+              </VStack>
+            )}
+          </ModalBody>
+
+          <ModalFooter bg="gray.50" borderTop="1px solid" borderColor="gray.200">
+            <HStack spacing={3} w="full" justify="flex-end">
+              <Button
+                onClick={handleCancelEditTask}
+                variant="outline"
+                colorScheme="gray"
+                size="md"
+                isDisabled={editingTaskLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveEditTask}
+                colorScheme="blue"
+                size="md"
+                isLoading={editingTaskLoading}
+                loadingText="Updating..."
+                isDisabled={!editingTask?.title?.trim() || !editingTask?.description?.trim() || !editingTask?.assignee?.trim() || !editingTask?.dueDate}
+              >
+                Update Task
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 } 

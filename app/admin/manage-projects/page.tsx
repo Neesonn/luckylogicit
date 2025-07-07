@@ -126,10 +126,38 @@ export default function ManageProjectsPage() {
   const [selectedCustomer, setSelectedCustomer] = useState<typeof mockCustomers[0] | null>(null);
 
   // Place projects state here
-  const [projects, setProjects] = useState([
-    { code: 'LLPR-010', name: 'Demo Project', customer: 'Alice Smith', status: 'Planned', startDate: '2024-06-01', priority: 'High' },
-    { code: 'LLPR-011', name: 'Website Redesign', customer: 'Bob Johnson', status: 'In Progress', startDate: '2024-06-10', priority: 'Medium' },
-  ]);
+  const [projects, setProjects] = useState<any[]>([]);
+
+  // Load projects from localStorage on component mount
+  useEffect(() => {
+    const savedProjects = localStorage.getItem('luckyLogicProjects');
+    if (savedProjects) {
+      try {
+        const parsedProjects = JSON.parse(savedProjects);
+        setProjects(parsedProjects);
+      } catch (error) {
+        console.error('Error parsing saved projects:', error);
+        // Fallback to default projects if parsing fails
+        setProjects([
+          { code: 'LLPR-010', name: 'Demo Project', customer: 'Alice Smith', status: 'Planned', startDate: '2024-06-01', priority: 'High' },
+          { code: 'LLPR-011', name: 'Website Redesign', customer: 'Bob Johnson', status: 'In Progress', startDate: '2024-06-10', priority: 'Medium' },
+        ]);
+      }
+    } else {
+      // Initialize with default projects if no saved data
+      setProjects([
+        { code: 'LLPR-010', name: 'Demo Project', customer: 'Alice Smith', status: 'Planned', startDate: '2024-06-01', priority: 'High' },
+        { code: 'LLPR-011', name: 'Website Redesign', customer: 'Bob Johnson', status: 'In Progress', startDate: '2024-06-10', priority: 'Medium' },
+      ]);
+    }
+  }, []);
+
+  // Save projects to localStorage whenever projects state changes
+  useEffect(() => {
+    if (projects.length > 0) {
+      localStorage.setItem('luckyLogicProjects', JSON.stringify(projects));
+    }
+  }, [projects]);
 
   useEffect(() => {
     if (customerQuery.trim() === '') {
@@ -160,6 +188,16 @@ export default function ManageProjectsPage() {
     router.push('/');
   };
 
+  const clearAllProjects = () => {
+    if (window.confirm('Are you sure you want to clear all projects? This action cannot be undone.')) {
+      localStorage.removeItem('luckyLogicProjects');
+      setProjects([
+        { code: 'LLPR-010', name: 'Demo Project', customer: 'Alice Smith', status: 'Planned', startDate: '2024-06-01', priority: 'High' },
+        { code: 'LLPR-011', name: 'Website Redesign', customer: 'Bob Johnson', status: 'In Progress', startDate: '2024-06-10', priority: 'Medium' },
+      ]);
+    }
+  };
+
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
@@ -178,20 +216,35 @@ export default function ManageProjectsPage() {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
+      // Create full project object with all required fields
+      const newProject = {
+        code: formData.projectCode,
+        name: formData.projectName,
+        description: formData.description,
+        customer: selectedCustomer ? selectedCustomer.name : 'Unassigned',
+        customerEmail: selectedCustomer ? selectedCustomer.email : '',
+        customerPhone: selectedCustomer ? selectedCustomer.phone : '',
+        status: formData.status || 'Planned',
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        priority: formData.priority || 'Medium',
+        projectOwner: formData.projectOwner || 'Admin',
+        client: formData.client || 'Internal',
+        budget: Number(formData.budget) || 0,
+        category: formData.category || 'internal',
+        estimatedHours: Number(formData.estimatedHours) || 0,
+        createdBy: formData.createdBy,
+        progress: 0,
+        tasksCompleted: 0,
+        totalTasks: 0,
+        budgetUsed: 0,
+        team: [formData.projectOwner || 'Admin'],
+        tasks: [], // Empty tasks array for new projects
+        updates: [], // Empty updates array for new projects
+      };
+
       // Add new project to state
-      setProjects(prev => [
-        ...prev,
-        {
-          code: formData.projectCode,
-          name: formData.projectName,
-          customer: selectedCustomer ? selectedCustomer.name : '',
-          status: formData.status,
-          startDate: formData.startDate,
-          priority: formData.priority,
-          budget: Number(formData.budget),
-          estimatedHours: Number(formData.estimatedHours),
-        },
-      ]);
+      setProjects(prev => [...prev, newProject]);
       setSuccess('Project created successfully!');
       setTimeout(() => {
         onClose();
@@ -307,6 +360,9 @@ export default function ManageProjectsPage() {
         </Button>
         <Button as={Link} href="/admin" leftIcon={<ArrowBackIcon />} colorScheme="red" variant="outline" size={{ base: "sm", md: "md" }}>
           Back
+        </Button>
+        <Button onClick={clearAllProjects} colorScheme="orange" variant="outline" size={{ base: "sm", md: "md" }}>
+          Clear All Projects
         </Button>
       </HStack>
 
@@ -440,6 +496,10 @@ export default function ManageProjectsPage() {
                     onChange={e => {
                       setCustomerQuery(e.target.value);
                       setSelectedCustomer(null);
+                      // Clear the client field when customer selection is cleared
+                      if (!e.target.value) {
+                        setFormData(prev => ({ ...prev, client: '' }));
+                      }
                     }}
                     placeholder="Search for customer name..."
                     fontSize="lg"
@@ -463,6 +523,8 @@ export default function ManageProjectsPage() {
                           onClick={() => {
                             setSelectedCustomer(c);
                             setCustomerQuery('');
+                            // Auto-populate the client field with the customer name
+                            setFormData(prev => ({ ...prev, client: c.name }));
                           }}
                         >
                           {c.name}
@@ -614,14 +676,18 @@ export default function ManageProjectsPage() {
                     <Input
                       value={formData.client}
                       onChange={(e) => handleInputChange('client', e.target.value)}
-                      placeholder="Enter client name"
+                      placeholder={selectedCustomer ? "Auto-populated from customer" : "Enter client name"}
                       fontSize="lg"
                       borderWidth="2px"
-                      borderColor="gray.200"
+                      borderColor={selectedCustomer ? "gray.300" : "gray.200"}
                       borderRadius="lg"
+                      bg={selectedCustomer ? "gray.50" : "white"}
                       _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                       _hover={{ borderColor: '#14543a' }}
                     />
+                    {selectedCustomer && (
+                      <Text fontSize="xs" color="gray.500" mt={1}>Auto-populated from selected customer</Text>
+                    )}
                   </FormControl>
                   <FormControl>
                     <FormLabel fontSize="lg" fontWeight="medium" color="gray.700">Category/Type</FormLabel>
