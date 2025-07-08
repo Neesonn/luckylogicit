@@ -52,6 +52,10 @@ import {
   Checkbox,
   useToast,
   Link as ChakraLink,
+  Table,
+  Tbody,
+  Tr,
+  Td,
 } from '@chakra-ui/react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -1565,107 +1569,184 @@ export default function ProjectDetailsPage() {
                 {/* Quotes & Billings */}
                 <Card shadow="sm" border="1px solid" borderColor="gray.200">
                   <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
-                    <HStack justify="space-between">
-                      <HStack>
-                        <Icon as={FaDollarSign} color="#003f2d" boxSize={5} />
-                        <Heading size="md" color="#003f2d" fontWeight="bold">Quotes & Billings</Heading>
-                      </HStack>
-                      <IconButton
-                        aria-label={showQuotes ? 'Collapse' : 'Expand'}
-                        icon={showQuotes ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setShowQuotes((v) => !v)}
-                      />
+                    <HStack>
+                      <Icon as={FaDollarSign} color="#003f2d" boxSize={5} />
+                      <Heading size="md" color="#003f2d" fontWeight="bold">Quotes & Billings</Heading>
                     </HStack>
                   </CardHeader>
-                  {showQuotes && (
-                    <CardBody py={6}>
-                      <VStack align="stretch" spacing={4}>
-                        {/* Dropdown to select a quote for this customer */}
-                        <HStack>
-                          <Select
-                            placeholder={fetchingQuotes ? 'Loading quotes...' : 'Select a quote to link'}
-                            value={selectedQuoteId}
-                            onChange={e => setSelectedQuoteId(e.target.value)}
-                            isDisabled={fetchingQuotes || customerQuotes.length === 0}
-                            size="md"
-                          >
-                            {customerQuotes.map((quote: any) => {
-                              const alreadyLinked = Array.isArray(project.linkedQuotes) && project.linkedQuotes.some((q: any) => q.quoteId === quote.id);
+                  <CardBody py={6}>
+                    <VStack align="stretch" spacing={4}>
+                      {/* Dropdown to select a quote for this customer */}
+                      <HStack>
+                        <Select
+                          placeholder={fetchingQuotes ? 'Loading quotes...' : 'Select a quote to link'}
+                          value={selectedQuoteId}
+                          onChange={e => setSelectedQuoteId(e.target.value)}
+                          isDisabled={fetchingQuotes || customerQuotes.length === 0}
+                          size="md"
+                        >
+                          {customerQuotes.map((quote: any) => {
+                            const alreadyLinked = Array.isArray(project.linkedQuotes) && project.linkedQuotes.some((q: any) => q.quoteId === quote.id);
+                            return (
+                              <option key={quote.id} value={quote.id} disabled={alreadyLinked}>
+                                {quote.number || quote.id} {quote.amount ? `- $${quote.amount}` : ''} {alreadyLinked ? '(Linked)' : ''}
+                              </option>
+                            );
+                          })}
+                        </Select>
+                        <Button
+                          leftIcon={<LinkIcon />}
+                          colorScheme="green"
+                          size="md"
+                          isDisabled={!selectedQuoteId || linkingQuoteId === selectedQuoteId || (Array.isArray(project.linkedQuotes) && project.linkedQuotes.some((q: any) => q.quoteId === selectedQuoteId))}
+                          isLoading={linkingQuoteId === selectedQuoteId}
+                          onClick={async () => {
+                            setLinkingQuoteId(selectedQuoteId);
+                            const quote = customerQuotes.find((q: any) => q.id === selectedQuoteId);
+                            try {
+                              const newLinked = Array.isArray(project.linkedQuotes) ? [...project.linkedQuotes] : [];
+                              newLinked.push({ 
+                                quoteId: quote.id, 
+                                quoteNumber: quote.number,
+                                amount: quote.amount,
+                                status: quote.status,
+                                created: quote.created,
+                                lines: quote.lines // Save line items (product/price/description/amount/quantity)
+                              });
+                              // Persist to backend
+                              await fetch(`/api/projects/${projectCode}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ linkedQuotes: newLinked })
+                              });
+                              // Update local state
+                              setProject((prev: any) => ({ ...prev, linkedQuotes: newLinked }));
+                              toast({
+                                title: 'Quote linked',
+                                description: `Quote ${quote.number || quote.id} linked to this project.`,
+                                status: 'success',
+                                duration: 4000,
+                                isClosable: true,
+                                position: 'top-right',
+                                variant: 'solid',
+                              });
+                              setSelectedQuoteId('');
+                            } catch (err) {
+                              toast({
+                                title: 'Failed to link quote',
+                                status: 'error',
+                                duration: 4000,
+                                isClosable: true,
+                                position: 'top-right',
+                                variant: 'solid',
+                              });
+                            } finally {
+                              setLinkingQuoteId(null);
+                            }
+                          }}
+                        >
+                          Link
+                        </Button>
+                      </HStack>
+                      {/* Linked quotes */}
+                      <Box>
+                        <Text fontWeight="semibold" mb={2}>Linked Quotes:</Text>
+                        {Array.isArray(project.linkedQuotes) && project.linkedQuotes.length > 0 ? (
+                          <VStack align="stretch" spacing={2}>
+                            {project.linkedQuotes.map((q: any, idx: number) => {
+                              const quoteTotal = Array.isArray(q.lines)
+                                ? q.lines.reduce((sum: number, line: any) => sum + (typeof line.amount_total === 'number' ? line.amount_total : 0), 0)
+                                : 0;
                               return (
-                                <option key={quote.id} value={quote.id} disabled={alreadyLinked}>
-                                  {quote.number || quote.id} {quote.amount ? `- $${quote.amount}` : ''} {alreadyLinked ? '(Linked)' : ''}
-                                </option>
+                                <Box
+                                  key={q.quoteId}
+                                  bg="white"
+                                  borderRadius="lg"
+                                  boxShadow="sm"
+                                  p={5}
+                                  mb={4}
+                                  border="1px solid"
+                                  borderColor="gray.200"
+                                  _hover={{ boxShadow: "md", borderColor: "green.300" }}
+                                  transition="box-shadow 0.2s, border-color 0.2s"
+                                >
+                                  <HStack justify="space-between" align="start" mb={2}>
+                                    <Box>
+                                      <Text fontWeight="bold" fontSize="lg" color="green.800" letterSpacing="wide">
+                                        {q.quoteNumber || q.quoteId}
+                                      </Text>
+                                      <Text fontSize="sm" color="gray.500" mt={1}>
+                                        {q.status && <Badge colorScheme={q.status === 'open' ? 'green' : 'gray'} mr={2}>{q.status}</Badge>}
+                                        {q.created && <>• {new Date(q.created * 1000).toLocaleDateString()}</>}
+                                      </Text>
+                                    </Box>
+                                    <HStack spacing={2}>
+                                      <Button size="sm" colorScheme="red" variant="ghost" onClick={async () => {
+                                        const newLinked = project.linkedQuotes.filter((lq: any) => lq.quoteId !== q.quoteId);
+                                        await fetch(`/api/projects/${projectCode}`, {
+                                          method: 'PUT',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({ linkedQuotes: newLinked })
+                                        });
+                                        setProject((prev: any) => ({ ...prev, linkedQuotes: newLinked }));
+                                        toast({
+                                          title: 'Quote unlinked',
+                                          description: `Quote ${q.quoteNumber || q.quoteId} unlinked from this project.`,
+                                          status: 'info',
+                                          duration: 4000,
+                                          isClosable: true,
+                                          position: 'top-right',
+                                          variant: 'subtle',
+                                        });
+                                      }}>
+                                        Unlink
+                                      </Button>
+                                    </HStack>
+                                  </HStack>
+                                  <Divider mb={3} />
+                                  {Array.isArray(q.lines) && q.lines.length > 0 && (
+                                    <Box>
+                                      <Table size="sm" variant="simple" mb={2}>
+                                        <Tbody>
+                                          {q.lines.map((line: any, idx: number) => (
+                                            <Tr key={idx} _hover={{ bg: "gray.50" }}>
+                                              <Td fontWeight="medium" color="gray.800" border="none">
+                                                {line.description}
+                                              </Td>
+                                              <Td color="gray.600" border="none" textAlign="right">
+                                                {line.quantity && `x${line.quantity}`}
+                                              </Td>
+                                              <Td color="gray.600" border="none" textAlign="right">
+                                                {typeof line.unit_amount === 'number' && (
+                                                  <>@ ${(line.unit_amount / 100).toFixed(2)}</>
+                                                )}
+                                              </Td>
+                                              <Td color="gray.900" border="none" textAlign="right">
+                                                {typeof line.amount_total === 'number' && (
+                                                  <b>${(line.amount_total / 100).toFixed(2)}</b>
+                                                )}
+                                              </Td>
+                                            </Tr>
+                                          ))}
+                                        </Tbody>
+                                      </Table>
+                                      <Flex justify="flex-end">
+                                        <Text fontWeight="bold" color="green.700" fontSize="md">
+                                          Quote Total: ${(quoteTotal / 100).toFixed(2)}
+                                        </Text>
+                                      </Flex>
+                                    </Box>
+                                  )}
+                                </Box>
                               );
                             })}
-                          </Select>
-                          <Button
-                            leftIcon={<LinkIcon />}
-                            colorScheme="green"
-                            size="md"
-                            isDisabled={!selectedQuoteId || linkingQuoteId === selectedQuoteId || (Array.isArray(project.linkedQuotes) && project.linkedQuotes.some((q: any) => q.quoteId === selectedQuoteId))}
-                            isLoading={linkingQuoteId === selectedQuoteId}
-                            onClick={async () => {
-                              setLinkingQuoteId(selectedQuoteId);
-                              const quote = customerQuotes.find((q: any) => q.id === selectedQuoteId);
-                              try {
-                                const newLinked = Array.isArray(project.linkedQuotes) ? [...project.linkedQuotes] : [];
-                                newLinked.push({ quoteId: quote.id, quoteNumber: quote.number });
-                                // Persist to backend
-                                await fetch(`/api/projects/${projectCode}`, {
-                                  method: 'PUT',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ linkedQuotes: newLinked })
-                                });
-                                // Update local state
-                                setProject((prev: any) => ({ ...prev, linkedQuotes: newLinked }));
-                                toast({
-                                  title: 'Quote linked',
-                                  description: `Quote ${quote.number || quote.id} linked to this project.`,
-                                  status: 'success',
-                                  duration: 4000,
-                                  isClosable: true,
-                                  position: 'top-right',
-                                  variant: 'solid',
-                                });
-                                setSelectedQuoteId('');
-                              } catch (err) {
-                                toast({
-                                  title: 'Failed to link quote',
-                                  status: 'error',
-                                  duration: 4000,
-                                  isClosable: true,
-                                  position: 'top-right',
-                                  variant: 'solid',
-                                });
-                              } finally {
-                                setLinkingQuoteId(null);
-                              }
-                            }}
-                          >
-                            Link
-                          </Button>
-                        </HStack>
-                        {/* Linked quotes */}
-                        <Box>
-                          <Text fontWeight="semibold" mb={2}>Linked Quotes:</Text>
-                          {Array.isArray(project.linkedQuotes) && project.linkedQuotes.length > 0 ? (
-                            <VStack align="stretch" spacing={2}>
-                              {project.linkedQuotes.map((q: any) => (
-                                <HStack key={q.quoteId} justify="space-between" bg="gray.50" borderRadius="md" px={2} py={1}>
-                                  <Text fontWeight="medium">{q.quoteNumber || q.quoteId}</Text>
-                                  <Button as={Link} href={`/admin/quotes/${q.quoteId}`} size="xs" colorScheme="teal" variant="outline">View</Button>
-                                </HStack>
-                              ))}
-                            </VStack>
-                          ) : (
-                            <Text color="gray.400" fontSize="sm">No quotes linked to this project.</Text>
-                          )}
-                        </Box>
-                      </VStack>
-                    </CardBody>
-                  )}
+                          </VStack>
+                        ) : (
+                          <Text color="gray.400" fontSize="sm">No quotes linked to this project.</Text>
+                        )}
+                      </Box>
+                    </VStack>
+                  </CardBody>
                 </Card>
 
               {/* Timeline & Resources */}
@@ -2266,7 +2347,44 @@ export default function ProjectDetailsPage() {
                 </CardHeader>
                 {showQuotes && (
                   <CardBody py={6}>
-                    {/* Empty for now */}
+                    {Array.isArray(project.linkedQuotes) && project.linkedQuotes.length > 0 ? (
+                      <VStack align="stretch" spacing={3}>
+                        <HStack justify="space-between">
+                          <Text fontWeight="semibold" color="gray.700">Linked Quotes</Text>
+                          <Badge colorScheme="green">{project.linkedQuotes.length}</Badge>
+                        </HStack>
+                        <Divider />
+                        {/* Calculate grand total of all quotes */}
+                        {(() => {
+                          const grandTotal = project.linkedQuotes.reduce((sum: number, q: any) => {
+                            const quoteTotal = Array.isArray(q.lines)
+                              ? q.lines.reduce((s: number, l: any) => s + (typeof l.amount_total === 'number' ? l.amount_total : 0), 0)
+                              : 0;
+                            return sum + quoteTotal;
+                          }, 0);
+                          return (
+                            <Text fontWeight="bold" color="green.700" fontSize="md" mb={2}>
+                              Total Value: A${(grandTotal / 100).toFixed(2)} inc GST
+                            </Text>
+                          );
+                        })()}
+                        <VStack align="stretch" spacing={1}>
+                          {project.linkedQuotes.map((q: any, idx: number) => {
+                            const quoteTotal = Array.isArray(q.lines)
+                              ? q.lines.reduce((sum: number, l: any) => sum + (typeof l.amount_total === 'number' ? l.amount_total : 0), 0)
+                              : 0;
+                            return (
+                              <HStack key={q.quoteId} justify="space-between" bg="gray.50" borderRadius="md" px={2} py={1}>
+                                <Text fontWeight="medium" color="gray.800">{q.quoteNumber || q.quoteId}</Text>
+                                <Text color="green.700" fontWeight="bold">${(quoteTotal / 100).toFixed(2)}</Text>
+                              </HStack>
+                            );
+                          })}
+                        </VStack>
+                      </VStack>
+                    ) : (
+                      <Text color="gray.400" fontSize="sm">No quotes linked to this project.</Text>
+                    )}
                   </CardBody>
                 )}
               </Card>

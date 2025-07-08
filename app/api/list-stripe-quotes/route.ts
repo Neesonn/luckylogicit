@@ -39,8 +39,11 @@ export async function GET(req: NextRequest) {
           const lineRes = await stripe.quotes.listLineItems(quote.id as string, { limit: 100 });
           lines = lineRes.data.map(item => ({
             description: item.description,
-            amount: (item as any).amount,
+            amount_total: item.amount_total,
+            unit_amount: item.price?.unit_amount,
             quantity: item.quantity,
+            product: item.price?.product,
+            price_id: item.price?.id,
           }));
         } catch {}
       }
