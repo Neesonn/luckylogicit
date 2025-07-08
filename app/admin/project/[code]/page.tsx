@@ -212,6 +212,12 @@ export default function ProjectDetailsPage() {
   const [history, setHistory] = useState<any[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyLimit, setHistoryLimit] = useState(5);
+  
+  // Public token management
+  const [publicToken, setPublicToken] = useState<string | null>(null);
+  const [isPublicTokenModalOpen, setIsPublicTokenModalOpen] = useState(false);
+  const [generatingToken, setGeneratingToken] = useState(false);
+  const [revokingToken, setRevokingToken] = useState(false);
   const [expandedTasks, setExpandedTasks] = useState<string[]>([]); // store expanded task ids
   const tasksSectionRef = useRef<HTMLDivElement>(null);
   // At the top, after other refs:
@@ -261,6 +267,9 @@ export default function ProjectDetailsPage() {
         
         if (foundProject) {
           setProject(foundProject);
+          
+          // Set public token if available
+          setPublicToken(foundProject.public_token || null);
           
           // Load project updates if available, initialize as empty array if not
           if (foundProject.updates && Array.isArray(foundProject.updates)) {
@@ -469,6 +478,85 @@ export default function ProjectDetailsPage() {
       return () => clearTimeout(timer);
     }
   }, [project, tasks]);
+
+  // Public token management functions
+  const generatePublicToken = async () => {
+    setGeneratingToken(true);
+    try {
+      const response = await fetch(`/api/projects/${projectCode}/public-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        const shareUrl = `${window.location.origin}/project/public/${data.publicToken}`;
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          toast({
+            title: 'Public link created!',
+            description: 'The link has been copied to your clipboard.',
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+          });
+        });
+        
+        setPublicToken(data.publicToken);
+        setIsPublicTokenModalOpen(false);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to generate public link',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setGeneratingToken(false);
+    }
+  };
+
+  const revokePublicToken = async () => {
+    setRevokingToken(true);
+    try {
+      const response = await fetch(`/api/projects/${projectCode}/public-token`, {
+        method: 'DELETE',
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setPublicToken(null);
+        toast({
+          title: 'Public access revoked!',
+          description: 'The public link has been disabled.',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to revoke public access',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setRevokingToken(false);
+    }
+  };
 
   // Project update handlers
   const handleAddUpdate = () => {
@@ -1160,6 +1248,15 @@ export default function ProjectDetailsPage() {
             </VStack>
             
             <HStack spacing={3}>
+              <Button 
+                onClick={() => setIsPublicTokenModalOpen(true)}
+                colorScheme={publicToken ? "orange" : "blue"}
+                variant="outline"
+                leftIcon={<LinkIcon />}
+                size="md"
+              >
+                {publicToken ? "Manage Public Link" : "Generate Public Link"}
+              </Button>
               <Button as={Link} href="/admin/manage-projects" leftIcon={<ArrowBackIcon />} variant="outline" size="md">
                 Back
               </Button>
@@ -3690,6 +3787,94 @@ export default function ProjectDetailsPage() {
               </Box>
             </Flex>
           </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      {/* Public Token Modal */}
+      <Modal isOpen={isPublicTokenModalOpen} onClose={() => setIsPublicTokenModalOpen(false)} size="md">
+        <ModalOverlay />
+        <ModalContent borderRadius="xl" mx={4} bg="white" shadow="lg">
+          <ModalHeader bg="#003f2d" color="white" borderTopRadius="xl" py={4}>
+            <HStack spacing={3}>
+              <Icon as={FaInfoCircle} boxSize={5} />
+              <Heading size="lg" fontWeight="bold">
+                {publicToken ? "Manage Public Link" : "Generate Public Link"}
+              </Heading>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton 
+            color="white" 
+            bg="whiteAlpha.200"
+            borderRadius="full"
+            _hover={{ bg: "whiteAlpha.300" }}
+            top={6}
+            right={6}
+          />
+          <ModalBody py={6}>
+            <VStack spacing={4} align="stretch">
+              {publicToken ? (
+                <Box>
+                  <Text fontWeight="semibold" color="gray.700" mb={2}>
+                    Public Link Active
+                  </Text>
+                  <Text fontSize="sm" color="gray.600" mb={4}>
+                    This project is currently accessible via a public link. You can revoke access at any time.
+                  </Text>
+                  <Box p={3} bg="gray.50" borderRadius="md" border="1px solid" borderColor="gray.200">
+                    <Text fontSize="sm" fontFamily="mono" wordBreak="break-all">
+                      {`${window.location.origin}/project/public/${publicToken}`}
+                    </Text>
+                  </Box>
+                </Box>
+              ) : (
+                <Box>
+                  <Text fontWeight="semibold" color="gray.700" mb={2}>
+                    Generate Public Link
+                  </Text>
+                  <Text fontSize="sm" color="gray.600" mb={4}>
+                    Create a secure public link to share this project with others. The link will provide read-only access to project information.
+                  </Text>
+                  <Alert status="info" borderRadius="lg">
+                    <AlertIcon />
+                    <Text fontSize="sm">
+                      Only whitelisted fields will be visible in the public view. Sensitive information will be hidden.
+                    </Text>
+                  </Alert>
+                </Box>
+              )}
+            </VStack>
+          </ModalBody>
+          <ModalFooter py={4}>
+            <HStack spacing={3}>
+              <Button 
+                onClick={() => setIsPublicTokenModalOpen(false)} 
+                variant="outline"
+              >
+                Cancel
+              </Button>
+              {publicToken ? (
+                <Button 
+                  onClick={revokePublicToken}
+                  colorScheme="red"
+                  isLoading={revokingToken}
+                  loadingText="Revoking..."
+                >
+                  Revoke Access
+                </Button>
+              ) : (
+                <Button 
+                  onClick={generatePublicToken}
+                  bg="#003f2d" 
+                  color="white"
+                  _hover={{ bg: '#14543a' }}
+                  isLoading={generatingToken}
+                  loadingText="Generating..."
+                >
+                  Generate Link
+                </Button>
+              )}
+            </HStack>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </Box>

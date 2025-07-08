@@ -96,6 +96,4 @@ export async function POST(request: NextRequest) {
       error: error.message || 'Failed to create project' 
     }, { status: 400 });
   }
-}
-
- 
+} 
