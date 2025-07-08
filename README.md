@@ -31,6 +31,8 @@ Lucky Logic provides comprehensive residential IT support and computer services 
 - **Advanced Filtering & Search** - Sort, filter, and search customers by various criteria
 - **Mobile-Optimized Projects Management** - The /admin/manage-projects page is fully responsive: the projects table is horizontally scrollable on mobile, all forms and modals are full width, and controls/buttons are stacked or wrapped for easy use on any device.
 - **Fast, Responsive Customer Profile Modal** - The customer profile modal now loads projects and invoices in parallel, uses skeleton loaders, caches results per customer, and is visually optimized for both desktop and mobile, ensuring a smooth and fast experience.
+- **Sticky Action Bar** - Persistent, modern action bar at the bottom of project pages, now with a red hamburger menu for additional actions like cloning.
+- **Clone Tasks Feature** - Easily select and clone tasks from one project to another, with a user-friendly modal and full change history tracking.
 
 ### **Contact System**
 - **Formspree Integration** - Reliable, production-ready contact form
@@ -377,6 +379,13 @@ This project is proprietary and confidential. All rights reserved by Lucky Logic
 - **Troubleshooting Guide**: Modern, accessible, and mobile-friendly. Includes robust search, swipeable accordion on mobile, contextual tips, and step completion with ARIA/keyboard support. Legal disclaimer is now in the Terms under 'Use of Website'.
 - **Cookie Banner**: Now links to Privacy Policy, Cookie Policy, and Terms & Conditions for full compliance.
 - **Legal**: Disclaimer about troubleshooting guides is clearly stated in the Terms & Conditions (see 'Use of Website' section).
+
+### 🆕 Clone Tasks, Sticky Action Bar, and Change History
+
+- **Sticky Action Bar**: Now includes a modern red hamburger ("Other") menu with a "Clone" option, styled to match the action buttons.
+- **Clone Tasks Modal**: Lets you select any number of tasks from the current project and clone them to another project. Features a spacious, responsive, two-column layout for easy selection and navigation.
+- **Change History Logging**: When tasks are cloned, both the source and destination projects log the event in their change history (e.g., "Cloned 3 task(s) to project LLPR-011" and "Received 3 cloned task(s) from project LLPR-010"). These entries are persisted to the backend and visible in the project history area.
+- **Modern Toast Notifications**: All clone actions use Chakra UI's toast system for non-blocking, visually appealing notifications. Success toasts include a direct link to the destination project.
 
 ---
 
