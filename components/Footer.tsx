@@ -21,42 +21,16 @@ declare global {
 
 export default function Footer() {
   const cookieBannerRef = useRef<{ openBanner: () => void }>(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const router = useRouter();
-  const ADMIN_PASSWORD = 'changeme'; // TODO: Replace with your real password
-  const [showPassword, setShowPassword] = useState(false);
   const { isOpen: isChatOpen, onOpen: onChatOpen, onClose: onChatClose } = useDisclosure();
   const [chatName, setChatName] = useState('');
   const [chatEmail, setChatEmail] = useState('');
   const [chatError, setChatError] = useState('');
   const [crispLoaded, setCrispLoaded] = useState(false);
   const [isLoadingChat, setIsLoadingChat] = useState(false);
+  const router = useRouter();
 
   const handleChangePreferences = () => {
     cookieBannerRef.current?.openBanner();
-  };
-
-  const handleAdminAccess = async () => {
-    setError('');
-    try {
-      const res = await fetch('/api/admin-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setPassword('');
-        onClose();
-        router.push('/admin');
-      } else {
-        setError('Incorrect password');
-      }
-    } catch (err) {
-      setError('Something went wrong.');
-    }
   };
 
   useEffect(() => {
@@ -179,55 +153,13 @@ export default function Footer() {
           aria-label="Admin Panel"
           bg="transparent"
           _hover={{ bg: 'rgba(0, 63, 45, 0.1)' }}
-          onClick={onOpen}
+          onClick={() => router.push('/admin/login')}
           p={0}
           minW={0}
         >
           <FaWrench size={22} color="#003f2d" style={{ verticalAlign: 'middle' }} />
         </Button>
       </Box>
-
-      {/* Admin password modal */}
-      <Modal isOpen={isOpen} onClose={onClose} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Admin Login</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl isInvalid={!!error}>
-              <FormLabel>Password</FormLabel>
-              <InputGroup>
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleAdminAccess(); }}
-                  autoFocus
-                />
-                <InputRightElement width="3rem">
-                  <Button
-                    h="1.75rem"
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setShowPassword((v) => !v)}
-                    tabIndex={-1}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <ViewOffIcon /> : <ViewIcon />}
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-              {error && <FormErrorMessage>{error}</FormErrorMessage>}
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="green" mr={3} onClick={handleAdminAccess}>
-              Login
-            </Button>
-            <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
 
       {/* Floating chat button (bottom right) */}
       {!crispLoaded && (
