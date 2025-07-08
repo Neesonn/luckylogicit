@@ -27,6 +27,7 @@ import {
   useToast,
   CircularProgress,
   CircularProgressLabel,
+  Tooltip,
 } from '@chakra-ui/react';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -53,6 +54,7 @@ import {
   FaExclamationCircle,
   FaLock,
   FaLockOpen,
+  FaBan,
 } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 
@@ -925,9 +927,47 @@ export default function PublicProjectPage() {
                             const quoteTotal = Array.isArray(q.lines)
                               ? q.lines.reduce((sum: number, l: any) => sum + (typeof l.amount_total === 'number' ? l.amount_total : 0), 0)
                               : 0;
+                            // Status logic
+                            let status = (q.status || '').toLowerCase();
+                            let icon = FaExclamationCircle;
+                            let color = 'gray.400';
+                            let tooltip = 'Unknown status';
+                            if (status === 'open') {
+                              // Check for expiry
+                              if (q.expires_at && q.expires_at * 1000 < Date.now()) {
+                                icon = FaExclamationCircle;
+                                color = 'red.500';
+                                tooltip = 'Quote expired';
+                              } else {
+                                icon = FaExclamationTriangle;
+                                color = 'orange.400';
+                                tooltip = 'Quote sent - pending acceptance';
+                              }
+                            } else if (status === 'accepted') {
+                              icon = FaCheckCircle;
+                              color = 'green.500';
+                              tooltip = 'Quote accepted';
+                            } else if (status === 'expired') {
+                              icon = FaExclamationCircle;
+                              color = 'red.500';
+                              tooltip = 'Quote expired';
+                            } else if (status === 'draft') {
+                              icon = FaPauseCircle;
+                              color = 'gray.400';
+                              tooltip = 'Draft quote';
+                            } else if (status === 'canceled') {
+                              icon = FaBan;
+                              color = 'gray.400';
+                              tooltip = 'Quote canceled';
+                            }
                             return (
                               <HStack key={q.quoteId || idx} justify="space-between" bg="gray.50" borderRadius="md" px={2} py={1}>
-                                <Text fontWeight="medium" color="gray.800">{q.quoteNumber || q.quoteId}</Text>
+                                <HStack>
+                                  <Tooltip label={tooltip} hasArrow>
+                                    <span><Icon as={icon} color={color} boxSize={4} mr={1} /></span>
+                                  </Tooltip>
+                                  <Text fontWeight="medium" color="gray.800">{q.quoteNumber || q.quoteId}</Text>
+                                </HStack>
                                 <Text color="green.700" fontWeight="bold">${(quoteTotal / 100).toFixed(2)}</Text>
                               </HStack>
                             );
@@ -962,9 +1002,40 @@ export default function PublicProjectPage() {
                             const invoiceTotal = Array.isArray(inv.lines)
                               ? inv.lines.reduce((sum: number, l: any) => sum + (typeof l.amount === 'number' ? l.amount : 0), 0)
                               : 0;
+                            // Status logic
+                            let status = (inv.status || '').toLowerCase();
+                            let icon = FaExclamationTriangle;
+                            let color = 'gray.400';
+                            let tooltip = 'Unknown status';
+                            const now = Date.now();
+                            const due = inv.due_date ? inv.due_date * 1000 : null;
+                            if (status === 'open') {
+                              if (due && due < now) {
+                                icon = FaExclamationCircle;
+                                color = 'red.500';
+                                tooltip = 'Invoice overdue';
+                              } else {
+                                icon = FaExclamationTriangle;
+                                color = 'orange.400';
+                                tooltip = 'Invoice sent - pending payment';
+                              }
+                            } else if (status === 'paid') {
+                              icon = FaCheckCircle;
+                              color = 'green.500';
+                              tooltip = 'Invoice paid';
+                            } else if (status === 'uncollectible' || status === 'void') {
+                              icon = FaBan;
+                              color = 'gray.400';
+                              tooltip = 'Invoice void/uncollectible';
+                            }
                             return (
                               <HStack key={inv.invoiceId || idx} justify="space-between" bg="gray.50" borderRadius="md" px={2} py={1}>
-                                <Text fontWeight="medium" color="gray.800">{inv.invoiceNumber || inv.invoiceId}</Text>
+                                <HStack>
+                                  <Tooltip label={tooltip} hasArrow>
+                                    <span><Icon as={icon} color={color} boxSize={4} mr={1} /></span>
+                                  </Tooltip>
+                                  <Text fontWeight="medium" color="gray.800">{inv.invoiceNumber || inv.invoiceId}</Text>
+                                </HStack>
                                 <Text color="blue.700" fontWeight="bold">${(invoiceTotal / 100).toFixed(2)}</Text>
                               </HStack>
                             );

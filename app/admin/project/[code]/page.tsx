@@ -1257,6 +1257,20 @@ export default function ProjectDetailsPage() {
               >
                 {publicToken ? "Manage Public Link" : "Generate Public Link"}
               </Button>
+              {/* Save button appears only when editing */}
+              {isEditing && (
+                <Button
+                  onClick={handleSave}
+                  colorScheme="green"
+                  variant="solid"
+                  leftIcon={<CheckCircleIcon />}
+                  size="md"
+                  isLoading={saving}
+                  loadingText="Saving..."
+                >
+                  Save
+                </Button>
+              )}
               <Button as={Link} href="/admin/manage-projects" leftIcon={<ArrowBackIcon />} variant="outline" size="md">
                 Back
               </Button>

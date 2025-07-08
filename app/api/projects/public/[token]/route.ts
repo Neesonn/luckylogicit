@@ -36,6 +36,7 @@ export async function GET(
     }
 
     // Only return whitelisted fields for public access
+    const addStatus = (arr: any[], key = 'status') => Array.isArray(arr) ? arr.map(obj => ({ ...obj, status: obj?.[key] ?? 'unknown' })) : [];
     const publicProject = {
       code: data.code,
       name: data.name,
@@ -56,8 +57,8 @@ export async function GET(
       team: data.team,
       tasks: data.tasks,
       updates: data.updates,
-      linkedQuotes: data.linkedQuotes,
-      linkedInvoices: data.linkedInvoices,
+      linkedQuotes: addStatus(data.linkedQuotes),
+      linkedInvoices: addStatus(data.linkedInvoices),
       // Exclude sensitive fields like actualCost, history, etc.
     };
 
