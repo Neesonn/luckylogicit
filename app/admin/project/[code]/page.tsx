@@ -1161,7 +1161,7 @@ export default function ProjectDetailsPage() {
     fetchQuotes();
   }, [showQuotes, project?.customer_stripe_id]);
 
-  // 2. Fetch invoices for the customer when Quotes & Billings is expanded
+  // 2. Fetch invoices for the customer
   useEffect(() => {
     const fetchInvoices = async () => {
       if (project && project.customer_stripe_id) {
@@ -1178,6 +1178,23 @@ export default function ProjectDetailsPage() {
       }
     };
     fetchInvoices();
+  }, [project?.customer_stripe_id]);
+
+  // Refresh invoices every 30 seconds to get latest status updates
+  useEffect(() => {
+    if (!project?.customer_stripe_id) return;
+    
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/list-stripe-invoices?customer_id=${project.customer_stripe_id}`);
+        const data = await res.json();
+        setCustomerInvoices(data.invoices || []);
+      } catch (err) {
+        console.error('Failed to refresh invoices:', err);
+      }
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
   }, [project?.customer_stripe_id]);
 
   if (loading) {
@@ -2814,12 +2831,12 @@ export default function ProjectDetailsPage() {
                     </Box>
                   )}
                   {/* Linked Invoices */}
-                  {Array.isArray(project.linkedInvoices) && project.linkedInvoices.length > 0 && (
+                  {customerInvoices && customerInvoices.length > 0 && (
                     <Box>
                       <HStack justify="space-between" align="center" mb={2}>
                         <Text fontWeight="semibold" color="gray.700" fontSize={{ base: "xs", md: "sm" }}>Invoices</Text>
                         <Text fontWeight="bold" color="blue.700" fontSize={{ base: "xs", md: "sm" }}>
-                          Total: ${(project.linkedInvoices.reduce((sum: number, inv: any) => {
+                          Total: ${(customerInvoices.reduce((sum: number, inv: any) => {
                             const invoiceTotal = Array.isArray(inv.lines)
                               ? inv.lines.reduce((lineSum: number, l: any) => lineSum + (typeof l.amount === 'number' ? l.amount : 0), 0)
                               : 0;
@@ -2828,7 +2845,7 @@ export default function ProjectDetailsPage() {
                         </Text>
                       </HStack>
                       <VStack align="stretch" spacing={1}>
-                        {project.linkedInvoices.map((inv: any, idx: number) => {
+                        {customerInvoices.map((inv: any, idx: number) => {
                           const invoiceTotal = Array.isArray(inv.lines)
                             ? inv.lines.reduce((sum: number, l: any) => sum + (typeof l.amount === 'number' ? l.amount : 0), 0)
                             : 0;
