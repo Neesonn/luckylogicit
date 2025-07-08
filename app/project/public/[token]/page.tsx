@@ -142,8 +142,11 @@ export default function PublicProjectPage() {
 
   const getBudgetUsagePercentage = () => {
     if (!project || !project.budget) return 0;
-    const spent = project.actualCost || 0;
-    return Math.min((spent / project.budget) * 100, 100);
+    // Calculate budget used from actual hours worked on tasks
+    const actualHours = project.tasks ? project.tasks.reduce((total: number, task: any) => total + (task.actualHours || 0), 0) : 0;
+    const hourlyRate = project.budget / project.estimatedHours; // Calculate hourly rate
+    const budgetUsed = actualHours * hourlyRate;
+    return Math.round((budgetUsed / project.budget) * 100);
   };
 
   const getTaskCompletionPercentage = () => {
@@ -152,17 +155,20 @@ export default function PublicProjectPage() {
     return (completedTasks / project.tasks.length) * 100;
   };
 
-  const getTimeElapsedPercentage = () => {
+  const getTimeRemainingPercentage = () => {
     if (!project || !project.startDate || !project.endDate) return 0;
-    const start = new Date(project.startDate);
-    const end = new Date(project.endDate);
-    const now = new Date();
-    if (now < start) return 0;
-    if (now > end) return 100;
-    const total = end.getTime() - start.getTime();
-    const elapsed = now.getTime() - start.getTime();
-    if (total <= 0) return 0;
-    return Math.round((elapsed / total) * 100);
+    
+    const startDate = new Date(project.startDate);
+    const endDate = new Date(project.endDate);
+    const today = new Date();
+    
+    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const elapsedDays = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const remainingDays = Math.max(0, totalDays - elapsedDays);
+    
+    // If the project hasn't started yet, show 0%
+    if (today < startDate) return 0;
+    return Math.round(((totalDays - remainingDays) / totalDays) * 100);
   };
 
   const toggleBlur = (updateId: number) => {
@@ -358,10 +364,15 @@ export default function PublicProjectPage() {
                     </CircularProgressLabel>
                   </CircularProgress>
                   <Text color="#003f2d" fontSize={{ base: "md", md: "lg" }} fontWeight="bold" mb={1}>
-                    ${project.budget ? project.budget.toLocaleString() : 0}
+                    ${(() => {
+                      const actualHours = project.tasks ? project.tasks.reduce((total: number, task: any) => total + (task.actualHours || 0), 0) : 0;
+                      const hourlyRate = project.budget / project.estimatedHours;
+                      const budgetUsed = actualHours * hourlyRate;
+                      return Math.round(budgetUsed).toLocaleString();
+                    })()}
                   </Text>
                   <Text color="gray.500" fontSize={{ base: "xs", md: "sm" }}>
-                    {project.budget ? `$${project.budget.toLocaleString()} total` : 'No budget set'}
+                    ${project.budget ? project.budget.toLocaleString() : 0} total
                   </Text>
                 </Box>
                 {/* Time Remaining */}
@@ -382,32 +393,50 @@ export default function PublicProjectPage() {
                     Time Remaining
                   </Text>
                   <CircularProgress 
-                    value={getTimeElapsedPercentage()} 
-                    color={getProgressColor(getTimeElapsedPercentage())} 
+                    value={getTimeRemainingPercentage()} 
+                    color={getProgressColor(getTimeRemainingPercentage())} 
                     size={{ base: "60px", md: "80px" }} 
                     thickness="8px"
                     mb={{ base: 2, md: 3 }}
                   >
                     <CircularProgressLabel fontSize={{ base: "sm", md: "lg" }} fontWeight="bold">
                       {(() => {
-                        const percent = getTimeElapsedPercentage();
-                        if (!project.startDate || !project.endDate) return 'No dates set';
-                        if (percent === 0) return 'Not started';
-                        if (percent === 100) return 'Complete';
-                        return `${percent}% elapsed`;
+                        if (!project || !project.startDate || !project.endDate) return 'No dates set';
+                        const startDate = new Date(project.startDate);
+                        const endDate = new Date(project.endDate);
+                        const today = new Date();
+                        const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                        const elapsedDays = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                        const remainingDays = Math.max(0, totalDays - elapsedDays);
+                        return `${remainingDays} days`;
                       })()}
                     </CircularProgressLabel>
                   </CircularProgress>
                   <Text color="#003f2d" fontSize={{ base: "md", md: "lg" }} fontWeight="bold" mb={1}>
-                    {project.startDate && project.endDate ? `${project.startDate} - ${project.endDate}` : 'N/A'}
+                    {(() => {
+                      if (!project || !project.startDate || !project.endDate) return 'N/A';
+                      const startDate = new Date(project.startDate);
+                      const endDate = new Date(project.endDate);
+                      const today = new Date();
+                      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                      const elapsedDays = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                      const remainingDays = Math.max(0, totalDays - elapsedDays);
+                      return `${remainingDays} days`;
+                    })()}
                   </Text>
                   <Text color="gray.500" fontSize={{ base: "xs", md: "sm" }}>
                     {(() => {
-                      const percent = getTimeElapsedPercentage();
-                      if (!project.startDate || !project.endDate) return 'No dates set';
-                      if (percent === 0) return 'Not started';
-                      if (percent === 100) return 'Complete';
-                      return `${percent}% elapsed`;
+                      if (!project || !project.startDate || !project.endDate) return 'N/A';
+                      const startDate = new Date(project.startDate);
+                      const endDate = new Date(project.endDate);
+                      const today = new Date();
+                      const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                      const elapsedDays = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                      const remainingDays = Math.max(0, totalDays - elapsedDays);
+                      const percentage = Math.round(((totalDays - remainingDays) / totalDays) * 100);
+                      if (percentage >= 75) return 'Behind schedule';
+                      if (percentage >= 50) return 'On schedule';
+                      return 'Ahead of schedule';
                     })()}
                   </Text>
                 </Box>
@@ -542,20 +571,7 @@ export default function PublicProjectPage() {
                           size="lg"
                         />
                       </Box>
-                      <Box>
-                        <HStack justify="space-between" mb={2}>
-                          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="medium" color="gray.700">Time Progress</Text>
-                          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="bold" color="gray.700">
-                            {Math.round(getTimeElapsedPercentage())}%
-                          </Text>
-                        </HStack>
-                        <Progress 
-                          value={getTimeElapsedPercentage()} 
-                          colorScheme={getProgressColor(getTimeElapsedPercentage())}
-                          borderRadius="full"
-                          size="lg"
-                        />
-                      </Box>
+
                     </VStack>
                   </CardBody>
                 </Card>
