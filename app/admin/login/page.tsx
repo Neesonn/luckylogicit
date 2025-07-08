@@ -234,10 +234,10 @@ export default function AdminLoginPage() {
       />
 
       {/* Main content */}
-      <Flex minH="100vh" alignItems="center" justifyContent="center" px={4} direction="column">
+      <Flex minH="100vh" alignItems="center" justifyContent="center" px={{ base: 1, sm: 4 }} direction="column">
         {/* Logo above the container */}
         <MotionBox 
-          mb={isMobile ? 6 : 8}
+          mb={isMobile ? 4 : 8}
           initial={{ y: 50, opacity: 0, scale: 0.9 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
           transition={{ 
@@ -253,8 +253,9 @@ export default function AdminLoginPage() {
             as="img"
             src="/lucky-logic-logo.png"
             alt="Lucky Logic logo"
-            height={isMobile ? "240px" : "320px"}
+            height={isMobile ? "120px" : "240px"}
             width="auto"
+            maxW={{ base: "70vw", sm: "320px" }}
             objectFit="contain"
             display="block"
             mx="auto"
@@ -307,12 +308,12 @@ export default function AdminLoginPage() {
           backdropFilter="blur(20px)"
           boxShadow="0 8px 32px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255,255,255,0.1)"
           borderRadius="2xl"
-          p={{ base: 6, sm: 10 }}
-          minW={{ base: "95vw", sm: "400px" }}
-          maxW="420px"
+          p={{ base: 3, sm: 6, md: 10 }}
+          minW={{ base: "98vw", sm: "95vw", md: "400px" }}
+          maxW={{ base: "98vw", sm: "420px" }}
           position="relative"
           zIndex={1}
-          mt={{ base: -16, md: -28 }}
+          mt={{ base: -8, md: -28 }}
           _before={{
             content: '""',
             position: 'absolute',
@@ -329,9 +330,9 @@ export default function AdminLoginPage() {
             pointerEvents: 'none'
           }}
         >
-          <VStack as="form" spacing={7} align="stretch" onSubmit={handleSubmit}>
+          <VStack as="form" spacing={{ base: 4, sm: 7 }} align="stretch" onSubmit={handleSubmit}>
             <Heading
-              size="lg"
+              size={{ base: "md", sm: "lg" }}
               color="brand.green"
               textAlign="center"
               fontWeight="extrabold"
@@ -342,7 +343,7 @@ export default function AdminLoginPage() {
             >
               Admin Login
             </Heading>
-            <Text color="gray.700" textAlign="center" fontSize="md" mb={2} fontWeight="medium">
+            <Text color="gray.700" textAlign="center" fontSize={{ base: "sm", sm: "md" }} mb={2} fontWeight="medium">
               Secure access to admin console
             </Text>
             {error && (
