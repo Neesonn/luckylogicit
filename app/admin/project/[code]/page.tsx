@@ -2738,115 +2738,142 @@ export default function ProjectDetailsPage() {
                 </CardBody>
               </Card>
 
-              {/* Quotes & Billings */}
+              {/* Quotes and Invoices (Sidebar) */}
               <Card shadow="sm" border="1px solid" borderColor="gray.200">
                 <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
                   <HStack>
                     <Icon as={FaMoneyBillWave} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
-                    <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Quotes & Billings</Heading>
+                    <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Quotes and Invoices</Heading>
                   </HStack>
                 </CardHeader>
                 <CardBody py={{ base: 4, md: 6 }}>
-                  <VStack spacing={{ base: 3, md: 4 }} align="stretch">
-                                         {/* Quotes */}
-                     <Box>
-                       <Text fontWeight="semibold" color="gray.700" mb={{ base: 2, md: 3 }} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
-                         Quotes ({customerQuotes.length})
-                            </Text>
-                       <VStack spacing={{ base: 2, md: 3 }} align="stretch">
-                         {customerQuotes.length === 0 ? (
-                           <Text fontSize={{ base: "sm", md: "md" }} color="gray.500" textAlign="center" py={4}>
-                             No quotes available
-                           </Text>
-                         ) : (
-                           customerQuotes.map((quote: any) => (
-                            <Box
-                              key={quote.id}
-                              p={{ base: 2, md: 3 }}
-                              border="1px solid"
-                              borderColor="gray.200"
-                              borderRadius="lg"
-                              bg="white"
-                              _hover={{ shadow: "sm" }}
-                              transition="all 0.2s"
-                            >
-                              <VStack align="start" spacing={{ base: 1, md: 2 }}>
-                                <HStack justify="space-between" w="full">
-                                  <Text fontSize={{ base: "sm", md: "md" }} fontWeight="semibold" whiteSpace="normal" wordBreak="break-word">
-                                    {quote.title}
-                                  </Text>
-                                  <Tooltip label={quote.status === 'overdue' ? 'Overdue' : quote.status === 'accepted' ? 'Accepted' : quote.status === 'pending' ? 'Pending' : 'Unknown'}>
-                                    <Icon
-                                      as={quote.status === 'overdue' ? FaExclamationCircle : quote.status === 'accepted' ? FaCheckCircle : FaExclamationTriangle}
-                                      color={quote.status === 'overdue' ? 'red.500' : quote.status === 'accepted' ? 'green.500' : 'orange.500'}
-                                      boxSize={{ base: 3, md: 4 }}
-                                    />
-                                  </Tooltip>
+                  {/* Linked Quotes */}
+                  {Array.isArray(project.linkedQuotes) && project.linkedQuotes.length > 0 && (
+                    <Box mb={6}>
+                      <HStack justify="space-between" align="center" mb={2}>
+                        <Text fontWeight="semibold" color="gray.700" fontSize={{ base: "xs", md: "sm" }}>Quotes</Text>
+                        <Text fontWeight="bold" color="green.700" fontSize={{ base: "xs", md: "sm" }}>
+                          Total: ${(project.linkedQuotes.reduce((sum: number, q: any) => {
+                            const quoteTotal = Array.isArray(q.lines)
+                              ? q.lines.reduce((lineSum: number, l: any) => lineSum + (typeof l.amount_total === 'number' ? l.amount_total : 0), 0)
+                              : 0;
+                            return sum + quoteTotal;
+                          }, 0) / 100).toFixed(2)}
+                        </Text>
+                      </HStack>
+                      <VStack align="stretch" spacing={1}>
+                        {project.linkedQuotes.map((q: any, idx: number) => {
+                          const quoteTotal = Array.isArray(q.lines)
+                            ? q.lines.reduce((sum: number, l: any) => sum + (typeof l.amount_total === 'number' ? l.amount_total : 0), 0)
+                            : 0;
+                          // Status logic (copied from public page)
+                          let status = (q.status || '').toLowerCase();
+                          let icon = FaExclamationCircle;
+                          let color = 'gray.400';
+                          let tooltip = 'Unknown status';
+                          if (status === 'open') {
+                            if (q.expires_at && q.expires_at * 1000 < Date.now()) {
+                              icon = FaExclamationCircle;
+                              color = 'red.500';
+                              tooltip = 'Quote expired';
+                            } else {
+                              icon = FaExclamationTriangle;
+                              color = 'orange.400';
+                              tooltip = 'Quote sent - pending acceptance';
+                            }
+                          } else if (status === 'accepted') {
+                            icon = FaCheckCircle;
+                            color = 'green.500';
+                            tooltip = 'Quote accepted';
+                          } else if (status === 'expired') {
+                            icon = FaExclamationCircle;
+                            color = 'red.500';
+                            tooltip = 'Quote expired';
+                          } else if (status === 'draft') {
+                            icon = FaPauseCircle;
+                            color = 'gray.400';
+                            tooltip = 'Draft quote';
+                          } else if (status === 'canceled') {
+                            icon = FaBan;
+                            color = 'gray.400';
+                            tooltip = 'Quote canceled';
+                          }
+                          return (
+                            <HStack key={q.quoteId || idx} justify="space-between" bg="gray.50" borderRadius="md" px={2} py={1}>
+                              <HStack>
+                                <Tooltip label={tooltip} hasArrow>
+                                  <span><Icon as={icon} color={color} boxSize={4} mr={1} /></span>
+                                </Tooltip>
+                                <Text fontWeight="medium" color="gray.800" fontSize={{ base: "xs", md: "sm" }}>{q.quoteNumber || q.quoteId}</Text>
                               </HStack>
-                                <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
-                                  ${quote.amount?.toLocaleString() || '0'}
-                                </Text>
-                                <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500">
-                                  {quote.status}
-                                </Text>
-                        </VStack>
-                            </Box>
-                          ))
-                        )}
+                              <Text color="green.700" fontWeight="bold" fontSize={{ base: "xs", md: "sm" }}>${(quoteTotal / 100).toFixed(2)}</Text>
+                            </HStack>
+                          );
+                        })}
                       </VStack>
                     </Box>
-
-                    <Divider />
-
-                                         {/* Invoices */}
-                     <Box>
-                       <Text fontWeight="semibold" color="gray.700" mb={{ base: 2, md: 3 }} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
-                         Invoices ({customerInvoices.length})
-                       </Text>
-                       <VStack spacing={{ base: 2, md: 3 }} align="stretch">
-                         {customerInvoices.length === 0 ? (
-                           <Text fontSize={{ base: "sm", md: "md" }} color="gray.500" textAlign="center" py={4}>
-                             No invoices available
-                           </Text>
-                         ) : (
-                           customerInvoices.map((invoice: any) => (
-                            <Box
-                              key={invoice.id}
-                              p={{ base: 2, md: 3 }}
-                              border="1px solid"
-                              borderColor="gray.200"
-                              borderRadius="lg"
-                              bg="white"
-                              _hover={{ shadow: "sm" }}
-                              transition="all 0.2s"
-                            >
-                              <VStack align="start" spacing={{ base: 1, md: 2 }}>
-                                <HStack justify="space-between" w="full">
-                                  <Text fontSize={{ base: "sm", md: "md" }} fontWeight="semibold" whiteSpace="normal" wordBreak="break-word">
-                                    {invoice.title}
-                            </Text>
-                                  <Tooltip label={invoice.status === 'overdue' ? 'Overdue' : invoice.status === 'paid' ? 'Paid' : invoice.status === 'pending' ? 'Pending' : 'Unknown'}>
-                                    <Icon
-                                      as={invoice.status === 'overdue' ? FaExclamationCircle : invoice.status === 'paid' ? FaCheckCircle : FaExclamationTriangle}
-                                      color={invoice.status === 'overdue' ? 'red.500' : invoice.status === 'paid' ? 'green.500' : 'orange.500'}
-                                      boxSize={{ base: 3, md: 4 }}
-                                    />
-                                  </Tooltip>
+                  )}
+                  {/* Linked Invoices */}
+                  {Array.isArray(project.linkedInvoices) && project.linkedInvoices.length > 0 && (
+                    <Box>
+                      <HStack justify="space-between" align="center" mb={2}>
+                        <Text fontWeight="semibold" color="gray.700" fontSize={{ base: "xs", md: "sm" }}>Invoices</Text>
+                        <Text fontWeight="bold" color="blue.700" fontSize={{ base: "xs", md: "sm" }}>
+                          Total: ${(project.linkedInvoices.reduce((sum: number, inv: any) => {
+                            const invoiceTotal = Array.isArray(inv.lines)
+                              ? inv.lines.reduce((lineSum: number, l: any) => lineSum + (typeof l.amount === 'number' ? l.amount : 0), 0)
+                              : 0;
+                            return sum + invoiceTotal;
+                          }, 0) / 100).toFixed(2)}
+                        </Text>
+                      </HStack>
+                      <VStack align="stretch" spacing={1}>
+                        {project.linkedInvoices.map((inv: any, idx: number) => {
+                          const invoiceTotal = Array.isArray(inv.lines)
+                            ? inv.lines.reduce((sum: number, l: any) => sum + (typeof l.amount === 'number' ? l.amount : 0), 0)
+                            : 0;
+                          // Status logic (copied from public page)
+                          let status = (inv.status || '').toLowerCase();
+                          let icon = FaExclamationTriangle;
+                          let color = 'gray.400';
+                          let tooltip = 'Unknown status';
+                          const now = Date.now();
+                          const due = inv.due_date ? inv.due_date * 1000 : null;
+                          if (status === 'open') {
+                            if (due && due < now) {
+                              icon = FaExclamationCircle;
+                              color = 'red.500';
+                              tooltip = 'Invoice overdue';
+                            } else {
+                              icon = FaExclamationTriangle;
+                              color = 'orange.400';
+                              tooltip = 'Invoice sent - pending payment';
+                            }
+                          } else if (status === 'paid') {
+                            icon = FaCheckCircle;
+                            color = 'green.500';
+                            tooltip = 'Invoice paid';
+                          } else if (status === 'uncollectible' || status === 'void') {
+                            icon = FaBan;
+                            color = 'gray.400';
+                            tooltip = 'Invoice void/uncollectible';
+                          }
+                          return (
+                            <HStack key={inv.invoiceId || idx} justify="space-between" bg="gray.50" borderRadius="md" px={2} py={1}>
+                              <HStack>
+                                <Tooltip label={tooltip} hasArrow>
+                                  <span><Icon as={icon} color={color} boxSize={4} mr={1} /></span>
+                                </Tooltip>
+                                <Text fontWeight="medium" color="gray.800" fontSize={{ base: "xs", md: "sm" }}>{inv.invoiceNumber || inv.invoiceId}</Text>
                               </HStack>
-                                <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
-                                  ${invoice.amount?.toLocaleString() || '0'}
-                                </Text>
-                                <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500">
-                                  {invoice.status}
-                                </Text>
-                        </VStack>
-                      </Box>
-                          ))
-                    )}
+                              <Text color="blue.700" fontWeight="bold" fontSize={{ base: "xs", md: "sm" }}>${(invoiceTotal / 100).toFixed(2)}</Text>
+                            </HStack>
+                          );
+                        })}
                       </VStack>
                     </Box>
-                  </VStack>
-                  </CardBody>
+                  )}
+                </CardBody>
               </Card>
             </VStack>
           </Box>
