@@ -45,10 +45,18 @@ import {
   ModalCloseButton,
   FormControl,
   FormLabel,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Checkbox,
+  useToast,
+  Link as ChakraLink,
 } from '@chakra-ui/react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowBackIcon, EditIcon, DeleteIcon, ChevronRightIcon, AddIcon, ChevronDownIcon, ChevronUpIcon, CheckCircleIcon } from '@chakra-ui/icons';
+import NextLink from 'next/link';
+import { ArrowBackIcon, EditIcon, DeleteIcon, ChevronRightIcon, AddIcon, ChevronDownIcon, ChevronUpIcon, CheckCircleIcon, HamburgerIcon } from '@chakra-ui/icons';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   FaInfoCircle, 
@@ -71,9 +79,10 @@ import {
   FaExclamationTriangle,
   FaPauseCircle,
   FaTrash,
-  FaEdit
+  FaEdit,
 } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
+import { CopyIcon } from '@chakra-ui/icons';
 
 // Default project data (fallback if localStorage is empty)
 const defaultProjects = [
@@ -201,6 +210,15 @@ export default function ProjectDetailsPage() {
   const tasksSectionRef = useRef<HTMLDivElement>(null);
   // At the top, after other refs:
   const updatesSectionRef = useRef<HTMLDivElement>(null);
+
+  // Clone modal state
+  const [isCloneModalOpen, setIsCloneModalOpen] = useState(false);
+  const [selectedTasksToClone, setSelectedTasksToClone] = useState<string[]>([]);
+  const [availableProjects, setAvailableProjects] = useState<any[]>([]);
+  const [selectedDestinationProject, setSelectedDestinationProject] = useState<string>('');
+  const [cloneSearchTerm, setCloneSearchTerm] = useState('');
+  const [cloning, setCloning] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     // Fetch project details from database
@@ -796,6 +814,188 @@ export default function ProjectDetailsPage() {
     setIsEditUpdateModalOpen(false);
     setEditingUpdate(null);
     setEditUpdateText('');
+  };
+
+  // Clone modal handlers
+  const handleOpenCloneModal = async () => {
+    setIsCloneModalOpen(true);
+    setSelectedTasksToClone([]);
+    setSelectedDestinationProject('');
+    setCloneSearchTerm('');
+    
+    // Fetch available projects for destination selection
+    try {
+      const response = await fetch('/api/projects');
+      const data = await response.json();
+      if (data.success) {
+        // Filter out current project from available destinations
+        const otherProjects = data.projects.filter((p: any) => p.code !== projectCode);
+        setAvailableProjects(otherProjects);
+      }
+    } catch (error) {
+      console.error('Failed to fetch projects for cloning:', error);
+    }
+  };
+
+  const handleCloseCloneModal = () => {
+    setIsCloneModalOpen(false);
+    setSelectedTasksToClone([]);
+    setSelectedDestinationProject('');
+    setCloneSearchTerm('');
+  };
+
+  const handleTaskSelectionChange = (taskId: string, isSelected: boolean) => {
+    if (isSelected) {
+      setSelectedTasksToClone(prev => [...prev, taskId]);
+    } else {
+      setSelectedTasksToClone(prev => prev.filter(id => id !== taskId));
+    }
+  };
+
+  const handleSelectAllTasks = () => {
+    const allTaskIds = tasks.map(task => task.id.toString());
+    setSelectedTasksToClone(allTaskIds);
+  };
+
+  const handleDeselectAllTasks = () => {
+    setSelectedTasksToClone([]);
+  };
+
+  const handleCloneTasks = async () => {
+    if (selectedTasksToClone.length === 0) {
+      toast({
+        title: 'No tasks selected',
+        description: 'Please select at least one task to clone.',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+        position: 'top-right',
+        variant: 'solid',
+      });
+      return;
+    }
+    if (!selectedDestinationProject) {
+      toast({
+        title: 'No destination project',
+        description: 'Please select a destination project.',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+        position: 'top-right',
+        variant: 'solid',
+      });
+      return;
+    }
+    setCloning(true);
+    try {
+      // Get the selected tasks data
+      const tasksToClone = tasks.filter(task => selectedTasksToClone.includes(task.id.toString()));
+      // Prepare the clone data
+      const cloneData = {
+        sourceProject: projectCode,
+        destinationProject: selectedDestinationProject,
+        tasks: tasksToClone.map(task => ({
+          title: task.title,
+          description: task.description,
+          status: 'planned', // Reset status for new project
+          priority: task.priority,
+          assignee: task.assignee,
+          dueDate: '', // Reset due date
+          estimatedHours: task.estimatedHours,
+          actualHours: 0 // Reset actual hours
+        }))
+      };
+      // Call API to clone tasks
+      const response = await fetch('/api/clone-tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(cloneData),
+      });
+      const result = await response.json();
+      if (result.success) {
+        // Add a history entry for cloning (source project)
+        const cloneDetails = `Cloned ${tasksToClone.length} task(s) to project ${selectedDestinationProject}`;
+        const newHistoryEntry = createHistoryEntry('Tasks Cloned', cloneDetails);
+        const updatedHistory = [...history, newHistoryEntry];
+        setHistory(updatedHistory);
+        // Persist the updated history to the backend (source project)
+        try {
+          await fetch(`/api/projects/${projectCode}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ history: updatedHistory })
+          });
+        } catch (err) {
+          // Optionally handle error, e.g., show a toast
+        }
+        // Add a history entry to the destination project
+        try {
+          // Fetch destination project to get its current history
+          const destRes = await fetch(`/api/projects?code=${selectedDestinationProject}`);
+          const destData = await destRes.json();
+          const destProject = destData.projects?.find((p: any) => p.code === selectedDestinationProject);
+          const destHistory = Array.isArray(destProject?.history) ? destProject.history : [];
+          const destEntry = createHistoryEntry('Tasks Received', `Received ${tasksToClone.length} cloned task(s) from project ${projectCode}`);
+          const updatedDestHistory = [...destHistory, destEntry];
+          await fetch(`/api/projects/${selectedDestinationProject}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ history: updatedDestHistory })
+          });
+        } catch (err) {
+          // Optionally handle error, e.g., show a toast
+        }
+        toast({
+          status: 'success',
+          duration: 6000,
+          isClosable: true,
+          position: 'top-right',
+          variant: 'solid',
+          render: () => (
+            <Box color="white" p={3} bg="green.500" borderRadius="md">
+              <Text fontWeight="bold">
+                Successfully cloned {tasksToClone.length} task(s) to project {selectedDestinationProject}
+              </Text>
+              <ChakraLink
+                as={NextLink}
+                href={`/admin/project/${selectedDestinationProject}`}
+                color="white"
+                textDecoration="underline"
+                fontWeight="semibold"
+                _hover={{ color: 'green.200' }}
+              >
+                Go to the project →
+              </ChakraLink>
+            </Box>
+          ),
+        });
+        handleCloseCloneModal();
+      } else {
+        toast({
+          title: 'Clone Failed',
+          description: result.error || 'Failed to clone tasks.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'top-right',
+          variant: 'solid',
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Clone Failed',
+        description: error.message || 'Failed to clone tasks. Please try again.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right',
+        variant: 'solid',
+      });
+    } finally {
+      setCloning(false);
+    }
   };
 
   // Add this handler in the component:
@@ -1959,6 +2159,29 @@ export default function ProjectDetailsPage() {
                     </Button>
             </>
           )}
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              aria-label="Other actions"
+              icon={<HamburgerIcon />} 
+              size="md"
+              bg="red.600"
+              color="white"
+              _hover={{ bg: 'red.700' }}
+              transition="all 0.2s"
+            />
+            <MenuList bg="red.600" color="white" border="none">
+              <MenuItem
+                icon={<CopyIcon />}
+                onClick={handleOpenCloneModal}
+                _hover={{ bg: 'red.700', color: 'white' }}
+                fontWeight="semibold"
+                bg="red.600"
+              >
+                Clone
+              </MenuItem>
+            </MenuList>
+          </Menu>
         </HStack>
           </Box>
 
@@ -2813,6 +3036,139 @@ export default function ProjectDetailsPage() {
           </CardBody>
         )}
       </Card>
+
+      {/* Clone Modal */}
+      <Modal isOpen={isCloneModalOpen} onClose={handleCloseCloneModal} size="full">
+        <ModalOverlay />
+        <ModalContent 
+          borderRadius="xl" 
+          mx={{ base: 2, md: 8 }}
+          maxW="5xl"
+          bg="white"
+          shadow="lg"
+        >
+          <ModalHeader 
+            bg="#003f2d" 
+            color="white" 
+            borderTopRadius="xl"
+            py={6}
+            px={{ base: 4, md: 8 }}
+          >
+            <HStack spacing={4}>
+              <Icon as={FaBuilding} boxSize={6} />
+              <Heading size="lg" fontWeight="bold">Clone Tasks</Heading>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton 
+            color="white" 
+            bg="whiteAlpha.200"
+            borderRadius="full"
+            _hover={{ bg: "whiteAlpha.300" }}
+            top={8}
+            right={8}
+          />
+          <ModalBody py={10} px={{ base: 4, md: 8 }} maxH="calc(100vh - 200px)" overflowY="auto">
+            <Flex direction={{ base: 'column', md: 'row' }} gap={10} align="stretch" minH="400px">
+              {/* Left: Tasks to Clone */}
+              <Box flex={2} minW={0}>
+                <Text fontSize="xl" fontWeight="bold" mb={4} color="#003f2d">Tasks to Clone</Text>
+                <Box bg="gray.50" borderRadius="lg" p={6} minH="400px" maxH="60vh" overflowY="auto" boxShadow="sm">
+                  <VStack spacing={4} align="stretch">
+                    {tasks.length === 0 ? (
+                      <Text color="gray.400" fontSize="lg">No tasks available in this project.</Text>
+                    ) : (
+                      tasks.map(task => (
+                        <Checkbox
+                          key={task.id}
+                          isChecked={selectedTasksToClone.includes(task.id.toString())}
+                          onChange={(e) => handleTaskSelectionChange(task.id.toString(), e.target.checked)}
+                          colorScheme="green"
+                          size="lg"
+                        >
+                          <VStack align="start" spacing={1}>
+                            <Text fontWeight="semibold" fontSize="lg">{task.title}</Text>
+                            <Text fontSize="md" color="gray.600" noOfLines={2}>{task.description}</Text>
+                          </VStack>
+                        </Checkbox>
+                      ))
+                    )}
+                  </VStack>
+                </Box>
+                <HStack spacing={4} mt={4}>
+                  <Button
+                    colorScheme="blue"
+                    size="md"
+                    onClick={handleSelectAllTasks}
+                    variant="outline"
+                  >
+                    Select All
+                  </Button>
+                  <Button
+                    colorScheme="blue"
+                    size="md"
+                    onClick={handleDeselectAllTasks}
+                    variant="outline"
+                  >
+                    Deselect All
+                  </Button>
+                </HStack>
+              </Box>
+              {/* Divider for desktop */}
+              <Box display={{ base: 'none', md: 'block' }} mx={2}>
+                <Divider orientation="vertical" h="100%" borderColor="gray.200" />
+              </Box>
+              {/* Right: Project Selection & Actions */}
+              <Box flex={1} minW={0}>
+                <Text fontSize="xl" fontWeight="bold" mb={4} color="#003f2d">Destination Project</Text>
+                <Box mb={8}>
+                  <FormLabel fontSize="md" fontWeight="semibold" color="gray.700" mb={2}>
+                    Available Projects
+                  </FormLabel>
+                  <Select
+                    value={selectedDestinationProject}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedDestinationProject(e.target.value)}
+                    size="lg"
+                    fontSize="md"
+                    borderWidth="2px"
+                    borderColor="gray.200"
+                    borderRadius="lg"
+                    bg="gray.50"
+                    _focus={{ borderColor: '#003f2d', boxShadow: '0 0 0 3px #003f2d22', bg: 'white' }}
+                    _hover={{ borderColor: '#003f2d', bg: 'white' }}
+                  >
+                    <option value="">Select a project</option>
+                    {availableProjects.map(project => (
+                      <option key={project.code} value={project.code}>{project.name}</option>
+                    ))}
+                  </Select>
+                </Box>
+                <Divider my={6} borderColor="gray.200" />
+                <HStack spacing={4} justify="flex-end">
+                  <Button
+                    onClick={handleCloseCloneModal}
+                    variant="outline"
+                    colorScheme="gray"
+                    size="lg"
+                    isDisabled={cloning}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleCloneTasks}
+                    colorScheme="green"
+                    size="lg"
+                    isLoading={cloning}
+                    loadingText="Cloning..."
+                    isDisabled={!selectedDestinationProject || selectedTasksToClone.length === 0}
+                  >
+                    Clone Tasks
+                  </Button>
+                </HStack>
+              </Box>
+            </Flex>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 } 
