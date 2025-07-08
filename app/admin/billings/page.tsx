@@ -7,6 +7,7 @@ import { useLock } from '../../../components/LockContext';
 import { useStripeData } from '../../../components/StripeDataContext';
 import GlassCard from '../../../components/GlassCard';
 import AdminSessionTimeout from '../../../components/AdminSessionTimeout';
+import { useRouter } from 'next/navigation';
 
 function getStatus(inv: any) {
   if (inv.status === 'open' && inv.due_date && inv.due_date * 1000 < Date.now()) {
@@ -38,6 +39,7 @@ export default function BillingsPage() {
   const [loggingOut, setLoggingOut] = useState(false);
   const { metricsLocked } = useLock();
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const router = useRouter();
 
   // Calculate buckets
   const buckets = [
@@ -103,9 +105,8 @@ export default function BillingsPage() {
   }
 
   const handleLogout = async () => {
-    setLoggingOut(true);
     await fetch('/api/admin-logout', { method: 'POST' });
-    window.location.href = '/';
+    router.push('/admin/login');
   };
 
   return (

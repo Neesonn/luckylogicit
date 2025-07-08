@@ -343,7 +343,7 @@ export default function ViewCustomersPage() {
 
   const handleLogout = async () => {
     await fetch('/api/admin-logout', { method: 'POST' });
-    router.push('/');
+    router.push('/admin/login');
   };
 
   const startEdit = (customer: any) => {

@@ -129,7 +129,7 @@ export default function QuotesPage() {
   const handleLogout = async () => {
     setLoggingOut(true);
     await fetch('/api/admin-logout', { method: 'POST' });
-    window.location.href = '/';
+    window.location.href = '/admin/login';
   };
 
   // Reset page to 1 when filter changes

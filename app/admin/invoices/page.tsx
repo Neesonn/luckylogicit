@@ -9,6 +9,7 @@ import { useStripeData } from '../../../components/StripeDataContext';
 import GlassCard from '../../../components/GlassCard';
 import StickyNavBar from '../../../components/StickyNavBar';
 import AdminSessionTimeout from '../../../components/AdminSessionTimeout';
+import { useRouter } from 'next/navigation';
 
 export default function InvoicesPage() {
   const { invoices, loading, error, refresh } = useStripeData();
@@ -32,6 +33,7 @@ export default function InvoicesPage() {
   const [notesLoading, setNotesLoading] = useState(false);
   const { metricsLocked } = useLock();
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const router = useRouter();
 
   function formatDate(ts: number | null) {
     if (!ts) return '-';
@@ -127,9 +129,8 @@ export default function InvoicesPage() {
   const paginatedInvoices = sortedInvoices.slice((page - 1) * pageSize, page * pageSize);
 
   const handleLogout = async () => {
-    setLoggingOut(true);
     await fetch('/api/admin-logout', { method: 'POST' });
-    window.location.href = '/';
+    router.push('/admin/login');
   };
 
   // Reset page to 1 when filter changes

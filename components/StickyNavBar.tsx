@@ -29,7 +29,7 @@ const StickyNavBar: React.FC<StickyNavBarProps> = ({
     setLoggingOut(true);
     try {
       await fetch('/api/admin-logout', { method: 'POST' });
-      window.location.href = 'https://www.luckylogic.com.au';
+      router.push('/admin/login');
     } catch (err) {
       setLoggingOut(false);
       alert('Logout failed. Please try again.');
