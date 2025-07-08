@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { useLock } from '../../components/LockContext';
 import { useStripeData } from '../../components/StripeDataContext';
 import supabase from '../services/supabaseClient';
+import StickyNavBar from '../../components/StickyNavBar';
 
 // Animated counter hook
 function useCountUp(target: number, duration = 1200) {
@@ -513,14 +514,7 @@ export default function AdminDashboard() {
           </Box>
         </Box>
       </Box>
-      <Box w="100%" maxW="1200px" mx="auto" px={4} pb={8} display="flex" justifyContent="center">
-        <Button onClick={handleLogout} colorScheme="red" variant="outline" size="lg" w={{ base: '100%', md: 'auto' }}
-          _hover={{ bg: 'red.50', color: 'red.600', border: '2px solid', borderColor: 'red.300' }}
-          _focus={{ bg: 'red.50', color: 'red.600', border: '2px solid', borderColor: 'red.300' }}
-        >
-          Logout
-        </Button>
-      </Box>
+      <StickyNavBar />
     </Box>
   );
 } 

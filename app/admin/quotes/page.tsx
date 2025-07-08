@@ -7,6 +7,7 @@ import { FaLock, FaUnlock } from 'react-icons/fa';
 import { useLock } from '../../../components/LockContext';
 import { useStripeData } from '../../../components/StripeDataContext';
 import GlassCard from '../../../components/GlassCard';
+import StickyNavBar from '../../../components/StickyNavBar';
 
 export default function QuotesPage() {
   const { quotes, loading, error, refresh, products } = useStripeData();
@@ -20,7 +21,7 @@ export default function QuotesPage() {
   const [dateField, setDateField] = useState<'created' | 'expires_at'>('created');
   const [dateStart, setDateStart] = useState<string>('');
   const [dateEnd, setDateEnd] = useState<string>('');
-  const [hideCanceled, setHideCanceled] = useState(false);
+  const [hideCanceled, setHideCanceled] = useState(true);
   const [detailsQuote, setDetailsQuote] = useState<any | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [pageSize, setPageSize] = useState(10);
@@ -497,30 +498,7 @@ export default function QuotesPage() {
           </HStack>
         </Box>
       )}
-      {/* Navigation */}
-      <Box w="100%" maxW="1200px" px={{ base: 0, md: 6 }} mb={8}>
-        <HStack justify="space-between" align="center">
-          <Button
-            leftIcon={<ArrowBackIcon />}
-            variant="ghost"
-            onClick={() => window.history.back()}
-            color="gray.600"
-            _hover={{ bg: 'gray.100' }}
-          >
-            Back
-          </Button>
-          <Button
-            onClick={handleLogout}
-            colorScheme="red"
-            variant="outline"
-            size="lg"
-            isLoading={loggingOut}
-            loadingText="Logging out..."
-          >
-            Logout
-          </Button>
-        </HStack>
-      </Box>
+
       {/* Quote Details Modal */}
       <Modal isOpen={isDetailsOpen} onClose={handleCloseDetails} size="xl">
         <ModalOverlay />
@@ -657,6 +635,7 @@ export default function QuotesPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <StickyNavBar />
     </Box>
   );
 } 

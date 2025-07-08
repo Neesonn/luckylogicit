@@ -95,6 +95,7 @@ export async function GET(req: NextRequest) {
         amount_due: inv.amount_due,
         status: inv.status,
         hosted_invoice_url: inv.hosted_invoice_url,
+        invoice_pdf: inv.invoice_pdf,
         lines,
         payments,
         quote_id: quoteId,

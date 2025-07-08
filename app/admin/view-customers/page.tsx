@@ -9,6 +9,7 @@ import { useStripeData } from '../../../components/StripeDataContext';
 import GlassCard from '../../../components/GlassCard';
 import { FaAddressCard, FaUser } from 'react-icons/fa';
 import React from 'react';
+import StickyNavBar from '../../../components/StickyNavBar';
 
 type SortField = 'name' | 'email' | 'created' | null;
 type SortDirection = 'asc' | 'desc';
@@ -1070,16 +1071,6 @@ export default function ViewCustomersPage() {
         </GlassCard>
       )}
 
-      {/* Navigation Buttons */}
-      <HStack spacing={4} mt={8}>
-        <Button onClick={handleLogout} colorScheme="red" variant="outline" size={{ base: "sm", md: "md" }}>
-        Logout
-      </Button>
-        <Button as={Link} href="/admin" leftIcon={<ArrowBackIcon />} colorScheme="red" variant="outline" size={{ base: "sm", md: "md" }}>
-        Back
-      </Button>
-      </HStack>
-
       {/* Edit Modal */}
       <Modal isOpen={isEditModalOpen} onClose={cancelEdit} isCentered size='md' motionPreset="slideInBottom">
         <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(8px)" />
@@ -1399,6 +1390,7 @@ export default function ViewCustomersPage() {
           </GlassCard>
         </ModalContent>
       </Modal>
+      <StickyNavBar />
     </Box>
   );
 } 

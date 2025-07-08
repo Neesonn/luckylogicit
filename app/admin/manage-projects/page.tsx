@@ -48,6 +48,7 @@ import Link from 'next/link';
 import { ArrowBackIcon, AddIcon } from '@chakra-ui/icons';
 import { useState, useEffect } from 'react';
 import { FaInfoCircle, FaRegCalendarAlt, FaUserTie, FaMoneyBillWave, FaUser } from 'react-icons/fa';
+import StickyNavBar from '../../../components/StickyNavBar';
 
 // Customer search functionality using live Stripe data
 
@@ -361,18 +362,6 @@ export default function ManageProjectsPage() {
         
       </VStack>
       
-      <HStack spacing={4} mt={6} flexWrap="wrap" justifyContent={{ base: 'center', md: 'flex-start' }}>
-        <Button onClick={handleLogout} colorScheme="red" variant="outline" size={{ base: "sm", md: "md" }}>
-          Logout
-        </Button>
-        <Button as={Link} href="/admin" leftIcon={<ArrowBackIcon />} colorScheme="red" variant="outline" size={{ base: "sm", md: "md" }}>
-          Back
-        </Button>
-        <Button onClick={clearAllProjects} colorScheme="orange" variant="outline" size={{ base: "sm", md: "md" }}>
-          Clear All Projects
-        </Button>
-      </HStack>
-
       {/* Create Project Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="xl" scrollBehavior="inside">
         <ModalOverlay />
@@ -806,7 +795,7 @@ export default function ManageProjectsPage() {
         </ModalContent>
       </Modal>
 
-
+      <StickyNavBar />
     </Box>
   );
 } 

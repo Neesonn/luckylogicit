@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowBackIcon, AddIcon, RepeatIcon } from '@chakra-ui/icons';
 import InputMask from 'react-input-mask';
 import { useStripeData } from '../../../components/StripeDataContext';
+import StickyNavBar from '../../../components/StickyNavBar';
 
 export default function CreateCustomerPage() {
   const router = useRouter();
@@ -147,24 +148,6 @@ export default function CreateCustomerPage() {
       </Box>
       
       <VStack as="form" spacing={{ base: 6, md: 8 }} w="100%" maxW="700px" bg="white" p={{ base: 6, md: 8 }} borderRadius="xl" boxShadow="xl" align="stretch" onSubmit={handleSubmit} mb={6}>
-        {/* Dummy Data Button */}
-        <Box textAlign="center" mb={2}>
-          <Button
-            onClick={generateDummyData}
-            colorScheme="blue"
-            variant="outline"
-            size={{ base: "sm", md: "md" }}
-            leftIcon={<RepeatIcon />}
-            _hover={{ 
-              transform: 'translateY(-1px)', 
-              boxShadow: '0 4px 12px rgba(66, 153, 225, 0.3)'
-            }}
-            transition="all 0.2s ease-in-out"
-          >
-            Generate Dummy Data
-          </Button>
-        </Box>
-
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 4, md: 6 }} w="100%">
           <FormControl isRequired>
             <FormLabel fontSize={{ base: "sm", md: "md" }} fontWeight="semibold" color="gray.700" mb={2}>Name</FormLabel>
@@ -372,12 +355,7 @@ export default function CreateCustomerPage() {
         {error && <Alert status="error" borderRadius="md"><AlertIcon />{error}</Alert>}
       </VStack>
       
-      <Button onClick={handleLogout} colorScheme="red" variant="outline" mt={6} size={{ base: "sm", md: "md" }}>
-        Logout
-      </Button>
-      <Button as={Link} href="/admin" leftIcon={<ArrowBackIcon />} colorScheme="red" variant="outline" mt={4} size={{ base: "sm", md: "md" }}>
-        Back
-      </Button>
+      <StickyNavBar />
     </Box>
   );
 } 

@@ -7,6 +7,7 @@ import { FaLock, FaUnlock } from 'react-icons/fa';
 import { useLock } from '../../../components/LockContext';
 import { useStripeData } from '../../../components/StripeDataContext';
 import GlassCard from '../../../components/GlassCard';
+import StickyNavBar from '../../../components/StickyNavBar';
 
 export default function InvoicesPage() {
   const { invoices, loading, error, refresh } = useStripeData();
@@ -20,7 +21,7 @@ export default function InvoicesPage() {
   const [dateField, setDateField] = useState<'created' | 'due_date'>('created');
   const [dateStart, setDateStart] = useState<string>('');
   const [dateEnd, setDateEnd] = useState<string>('');
-  const [hideVoid, setHideVoid] = useState(false);
+  const [hideVoid, setHideVoid] = useState(true);
   const [detailsInvoice, setDetailsInvoice] = useState<any | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [pageSize, setPageSize] = useState(10);
@@ -470,12 +471,6 @@ export default function InvoicesPage() {
           </Box>
         </Box>
       )}
-      <Button onClick={handleLogout} colorScheme="red" variant="outline" mt={6} isLoading={loggingOut}>
-        Logout
-      </Button>
-      <Button as={Link} href="/admin" leftIcon={<ArrowBackIcon />} colorScheme="red" variant="outline" mt={4}>
-        Back
-      </Button>
       {/* Invoice Modal */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} size={isMobile ? 'full' : 'md'} isCentered>
         <ModalOverlay />
@@ -723,6 +718,7 @@ export default function InvoicesPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <StickyNavBar />
     </Box>
   );
 } 

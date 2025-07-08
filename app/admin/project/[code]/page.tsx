@@ -87,6 +87,8 @@ import {
 } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import { CopyIcon } from '@chakra-ui/icons';
+// Fix import at the top
+import StickyNavBar from '../../../../components/StickyNavBar';
 
 // Default project data (fallback if localStorage is empty)
 const defaultProjects = [
@@ -234,6 +236,12 @@ export default function ProjectDetailsPage() {
   const [selectedQuoteId, setSelectedQuoteId] = useState<string>('');
   const [fetchingQuotes, setFetchingQuotes] = useState(false);
   const [linkingQuoteId, setLinkingQuoteId] = useState<string | null>(null);
+
+  // 1. Add state for invoice linking
+  const [customerInvoices, setCustomerInvoices] = useState<any[]>([]);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string>('');
+  const [fetchingInvoices, setFetchingInvoices] = useState(false);
+  const [linkingInvoiceId, setLinkingInvoiceId] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch project details from database
@@ -1063,6 +1071,25 @@ export default function ProjectDetailsPage() {
     fetchQuotes();
   }, [showQuotes, project?.customer_stripe_id]);
 
+  // 2. Fetch invoices for the customer when Quotes & Billings is expanded
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      if (project && project.customer_stripe_id) {
+        setFetchingInvoices(true);
+        try {
+          const res = await fetch(`/api/list-stripe-invoices?customer_id=${project.customer_stripe_id}`);
+          const data = await res.json();
+          setCustomerInvoices(data.invoices || []);
+        } catch (err) {
+          setCustomerInvoices([]);
+        } finally {
+          setFetchingInvoices(false);
+        }
+      }
+    };
+    fetchInvoices();
+  }, [project?.customer_stripe_id]);
+
   if (loading) {
     return (
       <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="gray.50">
@@ -1676,7 +1703,20 @@ export default function ProjectDetailsPage() {
                                         {q.quoteNumber || q.quoteId}
                                       </Text>
                                       <Text fontSize="sm" color="gray.500" mt={1}>
-                                        {q.status && <Badge colorScheme={q.status === 'open' ? 'green' : 'gray'} mr={2}>{q.status}</Badge>}
+                                        {q.status && (
+                                          <Badge
+                                            colorScheme={q.status === 'open' || q.status === 'accepted' ? 'green' : 'gray'}
+                                            mr={2}
+                                            textTransform="uppercase"
+                                            px={2}
+                                            py={1}
+                                            fontWeight="bold"
+                                            fontSize="sm"
+                                            letterSpacing="wide"
+                                          >
+                                            {q.status}
+                                          </Badge>
+                                        )}
                                         {q.created && <>• {new Date(q.created * 1000).toLocaleDateString()}</>}
                                       </Text>
                                     </Box>
@@ -1743,6 +1783,228 @@ export default function ProjectDetailsPage() {
                           </VStack>
                         ) : (
                           <Text color="gray.400" fontSize="sm">No quotes linked to this project.</Text>
+                        )}
+                      </Box>
+                      {/* 3. In the Quotes & Billings CardBody, after Linked Quotes, add: */}
+                      <Box mt={8}>
+                        <Text fontWeight="semibold" mb={2}>Linked Invoices:</Text>
+                        {/* Invoice search and link UI */}
+                        <HStack mb={2}>
+                          <Select
+                            placeholder={fetchingInvoices ? 'Loading invoices...' : 'Select an invoice to link'}
+                            value={selectedInvoiceId}
+                            onChange={e => setSelectedInvoiceId(e.target.value)}
+                            isDisabled={fetchingInvoices || customerInvoices.length === 0}
+                            size="md"
+                          >
+                            {customerInvoices.map((inv: any) => {
+                              const alreadyLinked = Array.isArray(project.linkedInvoices) && project.linkedInvoices.some((i: any) => i.invoiceId === inv.id);
+                              return (
+                                <option key={inv.id} value={inv.id} disabled={alreadyLinked}>
+                                  {inv.number || inv.id} {inv.amount_due ? `- $${(inv.amount_due / 100).toFixed(2)}` : ''} {alreadyLinked ? '(Linked)' : ''}
+                                </option>
+                              );
+                            })}
+                          </Select>
+                          <Button
+                            leftIcon={<LinkIcon />}
+                            colorScheme="blue"
+                            size="md"
+                            isDisabled={!selectedInvoiceId || linkingInvoiceId === selectedInvoiceId || (Array.isArray(project.linkedInvoices) && project.linkedInvoices.some((i: any) => i.invoiceId === selectedInvoiceId))}
+                            isLoading={linkingInvoiceId === selectedInvoiceId}
+                            onClick={async () => {
+                              setLinkingInvoiceId(selectedInvoiceId);
+                              const inv = customerInvoices.find((i: any) => i.id === selectedInvoiceId);
+                              try {
+                                const newLinked = Array.isArray(project.linkedInvoices) ? [...project.linkedInvoices] : [];
+                                newLinked.push({
+                                  invoiceId: inv.id,
+                                  invoiceNumber: inv.number,
+                                  amount_due: inv.amount_due,
+                                  status: inv.status,
+                                  created: inv.created,
+                                  due_date: inv.due_date,
+                                  hosted_invoice_url: inv.hosted_invoice_url, // <-- add this
+                                  invoice_pdf: inv.invoice_pdf, // <-- add this
+                                  lines: inv.lines // Save line items
+                                });
+                                // Persist to backend
+                                await fetch(`/api/projects/${projectCode}`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ linkedInvoices: newLinked })
+                                });
+                                setProject((prev: any) => ({ ...prev, linkedInvoices: newLinked }));
+                                toast({
+                                  title: 'Invoice linked',
+                                  description: `Invoice ${inv.number || inv.id} linked to this project.`,
+                                  status: 'success',
+                                  duration: 4000,
+                                  isClosable: true,
+                                  position: 'top-right',
+                                  variant: 'solid',
+                                });
+                                setSelectedInvoiceId('');
+                              } catch (err) {
+                                toast({
+                                  title: 'Failed to link invoice',
+                                  status: 'error',
+                                  duration: 4000,
+                                  isClosable: true,
+                                  position: 'top-right',
+                                });
+                              } finally {
+                                setLinkingInvoiceId(null);
+                              }
+                            }}
+                          >
+                            Link
+                          </Button>
+                        </HStack>
+                        {/* Linked invoices display */}
+                        {Array.isArray(project.linkedInvoices) && project.linkedInvoices.length > 0 ? (
+                          <VStack align="stretch" spacing={2}>
+                            {project.linkedInvoices.map((inv: any, idx: number) => {
+                              const invoiceTotal = Array.isArray(inv.lines)
+                                ? inv.lines.reduce((sum: number, line: any) => sum + (typeof line.amount === 'number' ? line.amount : 0), 0)
+                                : 0;
+                              return (
+                                <Box
+                                  key={inv.invoiceId}
+                                  bg="white"
+                                  borderRadius="lg"
+                                  boxShadow="sm"
+                                  p={5}
+                                  mb={4}
+                                  border="1px solid"
+                                  borderColor="gray.200"
+                                  _hover={{ boxShadow: "md", borderColor: "blue.300" }}
+                                  transition="box-shadow 0.2s, border-color 0.2s"
+                                >
+                                  <HStack justify="space-between" align="start" mb={2}>
+                                    <Box>
+                                      <Text fontWeight="bold" fontSize="lg" color="blue.800" letterSpacing="wide">
+                                        {inv.invoiceNumber || inv.invoiceId}
+                                      </Text>
+                                      <Text fontSize="sm" color="gray.500" mt={1}>
+                                        {inv.status && (
+                                          <Badge
+                                            colorScheme={
+                                              (inv.status === 'open' && inv.due_date && new Date(inv.due_date * 1000) < new Date()) ? 'red' :
+                                              inv.status === 'paid' ? 'green' :
+                                              inv.status === 'open' ? 'blue' :
+                                              inv.status === 'overdue' ? 'red' :
+                                              'gray'
+                                            }
+                                            mr={2}
+                                            textTransform="uppercase"
+                                            px={2}
+                                            py={1}
+                                            fontWeight="bold"
+                                            fontSize="sm"
+                                            letterSpacing="wide"
+                                          >
+                                            {(inv.status === 'open' && inv.due_date && new Date(inv.due_date * 1000) < new Date())
+                                              ? `OVERDUE — ${Math.ceil((Date.now() - inv.due_date * 1000) / (1000 * 60 * 60 * 24))} days overdue`
+                                              : inv.status}
+                                          </Badge>
+                                        )}
+                                        <span style={{ marginLeft: 4 }}>
+                                          <b>Created:</b> {inv.created ? new Date(inv.created * 1000).toLocaleDateString() : 'N/A'}
+                                          {inv.due_date && (
+                                            <>
+                                              <span style={{ margin: '0 8px', color: '#bbb' }}>|</span>
+                                              <b>Due:</b> <span style={{ color: '#b91c1c', fontWeight: 500 }}>{new Date(inv.due_date * 1000).toLocaleDateString()}</span>
+                                            </>
+                                          )}
+                                        </span>
+                                      </Text>
+                                    </Box>
+                                    <HStack spacing={2}>
+                                      {inv.hosted_invoice_url && (
+                                        <Button
+                                          as="a"
+                                          href={inv.hosted_invoice_url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          size="sm"
+                                          colorScheme="blue"
+                                          variant="outline"
+                                        >
+                                          View Invoice
+                                        </Button>
+                                      )}
+                                      {inv.invoice_pdf && (
+                                        <Button
+                                          as="a"
+                                          href={inv.invoice_pdf}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          size="sm"
+                                          colorScheme="gray"
+                                          variant="outline"
+                                          download
+                                        >
+                                          Download PDF
+                                        </Button>
+                                      )}
+                                      <Button size="sm" colorScheme="red" variant="ghost" onClick={async () => {
+                                        const newLinked = project.linkedInvoices.filter((li: any) => li.invoiceId !== inv.invoiceId);
+                                        await fetch(`/api/projects/${projectCode}`, {
+                                          method: 'PUT',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({ linkedInvoices: newLinked })
+                                        });
+                                        setProject((prev: any) => ({ ...prev, linkedInvoices: newLinked }));
+                                        toast({
+                                          title: 'Invoice unlinked',
+                                          description: `Invoice ${inv.invoiceNumber || inv.invoiceId} unlinked from this project.`,
+                                          status: 'info',
+                                          duration: 4000,
+                                          isClosable: true,
+                                          position: 'top-right',
+                                          variant: 'subtle',
+                                        });
+                                      }}>
+                                        Unlink
+                                      </Button>
+                                    </HStack>
+                                  </HStack>
+                                  <Divider mb={3} />
+                                  {Array.isArray(inv.lines) && inv.lines.length > 0 && (
+                                    <Box>
+                                      <Table size="sm" variant="simple" mb={2}>
+                                        <Tbody>
+                                          {inv.lines.map((line: any, idx: number) => (
+                                            <Tr key={idx} _hover={{ bg: "gray.50" }}>
+                                              <Td fontWeight="medium" color="gray.800" border="none">
+                                                {line.description}
+                                              </Td>
+                                              <Td color="gray.600" border="none" textAlign="right">
+                                                {line.quantity && `x${line.quantity}`}
+                                              </Td>
+                                              <Td color="gray.900" border="none" textAlign="right">
+                                                {typeof line.amount === 'number' && (
+                                                  <b>${(line.amount / 100).toFixed(2)}</b>
+                                                )}
+                                              </Td>
+                                            </Tr>
+                                          ))}
+                                        </Tbody>
+                                      </Table>
+                                      <Flex justify="flex-end">
+                                        <Text fontWeight="bold" color="blue.700" fontSize="md">
+                                          Invoice Total: ${(invoiceTotal / 100).toFixed(2)}
+                                        </Text>
+                                      </Flex>
+                                    </Box>
+                                  )}
+                                </Box>
+                              );
+                            })}
+                          </VStack>
+                        ) : (
+                          <Text color="gray.400" fontSize="sm">No invoices linked to this project.</Text>
                         )}
                       </Box>
                     </VStack>
@@ -2385,6 +2647,42 @@ export default function ProjectDetailsPage() {
                     ) : (
                       <Text color="gray.400" fontSize="sm">No quotes linked to this project.</Text>
                     )}
+                    {Array.isArray(project.linkedInvoices) && project.linkedInvoices.length > 0 && (
+                      <Box mt={6}>
+                        <HStack justify="space-between">
+                          <Text fontWeight="semibold" color="gray.700">Linked Invoices</Text>
+                          <Badge colorScheme="blue">{project.linkedInvoices.length}</Badge>
+                        </HStack>
+                        <Divider my={2} />
+                        {/* Calculate grand total of all invoices */}
+                        {(() => {
+                          const grandTotal = project.linkedInvoices.reduce((sum: number, inv: any) => {
+                            const invoiceTotal = Array.isArray(inv.lines)
+                              ? inv.lines.reduce((s: number, l: any) => s + (typeof l.amount === 'number' ? l.amount : 0), 0)
+                              : 0;
+                            return sum + invoiceTotal;
+                          }, 0);
+                          return (
+                            <Text fontWeight="bold" color="blue.700" fontSize="md" mb={2}>
+                              Total Value: A${(grandTotal / 100).toFixed(2)} inc GST
+                            </Text>
+                          );
+                        })()}
+                        <VStack align="stretch" spacing={1}>
+                          {project.linkedInvoices.map((inv: any, idx: number) => {
+                            const invoiceTotal = Array.isArray(inv.lines)
+                              ? inv.lines.reduce((sum: number, l: any) => sum + (typeof l.amount === 'number' ? l.amount : 0), 0)
+                              : 0;
+                            return (
+                              <HStack key={inv.invoiceId} justify="space-between" bg="gray.50" borderRadius="md" px={2} py={1}>
+                                <Text fontWeight="medium" color="gray.800">{inv.invoiceNumber || inv.invoiceId}</Text>
+                                <Text color="blue.700" fontWeight="bold">${(invoiceTotal / 100).toFixed(2)}</Text>
+                              </HStack>
+                            );
+                          })}
+                        </VStack>
+                      </Box>
+                    )}
                   </CardBody>
                 )}
               </Card>
@@ -2394,94 +2692,21 @@ export default function ProjectDetailsPage() {
       </Container>
 
       {/* Sticky Action Bar */}
-      <Box position="sticky" bottom={0} bg="white" zIndex={10} py={4} px={6} boxShadow="sm" borderTop="1px solid" borderColor="gray.200">
-        <HStack justify="center">
-          <Button
-            leftIcon={<FaTasks />}
-            colorScheme="teal"
-            size="md"
-            onClick={() => {
-              if (tasksSectionRef.current) {
-                tasksSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
-            }}
-            _hover={{ bg: 'teal.700' }}
-            transition="all 0.2s"
-          >
-            Tasks
-          </Button>
-          <Button
-            leftIcon={<FaInfoCircle />}
-            colorScheme="purple"
-            size="md"
-            onClick={() => {
-              if (updatesSectionRef.current) {
-                updatesSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
-            }}
-            _hover={{ bg: 'purple.700' }}
-            transition="all 0.2s"
-          >
-            Updates
-          </Button>
-          {!isEditing ? (
-                    <Button 
-                      leftIcon={<EditIcon />} 
-              bg="#003f2d" 
-              color="white" 
-                      size="md"
-                      onClick={handleEdit}
-              _hover={{ bg: '#14543a' }}
-              transition="all 0.2s"
-                    >
-              Edit
-                    </Button>
-          ) : (
-            <>
-              <Button 
-                colorScheme="green" 
-                size="md" 
-                onClick={handleSave}
-                isLoading={saving}
-                loadingText="Saving..."
-              >
-                Save
-                    </Button>
-              <Button 
-                variant="outline" 
-                size="md" 
-                onClick={handleCancel}
-                isDisabled={saving}
-              >
-                Cancel
-                    </Button>
-            </>
-          )}
-          <Menu>
-            <MenuButton
-              as={IconButton}
-              aria-label="Other actions"
-              icon={<HamburgerIcon />} 
-              size="md"
-              bg="red.600"
-              color="white"
-              _hover={{ bg: 'red.700' }}
-              transition="all 0.2s"
-            />
-            <MenuList bg="red.600" color="white" border="none">
-              <MenuItem
-                icon={<CopyIcon />}
-                onClick={handleOpenCloneModal}
-                _hover={{ bg: 'red.700', color: 'white' }}
-                fontWeight="semibold"
-                bg="red.600"
-              >
-                Clone
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </HStack>
-          </Box>
+      <StickyNavBar
+        showProjectActions
+        onTasksClick={() => {
+          if (tasksSectionRef.current) {
+            tasksSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }}
+        onUpdatesClick={() => {
+          if (updatesSectionRef.current) {
+            updatesSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }}
+        onEditClick={handleEdit}
+        onCloneClick={handleOpenCloneModal}
+      />
 
       {/* Footer */}
       <Box bg="white" borderTop="1px solid" borderColor="gray.200" py={6} mt={12}>
