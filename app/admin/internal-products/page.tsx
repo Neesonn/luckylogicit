@@ -1,5 +1,7 @@
 'use client';
 
+import AdminSessionTimeout from '../../../components/AdminSessionTimeout';
+
 export const dynamic = 'force-dynamic';
 import { Box, Heading, Text, Button, HStack, Input, Select, Table, Thead, Tbody, Tr, Th, Td, IconButton, Flex, Spacer, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, FormControl, FormLabel, Textarea, useDisclosure, NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper, Tooltip, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, Divider, useToast, SimpleGrid, useBreakpointValue, VStack } from '@chakra-ui/react';
 import { AddIcon, SearchIcon, EditIcon, InfoOutlineIcon, DeleteIcon, ExternalLinkIcon } from '@chakra-ui/icons';
@@ -247,71 +249,73 @@ export default function InternalProductsPage() {
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
-    <Box minH="100vh" bg="gray.50" px={4} py={10}>
-      {/* Header */}
-      <Box maxW="1200px" mx="auto" mb={6}>
-        <Heading as="h1" size="xl" color="#003f2d" fontWeight="bold" mb={1}>
-          Internal Products
-        </Heading>
-        <Text fontSize="md" color="gray.700" fontWeight="semibold" mt={2}>
-          Products in Catalogue: {products?.length || 0}
-        </Text>
-        <Text fontSize="lg" color="gray.600">
-          Manage your internal product catalog from Stripe.
-        </Text>
-      </Box>
-      {/* Toolbar */}
-      <Flex maxW="1200px" mx="auto" mb={4} align="center" gap={2} flexWrap="wrap">
-        <Button leftIcon={<AddIcon />} colorScheme="green" onClick={handleAddProduct}>
-          Add New Product
-        </Button>
-        <Select placeholder="Filter by Category" w="200px" value={category} onChange={e => setCategory(e.target.value)}>
-          {categories.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </Select>
-        <Select placeholder="Filter by Vendor" w="200px" value={vendor} onChange={e => setVendor(e.target.value)}>
-          {vendors.map(v => (
-            <option key={v} value={v}>{v}</option>
-          ))}
-        </Select>
-        <Select placeholder="Filter by Status" w="150px" value={activeFilter} onChange={e => setActiveFilter(e.target.value)}>
-          <option value="all">All Status</option>
-          <option value="active">Active Only</option>
-          <option value="inactive">Inactive Only</option>
-        </Select>
-        <Spacer />
-        <Box display="flex" alignItems="center" gap={2}>
-          <Input
-            placeholder="Search products..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            w="220px"
-            bg="white"
-          />
-          <IconButton aria-label="Search" icon={<SearchIcon />} colorScheme="gray" />
+    <>
+      <AdminSessionTimeout />
+      <Box minH="100vh" bg="gray.50" px={4} py={10}>
+        {/* Header */}
+        <Box maxW="1200px" mx="auto" mb={6}>
+          <Heading as="h1" size="xl" color="#003f2d" fontWeight="bold" mb={1}>
+            Internal Products
+          </Heading>
+          <Text fontSize="md" color="gray.700" fontWeight="semibold" mt={2}>
+            Products in Catalogue: {products?.length || 0}
+          </Text>
+          <Text fontSize="lg" color="gray.600">
+            Manage your internal product catalog from Stripe.
+          </Text>
         </Box>
-      </Flex>
-      {/* Loading and Error States */}
-      {loading && (
-        <Box textAlign="center" py={8}>
-          <Text>Loading products...</Text>
-        </Box>
-      )}
-      {error && (
-        <Box textAlign="center" py={8}>
-          <Text color="red.500">Error: {error}</Text>
-        </Box>
-      )}
-      {/* Products Table/Cards */}
-      {!loading && !error && (
-        isMobile ? (
-          <VStack w="100%" spacing={4} maxW="500px" mx="auto" mb={8}>
-            {filteredProducts.map((p: StripeProduct, idx: number) => (
-                             <GlassCard key={p.id} w="100%" p={4} borderRadius="lg" boxShadow="md">
+        {/* Toolbar */}
+        <Flex maxW="1200px" mx="auto" mb={4} align="center" gap={2} flexWrap="wrap">
+          <Button leftIcon={<AddIcon />} colorScheme="green" onClick={handleAddProduct}>
+            Add New Product
+          </Button>
+          <Select placeholder="Filter by Category" w="200px" value={category} onChange={e => setCategory(e.target.value)}>
+            {categories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </Select>
+          <Select placeholder="Filter by Vendor" w="200px" value={vendor} onChange={e => setVendor(e.target.value)}>
+            {vendors.map(v => (
+              <option key={v} value={v}>{v}</option>
+            ))}
+          </Select>
+          <Select placeholder="Filter by Status" w="150px" value={activeFilter} onChange={e => setActiveFilter(e.target.value)}>
+            <option value="all">All Status</option>
+            <option value="active">Active Only</option>
+            <option value="inactive">Inactive Only</option>
+          </Select>
+          <Spacer />
+          <Box display="flex" alignItems="center" gap={2}>
+            <Input
+              placeholder="Search products..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              w="220px"
+              bg="white"
+            />
+            <IconButton aria-label="Search" icon={<SearchIcon />} colorScheme="gray" />
+          </Box>
+        </Flex>
+        {/* Loading and Error States */}
+        {loading && (
+          <Box textAlign="center" py={8}>
+            <Text>Loading products...</Text>
+          </Box>
+        )}
+        {error && (
+          <Box textAlign="center" py={8}>
+            <Text color="red.500">Error: {error}</Text>
+          </Box>
+        )}
+        {/* Products Table/Cards */}
+        {!loading && !error && (
+          isMobile ? (
+            <VStack w="100%" spacing={4} maxW="500px" mx="auto" mb={8}>
+              {filteredProducts.map((p: StripeProduct, idx: number) => (
+                               <GlassCard key={p.id} w="100%" p={4} borderRadius="lg" boxShadow="md">
                  <Text fontWeight="bold" fontSize="lg">{p.name}</Text>
                  <Text fontSize="sm" color="gray.600" mb={2}>{p.description || 'No description'}</Text>
-                 <Text fontWeight="semibold">Price: {p.price_formatted || 'A$0.00'}</Text>
+                                   <Text fontWeight="semibold">Price: {p.price_formatted || 'A$0.00'}</Text>
                  <Text>Status: {p.active ? 'Active' : 'Inactive'}</Text>
                  <HStack spacing={2} mt={2}>
                    <IconButton aria-label="Edit" icon={<EditIcon />} size="sm" colorScheme="green" onClick={() => handleEditProduct(p)} />
@@ -330,168 +334,169 @@ export default function InternalProductsPage() {
                    </Tooltip>
                  </HStack>
                </GlassCard>
-            ))}
-          </VStack>
-        ) : (
-          <Box maxW="1200px" mx="auto" bg="white" boxShadow="md" borderRadius="2xl" p={0}>
-            <Table variant="simple" size="sm" sx={{ 'th, td': { whiteSpace: 'nowrap', fontSize: '14px', px: 2, py: 1, verticalAlign: 'middle' } }} layout="auto">
-              <Thead bg="gray.100">
-                                 <Tr>
-                   <Th fontSize="15px">Product Name</Th>
-                   <Th fontSize="15px">Description</Th>
-                   <Th isNumeric fontSize="15px">Price</Th>
-                   <Th fontSize="15px">Status</Th>
-                   <Th fontSize="15px">Actions</Th>
-                 </Tr>
-              </Thead>
-              <Tbody>
-                                 {filteredProducts.map((p: StripeProduct, idx: number) => (
-                   <Tr key={p.id}>
-                     <Td>
-                       {p.name}
-                       <Popover placement="right" trigger="click">
-                         <PopoverTrigger>
-                           <InfoOutlineIcon ml={1} color="gray.400" cursor="pointer" aria-label="Show Description" />
-                         </PopoverTrigger>
-                         <PopoverContent w="auto" fontSize="sm">
-                           <PopoverArrow />
-                           <PopoverBody>
-                             <b>Description:</b> {p.description || 'No description available'}
-                           </PopoverBody>
-                         </PopoverContent>
-                       </Popover>
-                     </Td>
-                     <Td maxW="200px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
-                       {p.description || 'No description'}
-                     </Td>
-                     <Td isNumeric>{p.price_formatted || 'A$0.00'}</Td>
-                     <Td>
-                       <Box display="inline-block" px={2} py={1} borderRadius="md" fontWeight="bold" fontSize="xs" 
-                         bg={p.active ? 'green.50' : 'gray.50'}
-                         color={p.active ? 'green.700' : 'gray.700'}
-                         border="1px solid"
-                         borderColor={p.active ? 'green.400' : 'gray.400'}>
-                         {p.active ? 'Active' : 'Inactive'}
-                       </Box>
-                     </Td>
-                     <Td>
-                       <HStack spacing={2}>
-                         <IconButton
-                           aria-label="Edit"
-                           icon={<EditIcon />}
-                           size="sm"
-                           colorScheme="green"
-                           onClick={() => handleEditProduct(p)}
-                         />
-                         <Tooltip label="View in Stripe" hasArrow>
-                           <IconButton
-                             as="a"
-                             href={`https://dashboard.stripe.com/products/${p.id}`}
-                             target="_blank"
-                             rel="noopener noreferrer"
-                             aria-label="View in Stripe"
-                             icon={<ExternalLinkIcon />}
-                             size="sm"
-                             colorScheme="blue"
-                             variant="outline"
-                           />
-                         </Tooltip>
-                       </HStack>
-                     </Td>
+              ))}
+            </VStack>
+          ) : (
+            <Box maxW="1200px" mx="auto" bg="white" boxShadow="md" borderRadius="2xl" p={0}>
+              <Table variant="simple" size="sm" sx={{ 'th, td': { whiteSpace: 'nowrap', fontSize: '14px', px: 2, py: 1, verticalAlign: 'middle' } }} layout="auto">
+                <Thead bg="gray.100">
+                                   <Tr>
+                     <Th fontSize="15px">Product Name</Th>
+                     <Th fontSize="15px">Description</Th>
+                     <Th isNumeric fontSize="15px">Price</Th>
+                     <Th fontSize="15px">Status</Th>
+                     <Th fontSize="15px">Actions</Th>
                    </Tr>
-                 ))}
-              </Tbody>
-            </Table>
-          </Box>
-        )
-      )}
-      {/* Add/Edit Product Modal */}
-      <Modal isOpen={isOpen} onClose={onClose} size="xl">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>{editProduct ? 'Edit Product' : 'Add New Product'}</ModalHeader>
-          <ModalCloseButton />
-          <form onSubmit={handleSubmit}>
-                         <ModalBody>
-               <VStack spacing={4}>
-                 <FormControl isRequired isInvalid={!!errors.name}>
-                   <FormLabel>Name (required)</FormLabel>
-                   <Text fontSize="sm" color="gray.600" mb={2}>Name of the product or service, visible to customers.</Text>
-                   <Input name="name" value={form.name} onChange={handleFormChange} />
-                   {errors.name && <Text color="red.500" fontSize="sm">{errors.name}</Text>}
-                 </FormControl>
-                 
-                 <FormControl>
-                   <FormLabel>Description</FormLabel>
-                   <Text fontSize="sm" color="gray.600" mb={2}>Appears at checkout, on the customer portal, and in quotes.</Text>
-                   <Textarea name="description" value={form.description} onChange={handleFormChange} rows={3} />
-                 </FormControl>
-                 
-                 <FormControl>
-                   <FormLabel>Product tax code</FormLabel>
-                   <Text fontSize="sm" color="gray.600" mb={2}>SET TO Use preset: General - Services</Text>
-                   <Input value="General - Services" isReadOnly bg="gray.50" />
-                 </FormControl>
-                 
-                 <FormControl>
-                   <FormLabel>Product type</FormLabel>
-                   <Text fontSize="sm" color="gray.600" mb={2}>It's a One-off product</Text>
-                   <Input value="One-off product" isReadOnly bg="gray.50" />
-                 </FormControl>
-                 
-                 <FormControl isRequired isInvalid={!!errors.amount}>
-                   <FormLabel>Amount (required)</FormLabel>
-                   <Text fontSize="sm" color="gray.600" mb={2}>A$</Text>
-                   <NumberInput name="amount" value={form.amount} onChange={(value) => {
-                     setForm(f => ({ ...f, amount: value }));
-                     handleAmountChange(value);
-                   }}>
-                     <NumberInputField />
-                     <NumberInputStepper>
-                       <NumberIncrementStepper />
-                       <NumberDecrementStepper />
-                     </NumberInputStepper>
-                   </NumberInput>
-                   {errors.amount && <Text color="red.500" fontSize="sm">{errors.amount}</Text>}
-                 </FormControl>
-                 
-                 <FormControl>
-                   <FormLabel>Include tax in price</FormLabel>
-                   <Text fontSize="sm" color="gray.600" mb={2}>Yes</Text>
-                   <input type="checkbox" name="include_tax" checked={form.include_tax} onChange={handleFormChange} />
-                 </FormControl>
-                 
-                 <FormControl>
-                   <FormLabel>Status</FormLabel>
-                   <Text fontSize="sm" color="gray.600" mb={2}>
-                     {form.active ? 'Active - Product is visible and available for purchase' : 'Inactive - Product is archived and not available'}
-                   </Text>
-                   <input type="checkbox" name="active" checked={form.active} onChange={handleFormChange} />
-                   <Text fontSize="sm" color="gray.500" mt={1}>
-                     {form.active ? '✓ Active' : '✗ Inactive (Archived in Stripe)'}
-                   </Text>
-                 </FormControl>
-                 
-                 <FormControl>
-                   <FormLabel>Set as default price</FormLabel>
-                   <Text fontSize="sm" color="gray.600" mb={2}>
-                     If checked, this price will be set as the default price for this product in Stripe.
-                   </Text>
-                   <input type="checkbox" name="set_as_default_price" checked={form.set_as_default_price} onChange={handleFormChange} />
-                 </FormControl>
-               </VStack>
-             </ModalBody>
-            <ModalFooter>
-              <Button variant="ghost" mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button colorScheme="green" type="submit">
-                {editProduct ? 'Update Product' : 'Add Product'}
-              </Button>
-            </ModalFooter>
-          </form>
-        </ModalContent>
-      </Modal>
-    </Box>
+                </Thead>
+                <Tbody>
+                                   {filteredProducts.map((p: StripeProduct, idx: number) => (
+                     <Tr key={p.id}>
+                       <Td>
+                         {p.name}
+                         <Popover placement="right" trigger="click">
+                           <PopoverTrigger>
+                             <InfoOutlineIcon ml={1} color="gray.400" cursor="pointer" aria-label="Show Description" />
+                           </PopoverTrigger>
+                           <PopoverContent w="auto" fontSize="sm">
+                             <PopoverArrow />
+                             <PopoverBody>
+                               <b>Description:</b> {p.description || 'No description available'}
+                             </PopoverBody>
+                           </PopoverContent>
+                         </Popover>
+                       </Td>
+                       <Td maxW="200px" whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">
+                         {p.description || 'No description'}
+                       </Td>
+                       <Td isNumeric>{p.price_formatted || 'A$0.00'}</Td>
+                       <Td>
+                         <Box display="inline-block" px={2} py={1} borderRadius="md" fontWeight="bold" fontSize="xs" 
+                           bg={p.active ? 'green.50' : 'gray.50'}
+                           color={p.active ? 'green.700' : 'gray.700'}
+                           border="1px solid"
+                           borderColor={p.active ? 'green.400' : 'gray.400'}>
+                           {p.active ? 'Active' : 'Inactive'}
+                         </Box>
+                       </Td>
+                       <Td>
+                         <HStack spacing={2}>
+                           <IconButton
+                             aria-label="Edit"
+                             icon={<EditIcon />}
+                             size="sm"
+                             colorScheme="green"
+                             onClick={() => handleEditProduct(p)}
+                           />
+                           <Tooltip label="View in Stripe" hasArrow>
+                             <IconButton
+                               as="a"
+                               href={`https://dashboard.stripe.com/products/${p.id}`}
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               aria-label="View in Stripe"
+                               icon={<ExternalLinkIcon />}
+                               size="sm"
+                               colorScheme="blue"
+                               variant="outline"
+                             />
+                           </Tooltip>
+                         </HStack>
+                       </Td>
+                     </Tr>
+                   ))}
+                </Tbody>
+              </Table>
+            </Box>
+          )
+        )}
+        {/* Add/Edit Product Modal */}
+        <Modal isOpen={isOpen} onClose={onClose} size="xl">
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>{editProduct ? 'Edit Product' : 'Add New Product'}</ModalHeader>
+            <ModalCloseButton />
+            <form onSubmit={handleSubmit}>
+                                   <ModalBody>
+                 <VStack spacing={4}>
+                   <FormControl isRequired isInvalid={!!errors.name}>
+                     <FormLabel>Name (required)</FormLabel>
+                     <Text fontSize="sm" color="gray.600" mb={2}>Name of the product or service, visible to customers.</Text>
+                     <Input name="name" value={form.name} onChange={handleFormChange} />
+                     {errors.name && <Text color="red.500" fontSize="sm">{errors.name}</Text>}
+                   </FormControl>
+                   
+                   <FormControl>
+                     <FormLabel>Description</FormLabel>
+                     <Text fontSize="sm" color="gray.600" mb={2}>Appears at checkout, on the customer portal, and in quotes.</Text>
+                     <Textarea name="description" value={form.description} onChange={handleFormChange} rows={3} />
+                   </FormControl>
+                   
+                   <FormControl>
+                     <FormLabel>Product tax code</FormLabel>
+                     <Text fontSize="sm" color="gray.600" mb={2}>SET TO Use preset: General - Services</Text>
+                     <Input value="General - Services" isReadOnly bg="gray.50" />
+                   </FormControl>
+                   
+                   <FormControl>
+                     <FormLabel>Product type</FormLabel>
+                     <Text fontSize="sm" color="gray.600" mb={2}>It's a One-off product</Text>
+                     <Input value="One-off product" isReadOnly bg="gray.50" />
+                   </FormControl>
+                   
+                   <FormControl isRequired isInvalid={!!errors.amount}>
+                     <FormLabel>Amount (required)</FormLabel>
+                     <Text fontSize="sm" color="gray.600" mb={2}>A$</Text>
+                     <NumberInput name="amount" value={form.amount} onChange={(value) => {
+                       setForm(f => ({ ...f, amount: value }));
+                       handleAmountChange(value);
+                     }}>
+                       <NumberInputField />
+                       <NumberInputStepper>
+                         <NumberIncrementStepper />
+                         <NumberDecrementStepper />
+                       </NumberInputStepper>
+                     </NumberInput>
+                     {errors.amount && <Text color="red.500" fontSize="sm">{errors.amount}</Text>}
+                   </FormControl>
+                   
+                   <FormControl>
+                     <FormLabel>Include tax in price</FormLabel>
+                     <Text fontSize="sm" color="gray.600" mb={2}>Yes</Text>
+                     <input type="checkbox" name="include_tax" checked={form.include_tax} onChange={handleFormChange} />
+                   </FormControl>
+                   
+                   <FormControl>
+                     <FormLabel>Status</FormLabel>
+                     <Text fontSize="sm" color="gray.600" mb={2}>
+                       {form.active ? 'Active - Product is visible and available for purchase' : 'Inactive - Product is archived and not available'}
+                     </Text>
+                     <input type="checkbox" name="active" checked={form.active} onChange={handleFormChange} />
+                     <Text fontSize="sm" color="gray.500" mt={1}>
+                       {form.active ? '✓ Active' : '✗ Inactive (Archived in Stripe)'}
+                     </Text>
+                   </FormControl>
+                   
+                   <FormControl>
+                     <FormLabel>Set as default price</FormLabel>
+                     <Text fontSize="sm" color="gray.600" mb={2}>
+                       If checked, this price will be set as the default price for this product in Stripe.
+                     </Text>
+                     <input type="checkbox" name="set_as_default_price" checked={form.set_as_default_price} onChange={handleFormChange} />
+                   </FormControl>
+                 </VStack>
+               </ModalBody>
+              <ModalFooter>
+                <Button variant="ghost" mr={3} onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button colorScheme="green" type="submit">
+                  {editProduct ? 'Update Product' : 'Add Product'}
+                </Button>
+              </ModalFooter>
+            </form>
+          </ModalContent>
+        </Modal>
+      </Box>
+    </>
   );
 } 

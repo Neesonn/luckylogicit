@@ -10,6 +10,7 @@ import GlassCard from '../../../components/GlassCard';
 import { FaAddressCard, FaUser } from 'react-icons/fa';
 import React from 'react';
 import StickyNavBar from '../../../components/StickyNavBar';
+import AdminSessionTimeout from '../../../components/AdminSessionTimeout';
 
 type SortField = 'name' | 'email' | 'created' | null;
 type SortDirection = 'asc' | 'desc';
@@ -531,311 +532,488 @@ export default function ViewCustomersPage() {
   const displayedInvoices = useMemo(() => invoices.slice(0, 5), [invoices]);
 
   return (
-    <Box minH="100vh" bg="gray.50" px={{ base: 3, md: 4 }} py={{ base: 6, md: 10 }} display="flex" flexDirection="column" alignItems="center">
-      {/* Header Section */}
-      <Box textAlign="center" mb={{ base: 6, md: 8 }} px={{ base: 2, md: 0 }}>
-        <Heading as="h1" size={{ base: "xl", md: "2xl" }} mb={3} color="brand.green" fontWeight="bold">
-          Customer Management
-        </Heading>
-        <Text fontSize={{ base: "md", md: "lg" }} color="gray.600" maxW="600px">
-          View, edit, and manage your customer accounts and billing information
-        </Text>
-      </Box>
-
-      {loading ? (
-        <Box textAlign="center" py={20}>
-          <Spinner size="xl" color="brand.green" thickness="4px" />
-          <Text mt={4} color="gray.600" fontSize="lg">Loading customers...</Text>
+    <>
+      <AdminSessionTimeout />
+      <Box minH="100vh" bg="gray.50" px={{ base: 3, md: 4 }} py={{ base: 6, md: 10 }} display="flex" flexDirection="column" alignItems="center">
+        {/* Header Section */}
+        <Box textAlign="center" mb={{ base: 6, md: 8 }} px={{ base: 2, md: 0 }}>
+          <Heading as="h1" size={{ base: "xl", md: "2xl" }} mb={3} color="brand.green" fontWeight="bold">
+            Customer Management
+          </Heading>
+          <Text fontSize={{ base: "md", md: "lg" }} color="gray.600" maxW="600px">
+            View, edit, and manage your customer accounts and billing information
+          </Text>
         </Box>
-      ) : error ? (
-        <GlassCard maxW="600px" w="100%">
-          <Alert status="error" borderRadius="lg">
-            <AlertIcon />
-            <Text fontWeight="medium">{error}</Text>
-          </Alert>
-        </GlassCard>
-      ) : (
-        <GlassCard w="100%" maxW="1400px" p={{ base: 4, md: 6 }}>
-          {/* Search, Sort, and Filter Bar */}
-          <VStack spacing={4} align="stretch" mb={6}>
-            {/* Search and Actions Row */}
-            <HStack justify="space-between" flexWrap="wrap" gap={4}>
-              <Box flex="1" minW="250px">
-                <HStack>
-                  <Box position="relative" flex="1">
-                    <Input
-                      placeholder="Search customers by name, email, or ID..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      pl={10}
-                      size="md"
+
+        {loading ? (
+          <Box textAlign="center" py={20}>
+            <Spinner size="xl" color="brand.green" thickness="4px" />
+            <Text mt={4} color="gray.600" fontSize="lg">Loading customers...</Text>
+          </Box>
+        ) : error ? (
+          <GlassCard maxW="600px" w="100%">
+            <Alert status="error" borderRadius="lg">
+              <AlertIcon />
+              <Text fontWeight="medium">{error}</Text>
+            </Alert>
+          </GlassCard>
+        ) : (
+          <GlassCard w="100%" maxW="1400px" p={{ base: 4, md: 6 }}>
+            {/* Search, Sort, and Filter Bar */}
+            <VStack spacing={4} align="stretch" mb={6}>
+              {/* Search and Actions Row */}
+              <HStack justify="space-between" flexWrap="wrap" gap={4}>
+                <Box flex="1" minW="250px">
+                  <HStack>
+                    <Box position="relative" flex="1">
+                      <Input
+                        placeholder="Search customers by name, email, or ID..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        pl={10}
+                        size="md"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                        _hover={{ borderColor: 'gray.300' }}
+                      />
+                      <SearchIcon position="absolute" left={3} top="50%" transform="translateY(-50%)" color="gray.400" />
+                    </Box>
+                  </HStack>
+                </Box>
+                <Button
+                  as={Link}
+                  href="/admin/create-customer"
+                  leftIcon={<AddIcon />}
+                  colorScheme="green"
+                  size={{ base: "md", md: "lg" }}
+                  _hover={{ 
+                    transform: 'translateY(-1px)', 
+                    boxShadow: '0 4px 12px rgba(0, 63, 45, 0.3)'
+                  }}
+                  transition="all 0.2s ease-in-out"
+                >
+                  Add Customer
+                </Button>
+              </HStack>
+
+              {/* Sort and Filter Row */}
+              <HStack justify="space-between" flexWrap="wrap" gap={4}>
+                <HStack spacing={4} flexWrap="wrap">
+                  {/* Sort Options */}
+                  <HStack spacing={2}>
+                    <Text fontSize="sm" color="gray.600" fontWeight="medium">Sort by:</Text>
+                    <Button
+                      size="sm"
+                      variant={sortField === 'name' ? 'solid' : 'outline'}
+                      colorScheme={sortField === 'name' ? 'blue' : 'gray'}
+                      onClick={() => handleSort('name')}
+                      rightIcon={getSortIcon('name')}
+                    >
+                      Name
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={sortField === 'email' ? 'solid' : 'outline'}
+                      colorScheme={sortField === 'email' ? 'blue' : 'gray'}
+                      onClick={() => handleSort('email')}
+                      rightIcon={getSortIcon('email')}
+                    >
+                      Email
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={sortField === 'created' ? 'solid' : 'outline'}
+                      colorScheme={sortField === 'created' ? 'blue' : 'gray'}
+                      onClick={() => handleSort('created')}
+                      rightIcon={getSortIcon('created')}
+                    >
+                      Date Created
+                    </Button>
+                  </HStack>
+
+                  {/* Filter Options */}
+                  <HStack spacing={2}>
+                    <Text fontSize="sm" color="gray.600" fontWeight="medium">Filter:</Text>
+                    <Select
+                      size="sm"
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
                       borderWidth="2px"
                       borderColor="gray.200"
                       _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                      _hover={{ borderColor: 'gray.300' }}
-                    />
-                    <SearchIcon position="absolute" left={3} top="50%" transform="translateY(-50%)" color="gray.400" />
-                  </Box>
-                </HStack>
-              </Box>
-              <Button
-                as={Link}
-                href="/admin/create-customer"
-                leftIcon={<AddIcon />}
-                colorScheme="green"
-                size={{ base: "md", md: "lg" }}
-                _hover={{ 
-                  transform: 'translateY(-1px)', 
-                  boxShadow: '0 4px 12px rgba(0, 63, 45, 0.3)'
-                }}
-                transition="all 0.2s ease-in-out"
-              >
-                Add Customer
-              </Button>
-            </HStack>
-
-            {/* Sort and Filter Row */}
-            <HStack justify="space-between" flexWrap="wrap" gap={4}>
-              <HStack spacing={4} flexWrap="wrap">
-                {/* Sort Options */}
-                <HStack spacing={2}>
-                  <Text fontSize="sm" color="gray.600" fontWeight="medium">Sort by:</Text>
-                  <Button
-                    size="sm"
-                    variant={sortField === 'name' ? 'solid' : 'outline'}
-                    colorScheme={sortField === 'name' ? 'blue' : 'gray'}
-                    onClick={() => handleSort('name')}
-                    rightIcon={getSortIcon('name')}
-                  >
-                    Name
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={sortField === 'email' ? 'solid' : 'outline'}
-                    colorScheme={sortField === 'email' ? 'blue' : 'gray'}
-                    onClick={() => handleSort('email')}
-                    rightIcon={getSortIcon('email')}
-                  >
-                    Email
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={sortField === 'created' ? 'solid' : 'outline'}
-                    colorScheme={sortField === 'created' ? 'blue' : 'gray'}
-                    onClick={() => handleSort('created')}
-                    rightIcon={getSortIcon('created')}
-                  >
-                    Date Created
-                  </Button>
+                      maxW="200px"
+                    >
+                      <option value="all">All Customers</option>
+                      <option value="withPhone">With Phone</option>
+                      <option value="withAddress">With Address</option>
+                      <option value="complete">Complete Profile</option>
+                    </Select>
+                  </HStack>
                 </HStack>
 
-                {/* Filter Options */}
-                <HStack spacing={2}>
-                  <Text fontSize="sm" color="gray.600" fontWeight="medium">Filter:</Text>
-                  <Select
+                {/* Clear Filters Button */}
+                {(searchTerm || sortField || filterStatus !== 'all') && (
+                  <Button
                     size="sm"
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    borderWidth="2px"
-                    borderColor="gray.200"
-                    _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                    maxW="200px"
+                    variant="ghost"
+                    color="gray.500"
+                    onClick={clearFilters}
+                    _hover={{ color: 'gray.700' }}
                   >
-                    <option value="all">All Customers</option>
-                    <option value="withPhone">With Phone</option>
-                    <option value="withAddress">With Address</option>
-                    <option value="complete">Complete Profile</option>
-                  </Select>
-                </HStack>
+                    Clear Filters
+                  </Button>
+                )}
               </HStack>
+            </VStack>
 
-              {/* Clear Filters Button */}
-              {(searchTerm || sortField || filterStatus !== 'all') && (
+            {/* Bulk Actions Bar */}
+            <Box mb={4} p={3} bg="blue.50" borderWidth="1px" borderColor="blue.200" borderRadius="md">
+              <HStack justify="space-between" align="center">
+                <HStack spacing={4} align="center">
+                  <Checkbox
+                    isChecked={selectedCustomers.size === filteredCustomers.length && filteredCustomers.length > 0}
+                    isIndeterminate={selectedCustomers.size > 0 && selectedCustomers.size < filteredCustomers.length}
+                    onChange={handleSelectAll}
+                    colorScheme="blue"
+                    size="md"
+                  >
+                    <Text fontSize="sm" color="blue.700" fontWeight="medium">
+                      Select All ({filteredCustomers.length} customers)
+                    </Text>
+                  </Checkbox>
+                  {selectedCustomers.size > 0 && (
+                    <Text fontSize="sm" color="blue.700" fontWeight="medium">
+                      • {selectedCustomers.size} selected
+                    </Text>
+                  )}
+                </HStack>
+                {selectedCustomers.size > 0 && (
+                  <HStack spacing={3}>
+                    <Button
+                      size="sm"
+                      colorScheme="blue"
+                      variant="outline"
+                      onClick={exportToCSV}
+                      _hover={{ transform: 'translateY(-1px)' }}
+                      transition="all 0.2s ease-in-out"
+                    >
+                      Export Selected
+                    </Button>
+                    <Button
+                      size="sm"
+                      colorScheme="red"
+                      onClick={startBulkDelete}
+                      _hover={{ transform: 'translateY(-1px)' }}
+                      transition="all 0.2s ease-in-out"
+                    >
+                      Delete Selected
+                    </Button>
+                  </HStack>
+                )}
+              </HStack>
+            </Box>
+
+            {/* Customer Count and Export All */}
+            <HStack justify="space-between" mb={4}>
+              <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                {filteredCustomers.length} customer{filteredCustomers.length !== 1 ? 's' : ''} found
+                {customers && customers.length !== filteredCustomers.length && (
+                  <Text as="span" color="gray.400"> (of {customers.length} total)</Text>
+                )}
+              </Text>
+              {filteredCustomers.length > 0 && (
                 <Button
                   size="sm"
-                  variant="ghost"
-                  color="gray.500"
-                  onClick={clearFilters}
-                  _hover={{ color: 'gray.700' }}
+                  colorScheme="green"
+                  variant="outline"
+                  onClick={exportToCSV}
+                  _hover={{ transform: 'translateY(-1px)' }}
+                  transition="all 0.2s ease-in-out"
                 >
-                  Clear Filters
+                  Export All
                 </Button>
               )}
             </HStack>
-          </VStack>
 
-          {/* Bulk Actions Bar */}
-          <Box mb={4} p={3} bg="blue.50" borderWidth="1px" borderColor="blue.200" borderRadius="md">
-            <HStack justify="space-between" align="center">
-              <HStack spacing={4} align="center">
-                <Checkbox
-                  isChecked={selectedCustomers.size === filteredCustomers.length && filteredCustomers.length > 0}
-                  isIndeterminate={selectedCustomers.size > 0 && selectedCustomers.size < filteredCustomers.length}
-                  onChange={handleSelectAll}
-                  colorScheme="blue"
-                  size="md"
-                >
-                  <Text fontSize="sm" color="blue.700" fontWeight="medium">
-                    Select All ({filteredCustomers.length} customers)
-                  </Text>
-                </Checkbox>
-                {selectedCustomers.size > 0 && (
-                  <Text fontSize="sm" color="blue.700" fontWeight="medium">
-                    • {selectedCustomers.size} selected
-                  </Text>
-                )}
-              </HStack>
-              {selectedCustomers.size > 0 && (
-                <HStack spacing={3}>
-                  <Button
-                    size="sm"
-                    colorScheme="blue"
-                    variant="outline"
-                    onClick={exportToCSV}
-                    _hover={{ transform: 'translateY(-1px)' }}
-                    transition="all 0.2s ease-in-out"
-                  >
-                    Export Selected
-                  </Button>
-                  <Button
-                    size="sm"
-                    colorScheme="red"
-                    onClick={startBulkDelete}
-                    _hover={{ transform: 'translateY(-1px)' }}
-                    transition="all 0.2s ease-in-out"
-                  >
-                    Delete Selected
-                  </Button>
-                </HStack>
-              )}
-            </HStack>
-          </Box>
-
-          {/* Customer Count and Export All */}
-          <HStack justify="space-between" mb={4}>
-            <Text fontSize="sm" color="gray.600" fontWeight="medium">
-              {filteredCustomers.length} customer{filteredCustomers.length !== 1 ? 's' : ''} found
-              {customers && customers.length !== filteredCustomers.length && (
-                <Text as="span" color="gray.400"> (of {customers.length} total)</Text>
-              )}
-            </Text>
-            {filteredCustomers.length > 0 && (
-              <Button
-                size="sm"
-                colorScheme="green"
-                variant="outline"
-                onClick={exportToCSV}
-                _hover={{ transform: 'translateY(-1px)' }}
-                transition="all 0.2s ease-in-out"
-              >
-                Export All
-              </Button>
-            )}
-          </HStack>
-
-          {/* Desktop Table View */}
-          <Box display={{ base: 'none', lg: 'block' }} overflowX="auto">
-          <Table variant="simple" size="md">
-            <Thead>
-                <Tr bg="brand.green">
-                  <Th color="white" borderTopLeftRadius="lg" fontSize="sm" fontWeight="bold" textAlign="center"></Th>
-                  <Th color="white" fontSize="sm" fontWeight="bold" textAlign="center">Customer ID</Th>
-                  <Th color="white" fontSize="sm" fontWeight="bold" cursor="pointer" onClick={() => handleSort('name')}>
-                    <HStack spacing={1}>
-                      <Text>Name</Text>
-                      {getSortIcon('name')}
-                    </HStack>
-                  </Th>
-                  <Th color="white" fontSize="sm" fontWeight="bold" cursor="pointer" onClick={() => handleSort('email')}>
-                    <HStack spacing={1}>
-                      <Text>Email</Text>
-                      {getSortIcon('email')}
-                    </HStack>
-                  </Th>
-                  <Th color="white" fontSize="sm" fontWeight="bold">Phone</Th>
-                  <Th color="white" fontSize="sm" fontWeight="bold">Address</Th>
-                  <Th color="white" fontSize="sm" fontWeight="bold" cursor="pointer" onClick={() => handleSort('created')}>
-                    <HStack spacing={1}>
-                      <Text>Created</Text>
-                      {getSortIcon('created')}
-                    </HStack>
-                  </Th>
-                  <Th color="white" borderTopRightRadius="lg" fontSize="sm" fontWeight="bold" textAlign="center">Actions</Th>
+            {/* Desktop Table View */}
+            <Box display={{ base: 'none', lg: 'block' }} overflowX="auto">
+            <Table variant="simple" size="md">
+              <Thead>
+                  <Tr bg="brand.green">
+                    <Th color="white" borderTopLeftRadius="lg" fontSize="sm" fontWeight="bold" textAlign="center"></Th>
+                    <Th color="white" fontSize="sm" fontWeight="bold" textAlign="center">Customer ID</Th>
+                    <Th color="white" fontSize="sm" fontWeight="bold" cursor="pointer" onClick={() => handleSort('name')}>
+                      <HStack spacing={1}>
+                        <Text>Name</Text>
+                        {getSortIcon('name')}
+                      </HStack>
+                    </Th>
+                    <Th color="white" fontSize="sm" fontWeight="bold" cursor="pointer" onClick={() => handleSort('email')}>
+                      <HStack spacing={1}>
+                        <Text>Email</Text>
+                        {getSortIcon('email')}
+                      </HStack>
+                    </Th>
+                    <Th color="white" fontSize="sm" fontWeight="bold">Phone</Th>
+                    <Th color="white" fontSize="sm" fontWeight="bold">Address</Th>
+                    <Th color="white" fontSize="sm" fontWeight="bold" cursor="pointer" onClick={() => handleSort('created')}>
+                      <HStack spacing={1}>
+                        <Text>Created</Text>
+                        {getSortIcon('created')}
+                      </HStack>
+                    </Th>
+                    <Th color="white" borderTopRightRadius="lg" fontSize="sm" fontWeight="bold" textAlign="center">Actions</Th>
               </Tr>
-            </Thead>
-            <Tbody>
-                {filteredCustomers.map((c) => (
-                  <Tr
-                    key={c.id}
-                    _hover={{ bg: 'gray.100', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
-                    borderBottom="1px solid #E2E8F0"
-                    transition="background 0.2s, box-shadow 0.2s"
-                  >
-                    <Td textAlign="center">
-                      <Checkbox
-                        isChecked={selectedCustomers.has(c.id)}
-                        onChange={() => handleSelectCustomer(c.id)}
-                        colorScheme="green"
-                        size="md"
-                      />
+              </Thead>
+              <Tbody>
+                  {filteredCustomers.map((c) => (
+                    <Tr
+                      key={c.id}
+                      _hover={{ bg: 'gray.100', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+                      borderBottom="1px solid #E2E8F0"
+                      transition="background 0.2s, box-shadow 0.2s"
+                    >
+                      <Td textAlign="center">
+                        <Checkbox
+                          isChecked={selectedCustomers.has(c.id)}
+                          onChange={() => handleSelectCustomer(c.id)}
+                          colorScheme="green"
+                          size="md"
+                        />
+                      </Td>
+                      <Td>
+                        <Button
+                          variant="link"
+                          color="brand.green"
+                          fontWeight="500"
+                          fontSize="sm"
+                          rightIcon={<ExternalLinkIcon mx="2px" />}
+                          onClick={() => { setSelectedCustomer(c); setIsProfileModalOpen(true); }}
+                          _hover={{ textDecoration: 'underline', color: 'green.700' }}
+                        >
+                        {c.id}
+                        </Button>
                     </Td>
                     <Td>
-                      <Button
-                        variant="link"
-                        color="brand.green"
-                        fontWeight="500"
-                        fontSize="sm"
-                        rightIcon={<ExternalLinkIcon mx="2px" />}
-                        onClick={() => { setSelectedCustomer(c); setIsProfileModalOpen(true); }}
-                        _hover={{ textDecoration: 'underline', color: 'green.700' }}
-                      >
-                      {c.id}
-                      </Button>
-                  </Td>
-                  <Td>
-                    {editId === c.id ? (
-                        <Input 
-                          size="sm" 
-                          value={editData.name} 
-                          onChange={e => handleEditChange('name', e.target.value)}
-                          borderWidth="2px"
-                          borderColor="gray.200"
-                          _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                        />
-                      ) : (
+                      {editId === c.id ? (
+                          <Input 
+                            size="sm" 
+                            value={editData.name} 
+                            onChange={e => handleEditChange('name', e.target.value)}
+                            borderWidth="2px"
+                            borderColor="gray.200"
+                            _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                          />
+                        ) : (
+                          <Text fontWeight="medium" color={c.name ? 'gray.800' : 'gray.400'}>
+                            {c.name || '(No name)'}
+                          </Text>
+                        )}
+                    </Td>
+                    <Td>
+                      {editId === c.id ? (
+                          <Input 
+                            size="sm" 
+                            value={editData.email} 
+                            onChange={e => handleEditChange('email', e.target.value)}
+                            borderWidth="2px"
+                            borderColor="gray.200"
+                            _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                          />
+                        ) : (
+                          <Text color={c.email ? 'gray.700' : 'gray.400'} fontSize="sm">
+                            {c.email || '(No email)'}
+                          </Text>
+                        )}
+                    </Td>
+                    <Td>
+                      {editId === c.id ? (
+                          <Input 
+                            size="sm" 
+                            value={editData.phone || ''} 
+                            onChange={e => handleEditChange('phone', e.target.value)}
+                            borderWidth="2px"
+                            borderColor="gray.200"
+                            _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                          />
+                        ) : (
+                          c.phone ? (
+                            <a 
+                              href={`tel:${c.phone.replace(/\s+/g, '')}`}
+                              style={{ 
+                                color: '#003f2d', 
+                                textDecoration: 'underline',
+                                fontSize: '14px',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {c.phone}
+                            </a>
+                          ) : (
+                            <Text color="gray.400" fontSize="sm" fontStyle="italic">Not provided</Text>
+                          )
+                        )}
+                    </Td>
+                    <Td>
+                      {editId === c.id ? (
+                        <VStack align="start" spacing={1}>
+                          <Input size="sm" placeholder="Line 1" value={editData.address?.line1} onChange={e => handleEditAddressChange('line1', e.target.value)} />
+                          <Input size="sm" placeholder="Line 2" value={editData.address?.line2 || ''} onChange={e => handleEditAddressChange('line2', e.target.value)} />
+                          <Input size="sm" placeholder="City" value={editData.address?.city} onChange={e => handleEditAddressChange('city', e.target.value)} />
+                          <Input size="sm" placeholder="State" value={editData.address?.state} onChange={e => handleEditAddressChange('state', e.target.value)} />
+                          <Input size="sm" placeholder="Postal Code" value={editData.address?.postal_code} onChange={e => handleEditAddressChange('postal_code', e.target.value)} />
+                          <Select size="sm" value={editData.address?.country} onChange={e => handleEditAddressChange('country', e.target.value)}>
+                            {countries.map(cn => (
+                              <option key={cn.code} value={cn.code}>{cn.name}</option>
+                            ))}
+                          </Select>
+                        </VStack>
+                      ) : c.address ? (
+                          <Text fontSize="sm" color="gray.700" maxW="200px" noOfLines={2}>
+                          {[c.address.line1, c.address.line2, c.address.city, c.address.state, c.address.country, c.address.postal_code]
+                            .filter(Boolean)
+                              .join(', ') || 'Not provided'}
+                          </Text>
+                        ) : (
+                          <Text color="gray.400" fontSize="sm" fontStyle="italic">Not provided</Text>
+                        )}
+                    </Td>
+                    <Td>
+                        <Text fontSize="sm" color="gray.600">
+                          {c.created ? new Date(c.created * 1000).toLocaleDateString() : 'Unknown'}
+                        </Text>
+                      </Td>
+                      <Td textAlign="center">
+                        <HStack justify="center" spacing={2}>
+                          {editId === c.id ? (
+                            <>
+                              <Tooltip label="Save Changes" placement="top" hasArrow>
+                                <IconButton 
+                                  aria-label="Save" 
+                                  icon={<CheckIcon />} 
+                                  size="sm" 
+                                  colorScheme="green" 
+                                  onClick={() => saveEdit(c.id)}
+                                  isLoading={saving}
+                                />
+                              </Tooltip>
+                              <Tooltip label="Cancel Edit" placement="top" hasArrow>
+                                <IconButton 
+                                  aria-label="Cancel" 
+                                  icon={<CloseIcon />} 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={cancelEdit}
+                                />
+                              </Tooltip>
+                            </>
+                          ) : (
+                            <>
+                              <Tooltip label="Edit Customer" placement="top" hasArrow>
+                                <IconButton 
+                                  aria-label="Edit" 
+                                  icon={<EditIcon />} 
+                                  size="sm" 
+                                  colorScheme="blue" 
+                                  onClick={() => startEdit(c)}
+                                  _hover={{ transform: 'scale(1.05)' }}
+                                  transition="transform 0.2s"
+                                />
+                              </Tooltip>
+                              <Tooltip label="Delete Customer" placement="top" hasArrow>
+                                <IconButton 
+                                  aria-label="Delete" 
+                                  icon={<DeleteIcon />} 
+                                  size="sm" 
+                                  colorScheme="red" 
+                                  onClick={() => startDelete(c.id)}
+                                  _hover={{ transform: 'scale(1.05)' }}
+                                  transition="transform 0.2s"
+                                />
+                              </Tooltip>
+                            </>
+                          )}
+                        </HStack>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
+
+            {/* Mobile Card View */}
+            <Box display={{ base: 'block', lg: 'none' }}>
+              <VStack spacing={5} align="stretch">
+                {filteredCustomers.map((c) => (
+                  <GlassCard key={c.id} p={{ base: 4, md: 5 }}>
+                    <VStack align="stretch" spacing={4}>
+                      <HStack justify="space-between" align="start">
+                        <HStack spacing={3} align="center">
+                          <Checkbox
+                            isChecked={selectedCustomers.has(c.id)}
+                            onChange={() => handleSelectCustomer(c.id)}
+                            colorScheme="green"
+                            size="lg"
+                          />
+                          <Box flex="1">
+                            <Text fontSize="xs" color="gray.500" fontWeight="medium" mb={1}>Customer ID</Text>
+                            <Button
+                              variant="link"
+                              color="brand.green"
+                              fontWeight="500"
+                              fontSize="sm"
+                              rightIcon={<ExternalLinkIcon mx="2px" />}
+                              onClick={() => { setSelectedCustomer(c); setIsProfileModalOpen(true); }}
+                              _hover={{ textDecoration: 'underline', color: 'green.700' }}
+                            >
+                              {c.id}
+                            </Button>
+                          </Box>
+                        </HStack>
+                        <HStack spacing={3}>
+                          <Tooltip label="Edit Customer" placement="top" hasArrow>
+                            <IconButton 
+                              aria-label="Edit" 
+                              icon={<EditIcon />} 
+                              size="md" 
+                              colorScheme="blue" 
+                              onClick={() => startEdit(c)}
+                              minW="44px"
+                              minH="44px"
+                            />
+                          </Tooltip>
+                          <Tooltip label="Delete Customer" placement="top" hasArrow>
+                            <IconButton 
+                              aria-label="Delete" 
+                              icon={<DeleteIcon />} 
+                              size="md" 
+                              colorScheme="red" 
+                              onClick={() => startDelete(c.id)}
+                              minW="44px"
+                              minH="44px"
+                            />
+                          </Tooltip>
+                        </HStack>
+                      </HStack>
+                      
+                      <Box>
+                        <Text fontSize="xs" color="gray.500" fontWeight="medium" mb={1}>Name</Text>
                         <Text fontWeight="medium" color={c.name ? 'gray.800' : 'gray.400'}>
                           {c.name || '(No name)'}
                         </Text>
-                      )}
-                  </Td>
-                  <Td>
-                    {editId === c.id ? (
-                        <Input 
-                          size="sm" 
-                          value={editData.email} 
-                          onChange={e => handleEditChange('email', e.target.value)}
-                          borderWidth="2px"
-                          borderColor="gray.200"
-                          _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                        />
-                      ) : (
+                      </Box>
+                      
+                      <Box>
+                        <Text fontSize="xs" color="gray.500" fontWeight="medium" mb={1}>Email</Text>
                         <Text color={c.email ? 'gray.700' : 'gray.400'} fontSize="sm">
                           {c.email || '(No email)'}
                         </Text>
-                      )}
-                  </Td>
-                  <Td>
-                    {editId === c.id ? (
-                        <Input 
-                          size="sm" 
-                          value={editData.phone || ''} 
-                          onChange={e => handleEditChange('phone', e.target.value)}
-                          borderWidth="2px"
-                          borderColor="gray.200"
-                          _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                        />
-                      ) : (
-                        c.phone ? (
+                      </Box>
+                      
+                      <Box>
+                        <Text fontSize="xs" color="gray.500" fontWeight="medium" mb={1}>Phone</Text>
+                        {c.phone ? (
                           <a 
                             href={`tel:${c.phone.replace(/\s+/g, '')}`}
                             style={{ 
@@ -849,548 +1027,374 @@ export default function ViewCustomersPage() {
                           </a>
                         ) : (
                           <Text color="gray.400" fontSize="sm" fontStyle="italic">Not provided</Text>
-                        )
-                      )}
-                  </Td>
-                  <Td>
-                    {editId === c.id ? (
-                      <VStack align="start" spacing={1}>
-                        <Input size="sm" placeholder="Line 1" value={editData.address?.line1} onChange={e => handleEditAddressChange('line1', e.target.value)} />
-                        <Input size="sm" placeholder="Line 2" value={editData.address?.line2 || ''} onChange={e => handleEditAddressChange('line2', e.target.value)} />
-                        <Input size="sm" placeholder="City" value={editData.address?.city} onChange={e => handleEditAddressChange('city', e.target.value)} />
-                        <Input size="sm" placeholder="State" value={editData.address?.state} onChange={e => handleEditAddressChange('state', e.target.value)} />
-                        <Input size="sm" placeholder="Postal Code" value={editData.address?.postal_code} onChange={e => handleEditAddressChange('postal_code', e.target.value)} />
-                        <Select size="sm" value={editData.address?.country} onChange={e => handleEditAddressChange('country', e.target.value)}>
-                          {countries.map(cn => (
-                            <option key={cn.code} value={cn.code}>{cn.name}</option>
-                          ))}
-                        </Select>
-                      </VStack>
-                    ) : c.address ? (
-                        <Text fontSize="sm" color="gray.700" maxW="200px" noOfLines={2}>
-                        {[c.address.line1, c.address.line2, c.address.city, c.address.state, c.address.country, c.address.postal_code]
-                          .filter(Boolean)
-                            .join(', ') || 'Not provided'}
-                        </Text>
-                      ) : (
-                        <Text color="gray.400" fontSize="sm" fontStyle="italic">Not provided</Text>
-                      )}
-                  </Td>
-                  <Td>
-                      <Text fontSize="sm" color="gray.600">
-                        {c.created ? new Date(c.created * 1000).toLocaleDateString() : 'Unknown'}
-                      </Text>
-                    </Td>
-                    <Td textAlign="center">
-                      <HStack justify="center" spacing={2}>
-                        {editId === c.id ? (
-                          <>
-                            <Tooltip label="Save Changes" placement="top" hasArrow>
-                              <IconButton 
-                                aria-label="Save" 
-                                icon={<CheckIcon />} 
-                                size="sm" 
-                                colorScheme="green" 
-                                onClick={() => saveEdit(c.id)}
-                                isLoading={saving}
-                              />
-                            </Tooltip>
-                            <Tooltip label="Cancel Edit" placement="top" hasArrow>
-                              <IconButton 
-                                aria-label="Cancel" 
-                                icon={<CloseIcon />} 
-                                size="sm" 
-                                variant="outline"
-                                onClick={cancelEdit}
-                              />
-                            </Tooltip>
-                          </>
-                        ) : (
-                          <>
-                            <Tooltip label="Edit Customer" placement="top" hasArrow>
-                              <IconButton 
-                                aria-label="Edit" 
-                                icon={<EditIcon />} 
-                                size="sm" 
-                                colorScheme="blue" 
-                                onClick={() => startEdit(c)}
-                                _hover={{ transform: 'scale(1.05)' }}
-                                transition="transform 0.2s"
-                              />
-                            </Tooltip>
-                            <Tooltip label="Delete Customer" placement="top" hasArrow>
-                              <IconButton 
-                                aria-label="Delete" 
-                                icon={<DeleteIcon />} 
-                                size="sm" 
-                                colorScheme="red" 
-                                onClick={() => startDelete(c.id)}
-                                _hover={{ transform: 'scale(1.05)' }}
-                                transition="transform 0.2s"
-                              />
-                            </Tooltip>
-                          </>
                         )}
-                      </HStack>
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </Box>
-
-          {/* Mobile Card View */}
-          <Box display={{ base: 'block', lg: 'none' }}>
-            <VStack spacing={5} align="stretch">
-              {filteredCustomers.map((c) => (
-                <GlassCard key={c.id} p={{ base: 4, md: 5 }}>
-                  <VStack align="stretch" spacing={4}>
-                    <HStack justify="space-between" align="start">
-                      <HStack spacing={3} align="center">
-                        <Checkbox
-                          isChecked={selectedCustomers.has(c.id)}
-                          onChange={() => handleSelectCustomer(c.id)}
-                          colorScheme="green"
-                          size="lg"
-                        />
-                        <Box flex="1">
-                          <Text fontSize="xs" color="gray.500" fontWeight="medium" mb={1}>Customer ID</Text>
-                          <Button
-                            variant="link"
-                            color="brand.green"
-                            fontWeight="500"
-                            fontSize="sm"
-                            rightIcon={<ExternalLinkIcon mx="2px" />}
-                            onClick={() => { setSelectedCustomer(c); setIsProfileModalOpen(true); }}
-                            _hover={{ textDecoration: 'underline', color: 'green.700' }}
-                          >
-                            {c.id}
-                          </Button>
-                        </Box>
-                      </HStack>
-                      <HStack spacing={3}>
-                        <Tooltip label="Edit Customer" placement="top" hasArrow>
-                          <IconButton 
-                            aria-label="Edit" 
-                            icon={<EditIcon />} 
-                            size="md" 
-                            colorScheme="blue" 
-                            onClick={() => startEdit(c)}
-                            minW="44px"
-                            minH="44px"
-                          />
-                        </Tooltip>
-                        <Tooltip label="Delete Customer" placement="top" hasArrow>
-                          <IconButton 
-                            aria-label="Delete" 
-                            icon={<DeleteIcon />} 
-                            size="md" 
-                            colorScheme="red" 
-                            onClick={() => startDelete(c.id)}
-                            minW="44px"
-                            minH="44px"
-                          />
-                        </Tooltip>
-                      </HStack>
-                    </HStack>
-                    
-                    <Box>
-                      <Text fontSize="xs" color="gray.500" fontWeight="medium" mb={1}>Name</Text>
-                      <Text fontWeight="medium" color={c.name ? 'gray.800' : 'gray.400'}>
-                        {c.name || '(No name)'}
-                      </Text>
-                    </Box>
-                    
-                    <Box>
-                      <Text fontSize="xs" color="gray.500" fontWeight="medium" mb={1}>Email</Text>
-                      <Text color={c.email ? 'gray.700' : 'gray.400'} fontSize="sm">
-                        {c.email || '(No email)'}
-                      </Text>
-                    </Box>
-                    
-                    <Box>
-                      <Text fontSize="xs" color="gray.500" fontWeight="medium" mb={1}>Phone</Text>
-                      {c.phone ? (
-                        <a 
-                          href={`tel:${c.phone.replace(/\s+/g, '')}`}
-                          style={{ 
-                            color: '#003f2d', 
-                            textDecoration: 'underline',
-                            fontSize: '14px',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {c.phone}
-                        </a>
-                      ) : (
-                        <Text color="gray.400" fontSize="sm" fontStyle="italic">Not provided</Text>
-                      )}
-                    </Box>
-                    
-                    <Box>
-                      <Text fontSize="xs" color="gray.500" fontWeight="medium" mb={1}>Address</Text>
-                      <Text fontSize="sm" color="gray.700">
-                        {c.address ? 
-                          [c.address.line1, c.address.line2, c.address.city, c.address.state, c.address.country, c.address.postal_code]
-                            .filter(Boolean)
-                            .join(', ') || 'Not provided'
-                          : 'Not provided'
-                        }
-                      </Text>
-                    </Box>
-
-                    <Box>
-                      <Text fontSize="xs" color="gray.500" fontWeight="medium" mb={1}>Created</Text>
-                      <Text fontSize="sm" color="gray.600">
-                        {c.created ? new Date(c.created * 1000).toLocaleDateString() : 'Unknown'}
-                      </Text>
-                    </Box>
-                  </VStack>
-                </GlassCard>
-              ))}
-            </VStack>
-          </Box>
-
-          {filteredCustomers.length === 0 && (
-            <Box textAlign="center" py={12}>
-              <Text color="gray.500" fontSize="lg">
-                {searchTerm || filterStatus !== 'all' ? 'No customers found matching your criteria.' : 'No customers found.'}
-              </Text>
-              {(searchTerm || filterStatus !== 'all') && (
-                <Button 
-                  variant="link" 
-                  color="brand.green" 
-                  onClick={clearFilters}
-                  mt={2}
-                >
-                  Clear filters
-                </Button>
-              )}
-            </Box>
-          )}
-        </GlassCard>
-      )}
-
-      {/* Edit Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={cancelEdit} isCentered size='md' motionPreset="slideInBottom">
-        <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(8px)" />
-        <ModalContent borderRadius="xl">
-          <ModalHeader color="brand.green" fontWeight="bold">Edit Customer</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <VStack align="stretch" spacing={4}>
-              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-              <FormControl>
-                  <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Name</FormLabel>
-                  <Input 
-                    value={editData.name} 
-                    onChange={e => handleEditChange('name', e.target.value)}
-                    size="md"
-                    borderWidth="2px"
-                    borderColor="gray.200"
-                    _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                  />
-              </FormControl>
-              <FormControl>
-                  <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Email</FormLabel>
-                  <Input 
-                    value={editData.email} 
-                    onChange={e => handleEditChange('email', e.target.value)}
-                    size="md"
-                    borderWidth="2px"
-                    borderColor="gray.200"
-                    _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                  />
-              </FormControl>
-              <FormControl>
-                  <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Mobile number</FormLabel>
-                  <Input 
-                    value={editData.phone} 
-                    onChange={e => handleEditChange('phone', e.target.value)}
-                    size="md"
-                    borderWidth="2px"
-                    borderColor="gray.200"
-                    _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                  />
-              </FormControl>
-              </SimpleGrid>
-              
-              <Box borderWidth="1px" borderColor="gray.200" borderRadius="lg" p={4} bg="gray.50">
-                <Text fontSize="sm" fontWeight="semibold" color="brand.green" mb={3}>Address Information</Text>
-                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-              <FormControl>
-                    <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Address Line 1</FormLabel>
-                    <Input 
-                      value={editData.address?.line1} 
-                      onChange={e => handleEditAddressChange('line1', e.target.value)}
-                      size="md"
-                      borderWidth="2px"
-                      borderColor="gray.200"
-                      _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                    />
-              </FormControl>
-              <FormControl>
-                    <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Address Line 2</FormLabel>
-                    <Input 
-                      value={editData.address?.line2 || ''} 
-                      onChange={e => handleEditAddressChange('line2', e.target.value)}
-                      size="md"
-                      borderWidth="2px"
-                      borderColor="gray.200"
-                      _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                    />
-              </FormControl>
-              <FormControl>
-                    <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Suburb / City</FormLabel>
-                    <Input 
-                      value={editData.address?.city} 
-                      onChange={e => handleEditAddressChange('city', e.target.value)}
-                      size="md"
-                      borderWidth="2px"
-                      borderColor="gray.200"
-                      _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                    />
-              </FormControl>
-              <FormControl>
-                    <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">State</FormLabel>
-                    <Select 
-                      value={editData.address?.state} 
-                      onChange={e => handleEditAddressChange('state', e.target.value)}
-                      size="md"
-                      borderWidth="2px"
-                      borderColor="gray.200"
-                      _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                    >
-                      <option value="">Select a state</option>
-                      {australianStates.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </Select>
-              </FormControl>
-              <FormControl>
-                    <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Postal Code</FormLabel>
-                    <Input 
-                      value={editData.address?.postal_code} 
-                      onChange={e => handleEditAddressChange('postal_code', e.target.value)}
-                      size="md"
-                      borderWidth="2px"
-                      borderColor="gray.200"
-                      _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                    />
-              </FormControl>
-              <FormControl>
-                    <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Country</FormLabel>
-                    <Select 
-                      value={editData.address?.country} 
-                      onChange={e => handleEditAddressChange('country', e.target.value)}
-                      size="md"
-                      borderWidth="2px"
-                      borderColor="gray.200"
-                      _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
-                    >
-                  {countries.map(cn => (
-                    <option key={cn.code} value={cn.code}>{cn.name}</option>
-                  ))}
-                </Select>
-              </FormControl>
-                </SimpleGrid>
-              </Box>
-            </VStack>
-          </ModalBody>
-          <ModalFooter>
-            <Button 
-              colorScheme="green" 
-              mr={3} 
-              isLoading={saving} 
-              onClick={() => saveEdit(editId!)}
-              _hover={{ transform: 'translateY(-1px)' }}
-              transition="all 0.2s ease-in-out"
-            >
-              Save Changes
-            </Button>
-            <Button variant="ghost" onClick={cancelEdit}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      {/* Delete Modal */}
-      <Modal isOpen={isDeleteModalOpen} onClose={cancelDelete} isCentered size='md' motionPreset="slideInBottom">
-        <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(8px)" />
-        <ModalContent borderRadius="xl">
-          <ModalHeader color="red.500" fontWeight="bold">Delete Customer</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Alert status="warning" mb={4} borderRadius="lg">
-              <AlertIcon />
-              <Box>
-                <Text fontWeight="medium" mb={1}>This action cannot be undone</Text>
-                <Text fontSize="sm">
-                  This will permanently remove the customer's billing information and immediately cancel any current subscriptions. Past payments or invoices associated with the customer will still remain.
-                </Text>
-              </Box>
-            </Alert>
-          </ModalBody>
-          <ModalFooter>
-            <Button 
-              colorScheme="red" 
-              mr={3} 
-              isLoading={deleting} 
-              onClick={confirmDelete}
-              _hover={{ transform: 'translateY(-1px)' }}
-              transition="all 0.2s ease-in-out"
-            >
-              Delete Customer
-            </Button>
-            <Button variant="ghost" onClick={cancelDelete}>Cancel</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      {/* Profile Modal */}
-      <Modal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} isCentered size="3xl">
-        <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(8px)" />
-        <ModalContent borderRadius="xl" bg="transparent" boxShadow="none" maxW="3xl">
-          <GlassCard p={{ base: 8, md: 12 }} maxW="3xl" mx="auto" bg="whiteAlpha.900" borderColor="whiteAlpha.700" boxShadow="2xl" position="relative">
-            <Box position="absolute" inset={0} borderRadius="inherit" bg="white" opacity={0.85} zIndex={0} />
-            <Box position="relative" zIndex={1}>
-              <ModalHeader color="brand.green" fontWeight="bold" fontSize="2xl" px={0} pb={2}>
-                <HStack spacing={3}>
-                  <InfoOutlineIcon color="brand.green" boxSize={6} />
-                  <span>Customer Profile</span>
-                </HStack>
-              </ModalHeader>
-              <ModalCloseButton top={4} right={4} zIndex={2} />
-              <ModalBody px={0} pt={0}>
-                {selectedCustomer ? (
-                  <VStack align="stretch" spacing={5} divider={<Box borderBottom="1px solid" borderColor="gray.200" />}> 
-                    <HStack spacing={3}>
-                      <FaUser color="#003f2d" size={20} />
-                      <Box>
-                        <Text fontSize="sm" color="gray.500" fontWeight="medium">Customer ID</Text>
-                        <Text fontWeight="bold" color="brand.green" fontSize="md">{selectedCustomer.id}</Text>
                       </Box>
-                    </HStack>
-                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                      <HStack align="start" spacing={3}>
-                        <FaUser color="#003f2d" size={18} />
-                        <Box>
-                          <Text fontSize="xs" color="gray.500" fontWeight="medium">Name</Text>
-                          <Text fontWeight="medium" color={selectedCustomer.name ? 'gray.800' : 'gray.400'} fontStyle={!selectedCustomer.name ? 'italic' : undefined}>
-                            {selectedCustomer.name || 'Not provided'}
-                          </Text>
-                        </Box>
-                      </HStack>
-                      <HStack align="start" spacing={3}>
-                        <EmailIcon color="#003f2d" boxSize={5} />
-                        <Box>
-                          <Text fontSize="xs" color="gray.500" fontWeight="medium">Email</Text>
-                          <Text color={selectedCustomer.email ? 'gray.700' : 'gray.400'} fontSize="sm" fontStyle={!selectedCustomer.email ? 'italic' : undefined}>
-                            {selectedCustomer.email || 'Not provided'}
-                          </Text>
-                        </Box>
-                      </HStack>
-                      <HStack align="start" spacing={3}>
-                        <PhoneIcon color="#003f2d" boxSize={5} />
-                        <Box>
-                          <Text fontSize="xs" color="gray.500" fontWeight="medium">Phone</Text>
-                          <Text color={selectedCustomer.phone ? 'gray.700' : 'gray.400'} fontSize="sm" fontStyle={!selectedCustomer.phone ? 'italic' : undefined}>
-                            {selectedCustomer.phone || 'Not provided'}
-                          </Text>
-                        </Box>
-                      </HStack>
-                      <HStack align="start" spacing={3}>
-                        <FaAddressCard color="#003f2d" size={18} />
-                        <Box>
-                          <Text fontSize="xs" color="gray.500" fontWeight="medium">Address</Text>
-                          <Text color={selectedCustomer.address ? 'gray.700' : 'gray.400'} fontSize="sm" fontStyle={!selectedCustomer.address ? 'italic' : undefined}>
-                            {selectedCustomer.address ? [selectedCustomer.address.line1, selectedCustomer.address.line2, selectedCustomer.address.city, selectedCustomer.address.state, selectedCustomer.address.country, selectedCustomer.address.postal_code].filter(Boolean).join(', ') : 'Not provided'}
-                          </Text>
-                        </Box>
-                      </HStack>
-                    </SimpleGrid>
-                    <HStack spacing={3}>
-                      <InfoOutlineIcon color="#003f2d" boxSize={5} />
+                      
                       <Box>
-                        <Text fontSize="xs" color="gray.500" fontWeight="medium">Created</Text>
-                        <Text fontSize="sm" color="gray.600">
-                          {selectedCustomer.created ? new Date(selectedCustomer.created * 1000).toLocaleDateString() : 'Unknown'}
+                        <Text fontSize="xs" color="gray.500" fontWeight="medium" mb={1}>Address</Text>
+                        <Text fontSize="sm" color="gray.700">
+                          {c.address ? 
+                            [c.address.line1, c.address.line2, c.address.city, c.address.state, c.address.country, c.address.postal_code]
+                              .filter(Boolean)
+                              .join(', ') || 'Not provided'
+                            : 'Not provided'
+                          }
                         </Text>
                       </Box>
-                    </HStack>
-                    <Box pt={2}>
-                      <Text fontSize="lg" fontWeight="bold" color="brand.green" mb={2}>Projects</Text>
-                      {projectsLoading && customerProjects.length === 0 ? (
-                        <>
-                          {[...Array(2)].map((_, i) => (
-                            <Skeleton key={i} height="40px" mb={2} borderRadius="md" />
-                          ))}
-                        </>
-                      ) : projectsError ? (
-                        <Text color="red.500">{projectsError}</Text>
-                      ) : customerProjects.length === 0 ? (
-                        <Text color="gray.500" fontStyle="italic">No projects found for this customer.</Text>
-                      ) : (
-                        <Box maxH="200px" overflowY="auto" transition="none" opacity={projectsLoading ? 0.5 : 1}>
-                          {displayedProjects.map(proj => (
-                            <ProjectCard key={proj.id} proj={proj} />
-                          ))}
-                          {customerProjects.length > 5 && (
-                            <Button as={NextLink} href={`/admin/manage-projects?customer_stripe_id=${selectedCustomer.id}`} size="sm" colorScheme="green" variant="ghost" mt={2}>
-                              View All Projects
-                            </Button>
-                          )}
-                        </Box>
-                      )}
-                    </Box>
-                    <Box pt={2}>
-                      <Text fontSize="lg" fontWeight="bold" color="brand.green" mb={2}>Billings</Text>
-                      {invoicesLoading && invoices.length === 0 ? (
-                        <>
-                          {[...Array(2)].map((_, i) => (
-                            <Skeleton key={i} height="40px" mb={2} borderRadius="md" />
-                          ))}
-                        </>
-                      ) : invoicesError ? (
-                        <Text color="red.500">{invoicesError}</Text>
-                      ) : invoices.length === 0 ? (
-                        <Text color="gray.500" fontStyle="italic">No invoices found for this customer.</Text>
-                      ) : (
-                        <Box maxH="200px" overflowY="auto" transition="none" opacity={invoicesLoading ? 0.5 : 1}>
-                          {displayedInvoices.map(inv => (
-                            <InvoiceCard key={inv.id} inv={inv} />
-                          ))}
-                          {invoices.length > 5 && (
-                            <Button as={NextLink} href={`https://dashboard.stripe.com/customers/${selectedCustomer.id}`} target="_blank" size="sm" colorScheme="green" variant="ghost" mt={2}>
-                              View All Invoices
-                            </Button>
-                          )}
-                        </Box>
-                      )}
-                    </Box>
-                    <Button
-                      as={NextLink}
-                      href={`https://dashboard.stripe.com/customers/${selectedCustomer.id}`}
-                      target="_blank"
-                      leftIcon={<ExternalLinkIcon />}
-                      colorScheme="green"
-                      variant="solid"
-                      size="lg"
-                      alignSelf="flex-end"
-                      mt={2}
-                      boxShadow="md"
-                    >
-                      View in Stripe Dashboard
-                    </Button>
-                  </VStack>
-                ) : (
-                  <Text>No customer selected.</Text>
-                )}
-              </ModalBody>
+
+                      <Box>
+                        <Text fontSize="xs" color="gray.500" fontWeight="medium" mb={1}>Created</Text>
+                        <Text fontSize="sm" color="gray.600">
+                          {c.created ? new Date(c.created * 1000).toLocaleDateString() : 'Unknown'}
+                        </Text>
+                      </Box>
+                    </VStack>
+                  </GlassCard>
+                ))}
+              </VStack>
             </Box>
+
+            {filteredCustomers.length === 0 && (
+              <Box textAlign="center" py={12}>
+                <Text color="gray.500" fontSize="lg">
+                  {searchTerm || filterStatus !== 'all' ? 'No customers found matching your criteria.' : 'No customers found.'}
+                </Text>
+                {(searchTerm || filterStatus !== 'all') && (
+                  <Button 
+                    variant="link" 
+                    color="brand.green" 
+                    onClick={clearFilters}
+                    mt={2}
+                  >
+                    Clear filters
+                  </Button>
+                )}
+              </Box>
+            )}
           </GlassCard>
-        </ModalContent>
-      </Modal>
-      <StickyNavBar />
-    </Box>
+        )}
+
+        {/* Edit Modal */}
+        <Modal isOpen={isEditModalOpen} onClose={cancelEdit} isCentered size='md' motionPreset="slideInBottom">
+          <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(8px)" />
+          <ModalContent borderRadius="xl">
+            <ModalHeader color="brand.green" fontWeight="bold">Edit Customer</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <VStack align="stretch" spacing={4}>
+                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                <FormControl>
+                    <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Name</FormLabel>
+                    <Input 
+                      value={editData.name} 
+                      onChange={e => handleEditChange('name', e.target.value)}
+                      size="md"
+                      borderWidth="2px"
+                      borderColor="gray.200"
+                      _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                    />
+                </FormControl>
+                <FormControl>
+                    <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Email</FormLabel>
+                    <Input 
+                      value={editData.email} 
+                      onChange={e => handleEditChange('email', e.target.value)}
+                      size="md"
+                      borderWidth="2px"
+                      borderColor="gray.200"
+                      _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                    />
+                </FormControl>
+                <FormControl>
+                    <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Mobile number</FormLabel>
+                    <Input 
+                      value={editData.phone} 
+                      onChange={e => handleEditChange('phone', e.target.value)}
+                      size="md"
+                      borderWidth="2px"
+                      borderColor="gray.200"
+                      _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                    />
+                </FormControl>
+                </SimpleGrid>
+                
+                <Box borderWidth="1px" borderColor="gray.200" borderRadius="lg" p={4} bg="gray.50">
+                  <Text fontSize="sm" fontWeight="semibold" color="brand.green" mb={3}>Address Information</Text>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                <FormControl>
+                      <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Address Line 1</FormLabel>
+                      <Input 
+                        value={editData.address?.line1} 
+                        onChange={e => handleEditAddressChange('line1', e.target.value)}
+                        size="md"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                      />
+                </FormControl>
+                <FormControl>
+                      <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Address Line 2</FormLabel>
+                      <Input 
+                        value={editData.address?.line2 || ''} 
+                        onChange={e => handleEditAddressChange('line2', e.target.value)}
+                        size="md"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                      />
+                </FormControl>
+                <FormControl>
+                      <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Suburb / City</FormLabel>
+                      <Input 
+                        value={editData.address?.city} 
+                        onChange={e => handleEditAddressChange('city', e.target.value)}
+                        size="md"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                      />
+                </FormControl>
+                <FormControl>
+                      <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">State</FormLabel>
+                      <Select 
+                        value={editData.address?.state} 
+                        onChange={e => handleEditAddressChange('state', e.target.value)}
+                        size="md"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                      >
+                        <option value="">Select a state</option>
+                        {australianStates.map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </Select>
+                </FormControl>
+                <FormControl>
+                      <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Postal Code</FormLabel>
+                      <Input 
+                        value={editData.address?.postal_code} 
+                        onChange={e => handleEditAddressChange('postal_code', e.target.value)}
+                        size="md"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                      />
+                </FormControl>
+                <FormControl>
+                      <FormLabel fontSize="sm" fontWeight="semibold" color="gray.700">Country</FormLabel>
+                      <Select 
+                        value={editData.address?.country} 
+                        onChange={e => handleEditAddressChange('country', e.target.value)}
+                        size="md"
+                        borderWidth="2px"
+                        borderColor="gray.200"
+                        _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                      >
+                    {countries.map(cn => (
+                      <option key={cn.code} value={cn.code}>{cn.name}</option>
+                    ))}
+                  </Select>
+                </FormControl>
+                  </SimpleGrid>
+                </Box>
+              </VStack>
+            </ModalBody>
+            <ModalFooter>
+              <Button 
+                colorScheme="green" 
+                mr={3} 
+                isLoading={saving} 
+                onClick={() => saveEdit(editId!)}
+                _hover={{ transform: 'translateY(-1px)' }}
+                transition="all 0.2s ease-in-out"
+              >
+                Save Changes
+              </Button>
+              <Button variant="ghost" onClick={cancelEdit}>Cancel</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        {/* Delete Modal */}
+        <Modal isOpen={isDeleteModalOpen} onClose={cancelDelete} isCentered size='md' motionPreset="slideInBottom">
+          <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(8px)" />
+          <ModalContent borderRadius="xl">
+            <ModalHeader color="red.500" fontWeight="bold">Delete Customer</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Alert status="warning" mb={4} borderRadius="lg">
+                <AlertIcon />
+                <Box>
+                  <Text fontWeight="medium" mb={1}>This action cannot be undone</Text>
+                  <Text fontSize="sm">
+                    This will permanently remove the customer's billing information and immediately cancel any current subscriptions. Past payments or invoices associated with the customer will still remain.
+                  </Text>
+                </Box>
+              </Alert>
+            </ModalBody>
+            <ModalFooter>
+              <Button 
+                colorScheme="red" 
+                mr={3} 
+                isLoading={deleting} 
+                onClick={confirmDelete}
+                _hover={{ transform: 'translateY(-1px)' }}
+                transition="all 0.2s ease-in-out"
+              >
+                Delete Customer
+              </Button>
+              <Button variant="ghost" onClick={cancelDelete}>Cancel</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        {/* Profile Modal */}
+        <Modal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} isCentered size="3xl">
+          <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(8px)" />
+          <ModalContent borderRadius="xl" bg="transparent" boxShadow="none" maxW="3xl">
+            <GlassCard p={{ base: 8, md: 12 }} maxW="3xl" mx="auto" bg="whiteAlpha.900" borderColor="whiteAlpha.700" boxShadow="2xl" position="relative">
+              <Box position="absolute" inset={0} borderRadius="inherit" bg="white" opacity={0.85} zIndex={0} />
+              <Box position="relative" zIndex={1}>
+                <ModalHeader color="brand.green" fontWeight="bold" fontSize="2xl" px={0} pb={2}>
+                  <HStack spacing={3}>
+                    <InfoOutlineIcon color="brand.green" boxSize={6} />
+                    <span>Customer Profile</span>
+                  </HStack>
+                </ModalHeader>
+                <ModalCloseButton top={4} right={4} zIndex={2} />
+                <ModalBody px={0} pt={0}>
+                  {selectedCustomer ? (
+                    <VStack align="stretch" spacing={5} divider={<Box borderBottom="1px solid" borderColor="gray.200" />}> 
+                      <HStack spacing={3}>
+                        <FaUser color="#003f2d" size={20} />
+                        <Box>
+                          <Text fontSize="sm" color="gray.500" fontWeight="medium">Customer ID</Text>
+                          <Text fontWeight="bold" color="brand.green" fontSize="md">{selectedCustomer.id}</Text>
+                        </Box>
+                      </HStack>
+                      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                        <HStack align="start" spacing={3}>
+                          <FaUser color="#003f2d" size={18} />
+                          <Box>
+                            <Text fontSize="xs" color="gray.500" fontWeight="medium">Name</Text>
+                            <Text fontWeight="medium" color={selectedCustomer.name ? 'gray.800' : 'gray.400'} fontStyle={!selectedCustomer.name ? 'italic' : undefined}>
+                              {selectedCustomer.name || 'Not provided'}
+                            </Text>
+                          </Box>
+                        </HStack>
+                        <HStack align="start" spacing={3}>
+                          <EmailIcon color="#003f2d" boxSize={5} />
+                          <Box>
+                            <Text fontSize="xs" color="gray.500" fontWeight="medium">Email</Text>
+                            <Text color={selectedCustomer.email ? 'gray.700' : 'gray.400'} fontSize="sm" fontStyle={!selectedCustomer.email ? 'italic' : undefined}>
+                              {selectedCustomer.email || 'Not provided'}
+                            </Text>
+                          </Box>
+                        </HStack>
+                        <HStack align="start" spacing={3}>
+                          <PhoneIcon color="#003f2d" boxSize={5} />
+                          <Box>
+                            <Text fontSize="xs" color="gray.500" fontWeight="medium">Phone</Text>
+                            <Text color={selectedCustomer.phone ? 'gray.700' : 'gray.400'} fontSize="sm" fontStyle={!selectedCustomer.phone ? 'italic' : undefined}>
+                              {selectedCustomer.phone || 'Not provided'}
+                            </Text>
+                          </Box>
+                        </HStack>
+                        <HStack align="start" spacing={3}>
+                          <FaAddressCard color="#003f2d" size={18} />
+                          <Box>
+                            <Text fontSize="xs" color="gray.500" fontWeight="medium">Address</Text>
+                            <Text color={selectedCustomer.address ? 'gray.700' : 'gray.400'} fontSize="sm" fontStyle={!selectedCustomer.address ? 'italic' : undefined}>
+                              {selectedCustomer.address ? [selectedCustomer.address.line1, selectedCustomer.address.line2, selectedCustomer.address.city, selectedCustomer.address.state, selectedCustomer.address.country, selectedCustomer.address.postal_code].filter(Boolean).join(', ') : 'Not provided'}
+                            </Text>
+                          </Box>
+                        </HStack>
+                      </SimpleGrid>
+                      <HStack spacing={3}>
+                        <InfoOutlineIcon color="#003f2d" boxSize={5} />
+                        <Box>
+                          <Text fontSize="xs" color="gray.500" fontWeight="medium">Created</Text>
+                          <Text fontSize="sm" color="gray.600">
+                            {selectedCustomer.created ? new Date(selectedCustomer.created * 1000).toLocaleDateString() : 'Unknown'}
+                          </Text>
+                        </Box>
+                      </HStack>
+                      <Box pt={2}>
+                        <Text fontSize="lg" fontWeight="bold" color="brand.green" mb={2}>Projects</Text>
+                        {projectsLoading && customerProjects.length === 0 ? (
+                          <>
+                            {[...Array(2)].map((_, i) => (
+                              <Skeleton key={i} height="40px" mb={2} borderRadius="md" />
+                            ))}
+                          </>
+                        ) : projectsError ? (
+                          <Text color="red.500">{projectsError}</Text>
+                        ) : customerProjects.length === 0 ? (
+                          <Text color="gray.500" fontStyle="italic">No projects found for this customer.</Text>
+                        ) : (
+                          <Box maxH="200px" overflowY="auto" transition="none" opacity={projectsLoading ? 0.5 : 1}>
+                            {displayedProjects.map(proj => (
+                              <ProjectCard key={proj.id} proj={proj} />
+                            ))}
+                            {customerProjects.length > 5 && (
+                              <Button as={NextLink} href={`/admin/manage-projects?customer_stripe_id=${selectedCustomer.id}`} size="sm" colorScheme="green" variant="ghost" mt={2}>
+                                View All Projects
+                              </Button>
+                            )}
+                          </Box>
+                        )}
+                      </Box>
+                      <Box pt={2}>
+                        <Text fontSize="lg" fontWeight="bold" color="brand.green" mb={2}>Billings</Text>
+                        {invoicesLoading && invoices.length === 0 ? (
+                          <>
+                            {[...Array(2)].map((_, i) => (
+                              <Skeleton key={i} height="40px" mb={2} borderRadius="md" />
+                            ))}
+                          </>
+                        ) : invoicesError ? (
+                          <Text color="red.500">{invoicesError}</Text>
+                        ) : invoices.length === 0 ? (
+                          <Text color="gray.500" fontStyle="italic">No invoices found for this customer.</Text>
+                        ) : (
+                          <Box maxH="200px" overflowY="auto" transition="none" opacity={invoicesLoading ? 0.5 : 1}>
+                            {displayedInvoices.map(inv => (
+                              <InvoiceCard key={inv.id} inv={inv} />
+                            ))}
+                            {invoices.length > 5 && (
+                              <Button as={NextLink} href={`https://dashboard.stripe.com/customers/${selectedCustomer.id}`} target="_blank" size="sm" colorScheme="green" variant="ghost" mt={2}>
+                                View All Invoices
+                              </Button>
+                            )}
+                          </Box>
+                        )}
+                      </Box>
+                      <Button
+                        as={NextLink}
+                        href={`https://dashboard.stripe.com/customers/${selectedCustomer.id}`}
+                        target="_blank"
+                        leftIcon={<ExternalLinkIcon />}
+                        colorScheme="green"
+                        variant="solid"
+                        size="lg"
+                        alignSelf="flex-end"
+                        mt={2}
+                        boxShadow="md"
+                      >
+                        View in Stripe Dashboard
+                      </Button>
+                    </VStack>
+                  ) : (
+                    <Text>No customer selected.</Text>
+                  )}
+                </ModalBody>
+              </Box>
+            </GlassCard>
+          </ModalContent>
+        </Modal>
+        <StickyNavBar />
+      </Box>
+    </>
   );
 } 

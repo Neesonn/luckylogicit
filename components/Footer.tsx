@@ -145,20 +145,6 @@ export default function Footer() {
         >
           Change Cookie Preferences
         </Button>
-        {/* Golden wrench icon button to open admin modal */}
-        <Button
-          position="absolute"
-          left={4}
-          top={4}
-          aria-label="Admin Panel"
-          bg="transparent"
-          _hover={{ bg: 'rgba(0, 63, 45, 0.1)' }}
-          onClick={() => router.push('/admin/login')}
-          p={0}
-          minW={0}
-        >
-          <FaWrench size={22} color="#003f2d" style={{ verticalAlign: 'middle' }} />
-        </Button>
       </Box>
 
       {/* Floating chat button (bottom right) */}

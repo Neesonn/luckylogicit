@@ -9,8 +9,12 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import GoogleAnalytics from '../components/GoogleAnalytics';
 import { LockProvider } from '../components/LockContext';
 import { StripeDataProvider } from '../components/StripeDataContext';
+import { usePathname } from 'next/navigation';
+import ClientLayoutShell from '../components/ClientLayoutShell';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const isLoginPage = pathname === '/admin/login';
   return (
     <html lang="en">
       <head>
@@ -81,13 +85,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ErrorBoundary>
             <LockProvider>
               <StripeDataProvider>
-                <Flex direction="column" minH="100vh">
-                  <Navbar />
-                  <Box as="main" id="main-content" flex="1" pt="80px">
-                    {children}
-                  </Box>
-                  <Footer />
-                </Flex>
+                <ClientLayoutShell>
+                  {children}
+                </ClientLayoutShell>
               </StripeDataProvider>
             </LockProvider>
           </ErrorBoundary>

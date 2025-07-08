@@ -623,9 +623,9 @@ export default function PublicProjectPage() {
                 <Card shadow="sm" border="1px solid" borderColor="gray.200">
                   <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
                     <HStack justify="space-between" w="full">
-                      <HStack>
-                        <Icon as={FaTasks} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
-                        <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Tasks ({project.tasks.length})</Heading>
+                    <HStack>
+                      <Icon as={FaTasks} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
+                      <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Tasks ({project.tasks.length})</Heading>
                       </HStack>
                       <IconButton
                         aria-label={tasksExpanded ? "Collapse tasks" : "Expand tasks"}
@@ -639,46 +639,46 @@ export default function PublicProjectPage() {
                     </HStack>
                   </CardHeader>
                   <Collapse in={tasksExpanded} animateOpacity>
-                    <CardBody py={{ base: 4, md: 6 }}>
-                      <VStack spacing={{ base: 3, md: 4 }} align="stretch">
-                        {project.tasks.map((task: any, index: number) => {
-                          // Flexible regex to match any InLIFE Wellness KIOSK URL
-                          const kioskUrlPattern = /https:\/\/central\.inlifewellness\.com\.au\/monitor_board\/getRollCall\/[^\s]+/g;
-                          let displayTitle = task.title;
-                          if (typeof displayTitle === 'string') {
-                            displayTitle = displayTitle.replace(kioskUrlPattern, "[blurred] blur'd for security");
-                          }
-                          return (
-                            <Box 
-                              key={task.id || index} 
-                              p={{ base: 3, md: 4 }} 
-                              border="1px solid" 
-                              borderColor="gray.200" 
-                              borderRadius="lg"
-                              bg="white"
-                            >
-                              <VStack align="start" spacing={{ base: 2, md: 3 }}>
-                                <Text fontWeight="semibold" fontSize={{ base: "md", md: "lg" }}>{displayTitle}</Text>
-                                <HStack spacing={{ base: 2, md: 2 }} flexWrap="wrap">
-                                  <Badge colorScheme={getStatusColor(task.status)} fontSize={{ base: "xs", md: "xs" }}>
-                                    {task.status}
-                                  </Badge>
-                                  <Badge colorScheme={getPriorityColor(task.priority)} fontSize={{ base: "xs", md: "xs" }}>
-                                    {task.priority}
-                                  </Badge>
-                                </HStack>
-                                <VStack align="start" spacing={1} fontSize={{ base: "xs", md: "sm" }} color="gray.600">
-                                  <Text>Assignee: {task.assignee}</Text>
-                                  {task.dueDate && (
-                                    <Text>Due: {new Date(task.dueDate).toLocaleDateString()}</Text>
-                                  )}
-                                </VStack>
+                  <CardBody py={{ base: 4, md: 6 }}>
+                    <VStack spacing={{ base: 3, md: 4 }} align="stretch">
+                      {project.tasks.map((task: any, index: number) => {
+                        // Flexible regex to match any InLIFE Wellness KIOSK URL
+                        const kioskUrlPattern = /https:\/\/central\.inlifewellness\.com\.au\/monitor_board\/getRollCall\/[^\s]+/g;
+                        let displayTitle = task.title;
+                        if (typeof displayTitle === 'string') {
+                          displayTitle = displayTitle.replace(kioskUrlPattern, "[blurred] blur'd for security");
+                        }
+                        return (
+                          <Box 
+                            key={task.id || index} 
+                            p={{ base: 3, md: 4 }} 
+                            border="1px solid" 
+                            borderColor="gray.200" 
+                            borderRadius="lg"
+                            bg="white"
+                          >
+                            <VStack align="start" spacing={{ base: 2, md: 3 }}>
+                              <Text fontWeight="semibold" fontSize={{ base: "md", md: "lg" }}>{displayTitle}</Text>
+                              <HStack spacing={{ base: 2, md: 2 }} flexWrap="wrap">
+                                <Badge colorScheme={getStatusColor(task.status)} fontSize={{ base: "xs", md: "xs" }}>
+                                  {task.status}
+                                </Badge>
+                                <Badge colorScheme={getPriorityColor(task.priority)} fontSize={{ base: "xs", md: "xs" }}>
+                                  {task.priority}
+                                </Badge>
+                              </HStack>
+                              <VStack align="start" spacing={1} fontSize={{ base: "xs", md: "sm" }} color="gray.600">
+                                <Text>Assignee: {task.assignee}</Text>
+                                {task.dueDate && (
+                                  <Text>Due: {new Date(task.dueDate).toLocaleDateString()}</Text>
+                                )}
                               </VStack>
-                            </Box>
-                          );
-                        })}
-                      </VStack>
-                    </CardBody>
+                            </VStack>
+                          </Box>
+                        );
+                      })}
+                    </VStack>
+                  </CardBody>
                   </Collapse>
                 </Card>
               )}
@@ -689,10 +689,10 @@ export default function PublicProjectPage() {
                   <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
                     <VStack align="start" spacing={{ base: 3, md: 4 }}>
                       <HStack justify="space-between" w="full">
-                        <HStack>
-                          <Icon as={FaInfoCircle} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
-                          <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Project Updates ({project.updates.length})</Heading>
-                        </HStack>
+                      <HStack>
+                        <Icon as={FaInfoCircle} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
+                        <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Project Updates ({project.updates.length})</Heading>
+                      </HStack>
                         <IconButton
                           aria-label={updatesExpanded ? "Collapse updates" : "Expand updates"}
                           icon={<Icon as={updatesExpanded ? FaChevronUp : FaChevronDown} />}
@@ -705,39 +705,39 @@ export default function PublicProjectPage() {
                       </HStack>
                       {/* Blur/Unblur All Button - Only show when expanded */}
                       {updatesExpanded && (
-                        <Box>
-                          {(() => {
-                            const allIds = getAllUpdateIds();
-                            const allBlurred = allIds.every((id: number) => blurredUpdates.has(id));
-                            return (
-                              <button
-                                style={{
-                                  background: 'none',
-                                  border: '1px solid #CBD5E0',
-                                  borderRadius: '8px',
-                                  padding: '6px 16px',
-                                  color: '#003f2d',
-                                  fontWeight: 600,
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '8px',
-                                  fontSize: '0.875rem',
-                                  transition: 'background 0.2s, border 0.2s',
-                                }}
-                                onClick={handleToggleAllBlur}
-                              >
+                      <Box>
+                        {(() => {
+                          const allIds = getAllUpdateIds();
+                          const allBlurred = allIds.every((id: number) => blurredUpdates.has(id));
+                          return (
+                            <button
+                              style={{
+                                background: 'none',
+                                border: '1px solid #CBD5E0',
+                                borderRadius: '8px',
+                                padding: '6px 16px',
+                                color: '#003f2d',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                fontSize: '0.875rem',
+                                transition: 'background 0.2s, border 0.2s',
+                              }}
+                              onClick={handleToggleAllBlur}
+                            >
                                                               <Icon as={allBlurred ? FaLockOpen : FaLock} boxSize={4} />
                               {allBlurred ? 'Show Updates' : 'Hide Updates'}
-                              </button>
-                            );
-                          })()}
-                        </Box>
+                            </button>
+                          );
+                        })()}
+                      </Box>
                       )}
                     </VStack>
                   </CardHeader>
                   <Collapse in={updatesExpanded} animateOpacity>
-                    <CardBody py={{ base: 4, md: 6 }}>
+                  <CardBody py={{ base: 4, md: 6 }}>
                     <VStack spacing={{ base: 3, md: 4 }} align="stretch">
                       {project.updates.map((update: any, index: number) => {
                         const updateId = update.id || index;
