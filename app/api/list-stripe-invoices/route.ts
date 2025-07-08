@@ -6,13 +6,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-05-28.basil',
 });
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const ip = typeof window === 'undefined' ? (globalThis as any).ip || 'unknown' : 'unknown';
   if (rateLimiter.isRateLimited(`list-stripe-invoices-${ip}`)) {
     return NextResponse.json({ success: false, message: 'Too many requests. Please try again later.' }, { status: 429 });
   }
   try {
-    const invoices = await stripe.invoices.list({ limit: 20, expand: ['data.customer', 'data.quote'] });
+    // Get customer_id from query params
+    const { searchParams } = new URL(req.url);
+    const customer_id = searchParams.get('customer_id');
+    const listParams: Stripe.InvoiceListParams = { limit: 20, expand: ['data.customer', 'data.quote'] };
+    if (customer_id) {
+      listParams.customer = customer_id;
+    }
+    const invoices = await stripe.invoices.list(listParams);
     // Map to include customer name/email and billing/shipping for each invoice
     const invoiceData = await Promise.all(invoices.data.map(async inv => {
       let customerId = '';

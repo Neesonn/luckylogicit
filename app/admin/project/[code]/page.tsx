@@ -56,7 +56,7 @@ import {
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import NextLink from 'next/link';
-import { ArrowBackIcon, EditIcon, DeleteIcon, ChevronRightIcon, AddIcon, ChevronDownIcon, ChevronUpIcon, CheckCircleIcon, HamburgerIcon } from '@chakra-ui/icons';
+import { ArrowBackIcon, EditIcon, DeleteIcon, ChevronRightIcon, AddIcon, ChevronDownIcon, ChevronUpIcon, CheckCircleIcon, HamburgerIcon, SearchIcon, LinkIcon } from '@chakra-ui/icons';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   FaInfoCircle, 
@@ -219,6 +219,17 @@ export default function ProjectDetailsPage() {
   const [cloneSearchTerm, setCloneSearchTerm] = useState('');
   const [cloning, setCloning] = useState(false);
   const toast = useToast();
+
+  // Collapsible state for sidebar cards
+  const [showTeam, setShowTeam] = useState(true);
+  const [showCustomer, setShowCustomer] = useState(true);
+  const [showQuotes, setShowQuotes] = useState(true);
+
+  // State for quote linking
+  const [customerQuotes, setCustomerQuotes] = useState<any[]>([]);
+  const [selectedQuoteId, setSelectedQuoteId] = useState<string>('');
+  const [fetchingQuotes, setFetchingQuotes] = useState(false);
+  const [linkingQuoteId, setLinkingQuoteId] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch project details from database
@@ -1029,6 +1040,25 @@ export default function ProjectDetailsPage() {
     }
   };
 
+  // Fetch all quotes for the customer when Quotes & Billings is expanded
+  useEffect(() => {
+    const fetchQuotes = async () => {
+      if (showQuotes && project && project.customer_stripe_id) {
+        setFetchingQuotes(true);
+        try {
+          const res = await fetch(`/api/list-stripe-quotes?customer=${project.customer_stripe_id}`);
+          const data = await res.json();
+          setCustomerQuotes(data.quotes || []);
+        } catch (err) {
+          setCustomerQuotes([]);
+        } finally {
+          setFetchingQuotes(false);
+        }
+      }
+    };
+    fetchQuotes();
+  }, [showQuotes, project?.customer_stripe_id]);
+
   if (loading) {
     return (
       <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="gray.50">
@@ -1532,7 +1562,111 @@ export default function ProjectDetailsPage() {
                   </CardBody>
                 </Card>
 
-                
+                {/* Quotes & Billings */}
+                <Card shadow="sm" border="1px solid" borderColor="gray.200">
+                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
+                    <HStack justify="space-between">
+                      <HStack>
+                        <Icon as={FaDollarSign} color="#003f2d" boxSize={5} />
+                        <Heading size="md" color="#003f2d" fontWeight="bold">Quotes & Billings</Heading>
+                      </HStack>
+                      <IconButton
+                        aria-label={showQuotes ? 'Collapse' : 'Expand'}
+                        icon={showQuotes ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setShowQuotes((v) => !v)}
+                      />
+                    </HStack>
+                  </CardHeader>
+                  {showQuotes && (
+                    <CardBody py={6}>
+                      <VStack align="stretch" spacing={4}>
+                        {/* Dropdown to select a quote for this customer */}
+                        <HStack>
+                          <Select
+                            placeholder={fetchingQuotes ? 'Loading quotes...' : 'Select a quote to link'}
+                            value={selectedQuoteId}
+                            onChange={e => setSelectedQuoteId(e.target.value)}
+                            isDisabled={fetchingQuotes || customerQuotes.length === 0}
+                            size="md"
+                          >
+                            {customerQuotes.map((quote: any) => {
+                              const alreadyLinked = Array.isArray(project.linkedQuotes) && project.linkedQuotes.some((q: any) => q.quoteId === quote.id);
+                              return (
+                                <option key={quote.id} value={quote.id} disabled={alreadyLinked}>
+                                  {quote.number || quote.id} {quote.amount ? `- $${quote.amount}` : ''} {alreadyLinked ? '(Linked)' : ''}
+                                </option>
+                              );
+                            })}
+                          </Select>
+                          <Button
+                            leftIcon={<LinkIcon />}
+                            colorScheme="green"
+                            size="md"
+                            isDisabled={!selectedQuoteId || linkingQuoteId === selectedQuoteId || (Array.isArray(project.linkedQuotes) && project.linkedQuotes.some((q: any) => q.quoteId === selectedQuoteId))}
+                            isLoading={linkingQuoteId === selectedQuoteId}
+                            onClick={async () => {
+                              setLinkingQuoteId(selectedQuoteId);
+                              const quote = customerQuotes.find((q: any) => q.id === selectedQuoteId);
+                              try {
+                                const newLinked = Array.isArray(project.linkedQuotes) ? [...project.linkedQuotes] : [];
+                                newLinked.push({ quoteId: quote.id, quoteNumber: quote.number });
+                                // Persist to backend
+                                await fetch(`/api/projects/${projectCode}`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ linkedQuotes: newLinked })
+                                });
+                                // Update local state
+                                setProject((prev: any) => ({ ...prev, linkedQuotes: newLinked }));
+                                toast({
+                                  title: 'Quote linked',
+                                  description: `Quote ${quote.number || quote.id} linked to this project.`,
+                                  status: 'success',
+                                  duration: 4000,
+                                  isClosable: true,
+                                  position: 'top-right',
+                                  variant: 'solid',
+                                });
+                                setSelectedQuoteId('');
+                              } catch (err) {
+                                toast({
+                                  title: 'Failed to link quote',
+                                  status: 'error',
+                                  duration: 4000,
+                                  isClosable: true,
+                                  position: 'top-right',
+                                  variant: 'solid',
+                                });
+                              } finally {
+                                setLinkingQuoteId(null);
+                              }
+                            }}
+                          >
+                            Link
+                          </Button>
+                        </HStack>
+                        {/* Linked quotes */}
+                        <Box>
+                          <Text fontWeight="semibold" mb={2}>Linked Quotes:</Text>
+                          {Array.isArray(project.linkedQuotes) && project.linkedQuotes.length > 0 ? (
+                            <VStack align="stretch" spacing={2}>
+                              {project.linkedQuotes.map((q: any) => (
+                                <HStack key={q.quoteId} justify="space-between" bg="gray.50" borderRadius="md" px={2} py={1}>
+                                  <Text fontWeight="medium">{q.quoteNumber || q.quoteId}</Text>
+                                  <Button as={Link} href={`/admin/quotes/${q.quoteId}`} size="xs" colorScheme="teal" variant="outline">View</Button>
+                                </HStack>
+                              ))}
+                            </VStack>
+                          ) : (
+                            <Text color="gray.400" fontSize="sm">No quotes linked to this project.</Text>
+                          )}
+                        </Box>
+                      </VStack>
+                    </CardBody>
+                  )}
+                </Card>
 
               {/* Timeline & Resources */}
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
@@ -1985,110 +2119,156 @@ export default function ProjectDetailsPage() {
               {/* Team & Ownership */}
               <Card shadow="sm" border="1px solid" borderColor="gray.200">
                 <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
-                  <HStack>
-                    <Icon as={FaUserTie} color="#003f2d" boxSize={5} />
-                    <Heading size="md" color="#003f2d" fontWeight="bold">Team & Ownership</Heading>
+                  <HStack justify="space-between">
+                    <HStack>
+                      <Icon as={FaUserTie} color="#003f2d" boxSize={5} />
+                      <Heading size="md" color="#003f2d" fontWeight="bold">Team & Ownership</Heading>
+                    </HStack>
+                    <IconButton
+                      aria-label={showTeam ? 'Collapse' : 'Expand'}
+                      icon={showTeam ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setShowTeam((v) => !v)}
+                    />
                   </HStack>
                 </CardHeader>
-                <CardBody py={6}>
-                  <VStack spacing={4} align="stretch">
-                    <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
-                        Project Owner
-                      </Text>
-                      <Text fontSize="lg" fontWeight="medium">{project.projectOwner}</Text>
-                    </Box>
-                    <Divider />
-                    <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
-                        Created By
-                      </Text>
-                      <Text fontSize="lg" fontWeight="medium">{project.createdBy}</Text>
-                    </Box>
-                    <Divider />
-                    <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
-                        Team
-                      </Text>
-                                             <VStack align="start" spacing={2}>
-                         {project.team.map((member: string, index: number) => (
-                           <HStack key={index} spacing={2}>
-                             <Avatar size="xs" name={member} />
-                             <Text fontSize="sm">{member}</Text>
-                           </HStack>
-                         ))}
-                       </VStack>
-                    </Box>
-                  </VStack>
-                </CardBody>
+                {showTeam && (
+                  <CardBody py={6}>
+                    <VStack spacing={4} align="stretch">
+                      <Box>
+                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                          Project Owner
+                        </Text>
+                        <Text fontSize="lg" fontWeight="medium">{project.projectOwner}</Text>
+                      </Box>
+                      <Divider />
+                      <Box>
+                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                          Created By
+                        </Text>
+                        <Text fontSize="lg" fontWeight="medium">{project.createdBy}</Text>
+                      </Box>
+                      <Divider />
+                      <Box>
+                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                          Team
+                        </Text>
+                        <VStack align="start" spacing={2}>
+                          {project.team.map((member: string, index: number) => (
+                            <HStack key={index} spacing={2}>
+                              <Avatar size="xs" name={member} />
+                              <Text fontSize="sm">{member}</Text>
+                            </HStack>
+                          ))}
+                        </VStack>
+                      </Box>
+                    </VStack>
+                  </CardBody>
+                )}
               </Card>
 
               {/* Customer Information */}
               <Card shadow="sm" border="1px solid" borderColor="gray.200">
                 <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
-                  <HStack>
-                    <Icon as={FaUser} color="#003f2d" boxSize={5} />
-                    <Heading size="md" color="#003f2d" fontWeight="bold">Customer Information</Heading>
+                  <HStack justify="space-between">
+                    <HStack>
+                      <Icon as={FaUser} color="#003f2d" boxSize={5} />
+                      <Heading size="md" color="#003f2d" fontWeight="bold">Customer Information</Heading>
+                    </HStack>
+                    <IconButton
+                      aria-label={showCustomer ? 'Collapse' : 'Expand'}
+                      icon={showCustomer ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setShowCustomer((v) => !v)}
+                    />
                   </HStack>
                 </CardHeader>
-                <CardBody py={6}>
-                  <SimpleGrid columns={1} spacing={4} mb={4}>
-                    <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={1} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
-                        Customer Name
-                      </Text>
-                      <HStack>
-                        <Icon as={FaUser} color="#003f2d" boxSize={4} />
-                        <Text fontSize="lg" fontWeight="medium" whiteSpace="normal" wordBreak="break-word">{project.customer}</Text>
-                      </HStack>
-                      {project.customer_stripe_id && (
-                        <Text fontSize="xs" color="gray.400" mt={1} whiteSpace="normal" wordBreak="break-word">
-                          Stripe ID: {project.customer_stripe_id}
+                {showCustomer && (
+                  <CardBody py={6}>
+                    <SimpleGrid columns={1} spacing={4} mb={4}>
+                      <Box>
+                        <Text fontWeight="semibold" color="gray.700" mb={1} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                          Customer Name
                         </Text>
-                      )}
-                    </Box>
-                    <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={1} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
-                        Email Address
-                      </Text>
-                      <HStack>
-                        <Icon as={FaEnvelope} color="#003f2d" boxSize={4} />
-                        <Text fontSize="lg" whiteSpace="normal" wordBreak="break-word">{project.customerEmail}</Text>
-                      </HStack>
-                    </Box>
-                    <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={1} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
-                        Phone Number
-                      </Text>
-                      <HStack>
-                        <Icon as={FaPhone} color="#003f2d" boxSize={4} />
-                        <Text fontSize="lg" whiteSpace="normal" wordBreak="break-word">{project.customerPhone}</Text>
-                      </HStack>
-                    </Box>
-                  </SimpleGrid>
-                  <Divider my={4} />
-                  <Box>
-                    <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
-                      Address
-                      </Text>
-                    <VStack align="start" spacing={1} fontSize="md">
-                      {project.customerAddressLine1 && (
-                        <Text>{project.customerAddressLine1}</Text>
-                      )}
-                      {project.customerAddressLine2 && (
-                        <Text>{project.customerAddressLine2}</Text>
-                      )}
-                      {(project.customerCity || project.customerState || project.customerPostcode) && (
-                        <Text>
-                          {[project.customerCity, project.customerState, project.customerPostcode].filter(Boolean).join(', ')}
+                        <HStack>
+                          <Icon as={FaUser} color="#003f2d" boxSize={4} />
+                          <Text fontSize="lg" fontWeight="medium" whiteSpace="normal" wordBreak="break-word">{project.customer}</Text>
+                        </HStack>
+                        {project.customer_stripe_id && (
+                          <Text fontSize="xs" color="gray.400" mt={1} whiteSpace="normal" wordBreak="break-word">
+                            Stripe ID: {project.customer_stripe_id}
+                          </Text>
+                        )}
+                      </Box>
+                      <Box>
+                        <Text fontWeight="semibold" color="gray.700" mb={1} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                          Email Address
                         </Text>
-                      )}
-                      {project.customerCountry && (
-                        <Text>{project.customerCountry}</Text>
-                    )}
-                  </VStack>
-                  </Box>
-                </CardBody>
+                        <HStack>
+                          <Icon as={FaEnvelope} color="#003f2d" boxSize={4} />
+                          <Text fontSize="lg" whiteSpace="normal" wordBreak="break-word">{project.customerEmail}</Text>
+                        </HStack>
+                      </Box>
+                      <Box>
+                        <Text fontWeight="semibold" color="gray.700" mb={1} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                          Phone Number
+                        </Text>
+                        <HStack>
+                          <Icon as={FaPhone} color="#003f2d" boxSize={4} />
+                          <Text fontSize="lg" whiteSpace="normal" wordBreak="break-word">{project.customerPhone}</Text>
+                        </HStack>
+                      </Box>
+                    </SimpleGrid>
+                    <Divider my={4} />
+                    <Box>
+                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        Address
+                      </Text>
+                      <VStack align="start" spacing={1} fontSize="md">
+                        {project.customerAddressLine1 && (
+                          <Text>{project.customerAddressLine1}</Text>
+                        )}
+                        {project.customerAddressLine2 && (
+                          <Text>{project.customerAddressLine2}</Text>
+                        )}
+                        {(project.customerCity || project.customerState || project.customerPostcode) && (
+                          <Text>
+                            {[project.customerCity, project.customerState, project.customerPostcode].filter(Boolean).join(', ')}
+                          </Text>
+                        )}
+                        {project.customerCountry && (
+                          <Text>{project.customerCountry}</Text>
+                        )}
+                      </VStack>
+                    </Box>
+                  </CardBody>
+                )}
+              </Card>
+
+              {/* Quotes & Billings */}
+              <Card shadow="sm" border="1px solid" borderColor="gray.200">
+                <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
+                  <HStack justify="space-between">
+                    <HStack>
+                      <Icon as={FaDollarSign} color="#003f2d" boxSize={5} />
+                      <Heading size="md" color="#003f2d" fontWeight="bold">Quotes & Billings</Heading>
+                    </HStack>
+                    <IconButton
+                      aria-label={showQuotes ? 'Collapse' : 'Expand'}
+                      icon={showQuotes ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setShowQuotes((v) => !v)}
+                    />
+                  </HStack>
+                </CardHeader>
+                {showQuotes && (
+                  <CardBody py={6}>
+                    {/* Empty for now */}
+                  </CardBody>
+                )}
               </Card>
             </VStack>
           </Box>

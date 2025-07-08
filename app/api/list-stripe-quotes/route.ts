@@ -6,13 +6,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-05-28.basil',
 });
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const ip = typeof window === 'undefined' ? (globalThis as any).ip || 'unknown' : 'unknown';
   if (rateLimiter.isRateLimited(`list-stripe-quotes-${ip}`)) {
     return NextResponse.json({ success: false, message: 'Too many requests. Please try again later.' }, { status: 429 });
   }
   try {
-    const quotes = await stripe.quotes.list({ limit: 20, expand: ['data.customer'] });
+    const { searchParams } = new URL(req.url);
+    const customerParam = searchParams.get('customer');
+    const quotes = await stripe.quotes.list({ limit: 100, expand: ['data.customer'] });
     
     // Map to include customer name/email and other details for each quote
     const quoteData = await Promise.all(quotes.data.map(async quote => {
@@ -64,7 +66,12 @@ export async function GET() {
       };
     }));
     
-    return NextResponse.json({ success: true, quotes: quoteData });
+    // Filter by customer if provided
+    const filteredQuotes = customerParam
+      ? quoteData.filter(q => q.customer === customerParam)
+      : quoteData;
+    
+    return NextResponse.json({ success: true, quotes: filteredQuotes });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }
