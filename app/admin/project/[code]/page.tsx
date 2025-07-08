@@ -1232,12 +1232,12 @@ export default function ProjectDetailsPage() {
           {/* Project Header */}
           <VStack align="start" spacing={{ base: 3, md: 4 }}>
             <Heading as="h1" size={{ base: "xl", md: "2xl" }} color="#003f2d" fontWeight="bold">
-              {project.name}
-            </Heading>
+                {project.name}
+              </Heading>
             <VStack align="start" spacing={{ base: 2, md: 4 }}>
               <Text fontSize={{ base: "md", md: "lg" }} color="gray.600" fontWeight="medium">
-                {project.code}
-              </Text>
+                  {project.code}
+                </Text>
               <HStack spacing={{ base: 2, md: 4 }} flexWrap="wrap">
                 <Badge colorScheme={getStatusColor(isEditing ? editData.status : project.status)} size="lg" px={{ base: 3, md: 4 }} py={{ base: 1, md: 2 }} fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold">
                   <Icon as={getStatusIcon(isEditing ? editData.status : project.status)} mr={2} />
@@ -1518,294 +1518,294 @@ export default function ProjectDetailsPage() {
           {/* Main Content Area */}
           <Box gridColumn={{ xl: "span 3" }} minW={0}>
             <VStack spacing={{ base: 4, md: 8 }} align="stretch">
-              {/* Project Overview */}
-              <Card shadow="sm" border="1px solid" borderColor="gray.200">
+                {/* Project Overview */}
+                <Card shadow="sm" border="1px solid" borderColor="gray.200">
                 <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
-                  <HStack>
+                    <HStack>
                     <Icon as={FaInfoCircle} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
                     <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Project Overview</Heading>
-                  </HStack>
-                </CardHeader>
+                    </HStack>
+                  </CardHeader>
                 <CardBody py={{ base: 4, md: 6 }}>
                   <Box mb={{ base: 4, md: 6 }}>
                     <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
-                      Description
-                    </Text>
-                    {isEditing ? (
-                      <Textarea
-                        value={editData.description || ''}
-                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('description', e.target.value)}
+                        Description
+                      </Text>
+                      {isEditing ? (
+                        <Textarea
+                          value={editData.description || ''}
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('description', e.target.value)}
                         fontSize={{ base: "md", md: "lg" }}
-                        borderWidth="2px"
-                        borderColor="gray.200"
-                        borderRadius="lg"
-                        _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
-                        _hover={{ borderColor: '#14543a' }}
-                        rows={4}
-                      />
-                    ) : (
-                      <Text fontSize={{ base: "md", md: "lg" }} color="gray.700" lineHeight="tall">
-                        {project.description}
-                      </Text>
-                    )}
-                  </Box>
-                  <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={{ base: 4, md: 6 }} alignItems="start">
-                    <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
-                        Category
-                      </Text>
-                      {isEditing ? (
-                        <Select
-                          value={editData.category || ''}
-                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('category', e.target.value)}
-                          fontSize={{ base: "md", md: "lg" }}
                           borderWidth="2px"
                           borderColor="gray.200"
                           borderRadius="lg"
                           _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
                           _hover={{ borderColor: '#14543a' }}
-                        >
-                          <option value="residential">Residential</option>
-                          <option value="business">Business</option>
-                        </Select>
-                      ) : (
-                        <Text fontSize={{ base: "md", md: "lg" }} textTransform="capitalize">{project.category}</Text>
-                      )}
-                    </Box>
-                    <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
-                        Client
-                      </Text>
-                      {isEditing ? (
-                        <Input
-                          value={editData.client || ''}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('client', e.target.value)}
-                          fontSize={{ base: "md", md: "lg" }}
-                          borderWidth="2px"
-                          borderColor="gray.200"
-                          borderRadius="lg"
-                          _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
-                          _hover={{ borderColor: '#14543a' }}
+                          rows={4}
                         />
                       ) : (
+                      <Text fontSize={{ base: "md", md: "lg" }} color="gray.700" lineHeight="tall">
+                          {project.description}
+                        </Text>
+                      )}
+                    </Box>
+                  <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={{ base: 4, md: 6 }} alignItems="start">
+                      <Box>
+                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
+                          Category
+                        </Text>
+                        {isEditing ? (
+                          <Select
+                            value={editData.category || ''}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('category', e.target.value)}
+                          fontSize={{ base: "md", md: "lg" }}
+                            borderWidth="2px"
+                            borderColor="gray.200"
+                            borderRadius="lg"
+                            _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
+                            _hover={{ borderColor: '#14543a' }}
+                          >
+                            <option value="residential">Residential</option>
+                            <option value="business">Business</option>
+                          </Select>
+                        ) : (
+                        <Text fontSize={{ base: "md", md: "lg" }} textTransform="capitalize">{project.category}</Text>
+                        )}
+                      </Box>
+                      <Box>
+                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
+                          Client
+                        </Text>
+                        {isEditing ? (
+                          <Input
+                            value={editData.client || ''}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('client', e.target.value)}
+                          fontSize={{ base: "md", md: "lg" }}
+                            borderWidth="2px"
+                            borderColor="gray.200"
+                            borderRadius="lg"
+                            _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
+                            _hover={{ borderColor: '#14543a' }}
+                          />
+                        ) : (
                         <Text fontSize={{ base: "md", md: "lg" }}>{project.client}</Text>
-                      )}
-                    </Box>
-                    <Box>
+                        )}
+                      </Box>
+                      <Box>
                       <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
-                        Status
-                      </Text>
-                      {isEditing ? (
-                        <Select
-                          value={editData.status || ''}
-                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('status', e.target.value)}
+                          Status
+                        </Text>
+                        {isEditing ? (
+                          <Select
+                            value={editData.status || ''}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('status', e.target.value)}
                           fontSize={{ base: "md", md: "lg" }}
-                          borderWidth="2px"
-                          borderColor="gray.200"
-                          borderRadius="lg"
-                          _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
-                          _hover={{ borderColor: '#14543a' }}
-                        >
-                          <option value="planned">Planned</option>
-                          <option value="in progress">In Progress</option>
-                          <option value="completed">Completed</option>
-                          <option value="on hold">On Hold</option>
-                        </Select>
-                      ) : (
+                            borderWidth="2px"
+                            borderColor="gray.200"
+                            borderRadius="lg"
+                            _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
+                            _hover={{ borderColor: '#14543a' }}
+                          >
+                            <option value="planned">Planned</option>
+                            <option value="in progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="on hold">On Hold</option>
+                          </Select>
+                        ) : (
                         <Badge colorScheme={getStatusColor(project.status)} px={3} py={1} fontSize={{ base: "xs", md: "md" }} fontWeight="semibold">
-                          <Icon as={getStatusIcon(project.status)} mr={2} />
-                          {project.status}
-                        </Badge>
-                      )}
-                    </Box>
-                    <Box>
+                            <Icon as={getStatusIcon(project.status)} mr={2} />
+                            {project.status}
+                          </Badge>
+                        )}
+                      </Box>
+                      <Box>
                       <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
-                        Priority
-                      </Text>
-                      {isEditing ? (
-                        <Select
-                          value={editData.priority || ''}
-                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('priority', e.target.value)}
+                          Priority
+                        </Text>
+                        {isEditing ? (
+                          <Select
+                            value={editData.priority || ''}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('priority', e.target.value)}
                           fontSize={{ base: "md", md: "lg" }}
-                          borderWidth="2px"
-                          borderColor="gray.200"
-                          borderRadius="lg"
-                          _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
-                          _hover={{ borderColor: '#14543a' }}
-                        >
-                          <option value="high">High</option>
-                          <option value="medium">Medium</option>
-                          <option value="low">Low</option>
-                        </Select>
-                      ) : (
+                            borderWidth="2px"
+                            borderColor="gray.200"
+                            borderRadius="lg"
+                            _focus={{ borderColor: '#14543a', boxShadow: '0 0 0 2px #14543a' }}
+                            _hover={{ borderColor: '#14543a' }}
+                          >
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                          </Select>
+                        ) : (
                         <Badge colorScheme={getPriorityColor(project.priority)} px={3} py={1} fontSize={{ base: "xs", md: "md" }} fontWeight="semibold">
-                          {project.priority} Priority
-                        </Badge>
-                      )}
-                    </Box>
-                  </SimpleGrid>
-                </CardBody>
-              </Card>
+                            {project.priority} Priority
+                          </Badge>
+                        )}
+                      </Box>
+                    </SimpleGrid>
+                  </CardBody>
+                </Card>
 
-              {/* Customer Information */}
-              <Card shadow="sm" border="1px solid" borderColor="gray.200">
+                {/* Customer Information */}
+                <Card shadow="sm" border="1px solid" borderColor="gray.200">
                 <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
-                  <HStack>
+                    <HStack>
                     <Icon as={FaUser} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
                     <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Customer Information</Heading>
-                  </HStack>
-                </CardHeader>
+                    </HStack>
+                  </CardHeader>
                 <CardBody py={{ base: 4, md: 6 }}>
                   <SimpleGrid columns={1} spacing={{ base: 3, md: 4 }} mb={4}>
-                    <Box>
+                      <Box>
                       <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
-                        Customer Name
-                      </Text>
-                      <HStack>
+                          Customer Name
+                        </Text>
+                        <HStack>
                         <Icon as={FaUser} color="#003f2d" boxSize={{ base: 3, md: 4 }} />
                         <Text fontSize={{ base: "md", md: "lg" }} fontWeight="medium" whiteSpace="normal" wordBreak="break-word">{project.customer}</Text>
-                      </HStack>
-                      {project.customer_stripe_id && (
+                        </HStack>
+                        {project.customer_stripe_id && (
                         <Text fontSize={{ base: "xs", md: "xs" }} color="gray.400" mt={1} whiteSpace="normal" wordBreak="break-word">
-                          Stripe ID: {project.customer_stripe_id}
-                        </Text>
-                      )}
-                    </Box>
-                    <Box>
+                            Stripe ID: {project.customer_stripe_id}
+                          </Text>
+                        )}
+                      </Box>
+                      <Box>
                       <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
-                        Email Address
-                      </Text>
-                      <HStack>
+                          Email Address
+                        </Text>
+                        <HStack>
                         <Icon as={FaEnvelope} color="#003f2d" boxSize={{ base: 3, md: 4 }} />
                         <Text fontSize={{ base: "md", md: "lg" }} whiteSpace="normal" wordBreak="break-word">{project.customerEmail}</Text>
-                      </HStack>
-                    </Box>
-                    <Box>
+                        </HStack>
+                      </Box>
+                      <Box>
                       <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
-                        Phone Number
-                      </Text>
-                      <HStack>
+                          Phone Number
+                        </Text>
+                        <HStack>
                         <Icon as={FaPhone} color="#003f2d" boxSize={{ base: 3, md: 4 }} />
                         <Text fontSize={{ base: "md", md: "lg" }} whiteSpace="normal" wordBreak="break-word">{project.customerPhone}</Text>
-                      </HStack>
-                    </Box>
-                  </SimpleGrid>
+                        </HStack>
+                      </Box>
+                    </SimpleGrid>
                   <Divider my={{ base: 3, md: 4 }} />
-                  <Box>
-                    <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
-                      Address
-                    </Text>
-                    <VStack align="start" spacing={1} fontSize={{ base: "md", md: "md" }}>
-                      {project.customerAddressLine1 && (
-                        <Text>{project.customerAddressLine1}</Text>
-                      )}
-                      {project.customerAddressLine2 && (
-                        <Text>{project.customerAddressLine2}</Text>
-                      )}
-                      {(project.customerCity || project.customerState || project.customerPostcode) && (
-                        <Text>
-                          {[project.customerCity, project.customerState, project.customerPostcode].filter(Boolean).join(', ')}
-                        </Text>
-                      )}
-                      {project.customerCountry && (
-                        <Text>{project.customerCountry}</Text>
-                      )}
-                    </VStack>
-                  </Box>
-                </CardBody>
-              </Card>
-
-              {/* Quotes & Billings */}
-              <Card shadow="sm" border="1px solid" borderColor="gray.200">
-                <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
-                  <HStack>
-                    <Icon as={FaDollarSign} color="#003f2d" boxSize={5} />
-                    <Heading size="md" color="#003f2d" fontWeight="bold">Quotes & Billings</Heading>
-                  </HStack>
-                </CardHeader>
-                <CardBody py={6}>
-                  <VStack align="stretch" spacing={4}>
-                    {/* Dropdown to select a quote for this customer */}
-                    <HStack>
-                      <Select
-                        placeholder={fetchingQuotes ? 'Loading quotes...' : 'Select a quote to link'}
-                        value={selectedQuoteId}
-                        onChange={e => setSelectedQuoteId(e.target.value)}
-                        isDisabled={fetchingQuotes || customerQuotes.length === 0}
-                        size="md"
-                      >
-                        {customerQuotes.map((quote: any) => {
-                          const alreadyLinked = Array.isArray(project.linkedQuotes) && project.linkedQuotes.some((q: any) => q.quoteId === quote.id);
-                          return (
-                            <option key={quote.id} value={quote.id} disabled={alreadyLinked}>
-                              {quote.number || quote.id} {quote.amount ? `- $${quote.amount}` : ''} {alreadyLinked ? '(Linked)' : ''}
-                            </option>
-                          );
-                        })}
-                      </Select>
-                      <Button
-                        leftIcon={<LinkIcon />}
-                        colorScheme="green"
-                        size="md"
-                        isDisabled={!selectedQuoteId || linkingQuoteId === selectedQuoteId || (Array.isArray(project.linkedQuotes) && project.linkedQuotes.some((q: any) => q.quoteId === selectedQuoteId))}
-                        isLoading={linkingQuoteId === selectedQuoteId}
-                        onClick={async () => {
-                          setLinkingQuoteId(selectedQuoteId);
-                          const quote = customerQuotes.find((q: any) => q.id === selectedQuoteId);
-                          try {
-                            const newLinked = Array.isArray(project.linkedQuotes) ? [...project.linkedQuotes] : [];
-                            newLinked.push({ 
-                              quoteId: quote.id, 
-                              quoteNumber: quote.number,
-                              amount: quote.amount,
-                              status: quote.status,
-                              created: quote.created,
-                              lines: quote.lines // Save line items (product/price/description/amount/quantity)
-                            });
-                            // Persist to backend
-                            await fetch(`/api/projects/${projectCode}`, {
-                              method: 'PUT',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ linkedQuotes: newLinked })
-                            });
-                            // Update local state
-                            setProject((prev: any) => ({ ...prev, linkedQuotes: newLinked }));
-                            toast({
-                              title: 'Quote linked',
-                              description: `Quote ${quote.number || quote.id} linked to this project.`,
-                              status: 'success',
-                              duration: 4000,
-                              isClosable: true,
-                              position: 'top-right',
-                              variant: 'solid',
-                            });
-                            setSelectedQuoteId('');
-                          } catch (err) {
-                            toast({
-                              title: 'Failed to link quote',
-                              status: 'error',
-                              duration: 4000,
-                              isClosable: true,
-                              position: 'top-right',
-                              variant: 'solid',
-                            });
-                          } finally {
-                            setLinkingQuoteId(null);
-                          }
-                        }}
-                      >
-                        Link
-                      </Button>
-                    </HStack>
-                    {/* Linked quotes */}
                     <Box>
-                      <Text fontWeight="semibold" mb={2}>Linked Quotes:</Text>
-                      {Array.isArray(project.linkedQuotes) && project.linkedQuotes.length > 0 ? (
-                        <VStack align="stretch" spacing={2}>
-                          {project.linkedQuotes.map((q: any, idx: number) => {
-                            const quoteTotal = Array.isArray(q.lines)
-                              ? q.lines.reduce((sum: number, line: any) => sum + (typeof line.amount_total === 'number' ? line.amount_total : 0), 0)
-                              : 0;
+                    <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
+                        Address
+                      </Text>
+                    <VStack align="start" spacing={1} fontSize={{ base: "md", md: "md" }}>
+                        {project.customerAddressLine1 && (
+                          <Text>{project.customerAddressLine1}</Text>
+                        )}
+                        {project.customerAddressLine2 && (
+                          <Text>{project.customerAddressLine2}</Text>
+                        )}
+                        {(project.customerCity || project.customerState || project.customerPostcode) && (
+                          <Text>
+                            {[project.customerCity, project.customerState, project.customerPostcode].filter(Boolean).join(', ')}
+                          </Text>
+                        )}
+                        {project.customerCountry && (
+                          <Text>{project.customerCountry}</Text>
+                        )}
+                      </VStack>
+                    </Box>
+                  </CardBody>
+                </Card>
+
+                {/* Quotes & Billings */}
+                <Card shadow="sm" border="1px solid" borderColor="gray.200">
+                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
+                    <HStack>
+                      <Icon as={FaDollarSign} color="#003f2d" boxSize={5} />
+                      <Heading size="md" color="#003f2d" fontWeight="bold">Quotes & Billings</Heading>
+                    </HStack>
+                  </CardHeader>
+                  <CardBody py={6}>
+                    <VStack align="stretch" spacing={4}>
+                      {/* Dropdown to select a quote for this customer */}
+                      <HStack>
+                        <Select
+                          placeholder={fetchingQuotes ? 'Loading quotes...' : 'Select a quote to link'}
+                          value={selectedQuoteId}
+                          onChange={e => setSelectedQuoteId(e.target.value)}
+                          isDisabled={fetchingQuotes || customerQuotes.length === 0}
+                          size="md"
+                        >
+                          {customerQuotes.map((quote: any) => {
+                            const alreadyLinked = Array.isArray(project.linkedQuotes) && project.linkedQuotes.some((q: any) => q.quoteId === quote.id);
+                            return (
+                              <option key={quote.id} value={quote.id} disabled={alreadyLinked}>
+                                {quote.number || quote.id} {quote.amount ? `- $${quote.amount}` : ''} {alreadyLinked ? '(Linked)' : ''}
+                              </option>
+                            );
+                          })}
+                        </Select>
+                        <Button
+                          leftIcon={<LinkIcon />}
+                          colorScheme="green"
+                          size="md"
+                          isDisabled={!selectedQuoteId || linkingQuoteId === selectedQuoteId || (Array.isArray(project.linkedQuotes) && project.linkedQuotes.some((q: any) => q.quoteId === selectedQuoteId))}
+                          isLoading={linkingQuoteId === selectedQuoteId}
+                          onClick={async () => {
+                            setLinkingQuoteId(selectedQuoteId);
+                            const quote = customerQuotes.find((q: any) => q.id === selectedQuoteId);
+                            try {
+                              const newLinked = Array.isArray(project.linkedQuotes) ? [...project.linkedQuotes] : [];
+                              newLinked.push({ 
+                                quoteId: quote.id, 
+                                quoteNumber: quote.number,
+                                amount: quote.amount,
+                                status: quote.status,
+                                created: quote.created,
+                                lines: quote.lines // Save line items (product/price/description/amount/quantity)
+                              });
+                              // Persist to backend
+                              await fetch(`/api/projects/${projectCode}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ linkedQuotes: newLinked })
+                              });
+                              // Update local state
+                              setProject((prev: any) => ({ ...prev, linkedQuotes: newLinked }));
+                              toast({
+                                title: 'Quote linked',
+                                description: `Quote ${quote.number || quote.id} linked to this project.`,
+                                status: 'success',
+                                duration: 4000,
+                                isClosable: true,
+                                position: 'top-right',
+                                variant: 'solid',
+                              });
+                              setSelectedQuoteId('');
+                            } catch (err) {
+                              toast({
+                                title: 'Failed to link quote',
+                                status: 'error',
+                                duration: 4000,
+                                isClosable: true,
+                                position: 'top-right',
+                                variant: 'solid',
+                              });
+                            } finally {
+                              setLinkingQuoteId(null);
+                            }
+                          }}
+                        >
+                          Link
+                        </Button>
+                      </HStack>
+                      {/* Linked quotes */}
+                      <Box>
+                        <Text fontWeight="semibold" mb={2}>Linked Quotes:</Text>
+                        {Array.isArray(project.linkedQuotes) && project.linkedQuotes.length > 0 ? (
+                          <VStack align="stretch" spacing={2}>
+                            {project.linkedQuotes.map((q: any, idx: number) => {
+                              const quoteTotal = Array.isArray(q.lines)
+                                ? q.lines.reduce((sum: number, line: any) => sum + (typeof line.amount_total === 'number' ? line.amount_total : 0), 0)
+                                : 0;
                             // Status logic (copied from public page)
                             let status = (q.status || '').toLowerCase();
                             let icon = FaExclamationCircle;
@@ -1839,21 +1839,21 @@ export default function ProjectDetailsPage() {
                               color = 'gray.400';
                               tooltip = 'Quote canceled';
                             }
-                            return (
-                              <Box
-                                key={q.quoteId}
-                                bg="white"
-                                borderRadius="lg"
-                                boxShadow="sm"
-                                p={5}
-                                mb={4}
-                                border="1px solid"
-                                borderColor="gray.200"
-                                _hover={{ boxShadow: "md", borderColor: "green.300" }}
-                                transition="box-shadow 0.2s, border-color 0.2s"
-                              >
-                                <HStack justify="space-between" align="start" mb={2}>
-                                  <Box>
+                              return (
+                                <Box
+                                  key={q.quoteId}
+                                  bg="white"
+                                  borderRadius="lg"
+                                  boxShadow="sm"
+                                  p={5}
+                                  mb={4}
+                                  border="1px solid"
+                                  borderColor="gray.200"
+                                  _hover={{ boxShadow: "md", borderColor: "green.300" }}
+                                  transition="box-shadow 0.2s, border-color 0.2s"
+                                >
+                                  <HStack justify="space-between" align="start" mb={2}>
+                                    <Box>
                                     <HStack>
                                       <Tooltip label={tooltip} hasArrow>
                                         <span><Icon as={icon} color={color} boxSize={4} mr={1} /></span>
@@ -1862,172 +1862,172 @@ export default function ProjectDetailsPage() {
                                         {q.quoteNumber || q.quoteId}
                                       </Text>
                                     </HStack>
-                                    <Text fontSize="sm" color="gray.500" mt={1}>
-                                      {q.status && (
-                                        <Badge
-                                          colorScheme={q.status === 'open' || q.status === 'accepted' ? 'green' : 'gray'}
-                                          mr={2}
-                                          textTransform="uppercase"
-                                          px={2}
-                                          py={1}
-                                          fontWeight="bold"
-                                          fontSize="sm"
-                                          letterSpacing="wide"
-                                        >
-                                          {q.status}
-                                        </Badge>
-                                      )}
-                                      {q.created && <>• {new Date(q.created * 1000).toLocaleDateString()}</>}
-                                    </Text>
-                                  </Box>
-                                  <HStack spacing={2}>
-                                    <Button size="sm" colorScheme="red" variant="ghost" onClick={async () => {
-                                      const newLinked = project.linkedQuotes.filter((lq: any) => lq.quoteId !== q.quoteId);
-                                      await fetch(`/api/projects/${projectCode}`, {
-                                        method: 'PUT',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ linkedQuotes: newLinked })
-                                      });
-                                      setProject((prev: any) => ({ ...prev, linkedQuotes: newLinked }));
-                                      toast({
-                                        title: 'Quote unlinked',
-                                        description: `Quote ${q.quoteNumber || q.quoteId} unlinked from this project.`,
-                                        status: 'info',
-                                        duration: 4000,
-                                        isClosable: true,
-                                        position: 'top-right',
-                                        variant: 'subtle',
-                                      });
-                                    }}>
-                                      Unlink
-                                    </Button>
-                                  </HStack>
-                                </HStack>
-                                <Divider mb={3} />
-                                {Array.isArray(q.lines) && q.lines.length > 0 && (
-                                  <Box>
-                                    <Table size="sm" variant="simple" mb={2}>
-                                      <Tbody>
-                                        {q.lines.map((line: any, idx: number) => (
-                                          <Tr key={idx} _hover={{ bg: "gray.50" }}>
-                                            <Td fontWeight="medium" color="gray.800" border="none">
-                                              {line.description}
-                                            </Td>
-                                            <Td color="gray.600" border="none" textAlign="right">
-                                              {line.quantity && `x${line.quantity}`}
-                                            </Td>
-                                            <Td color="gray.600" border="none" textAlign="right">
-                                              {typeof line.unit_amount === 'number' && (
-                                                <>@ ${(line.unit_amount / 100).toFixed(2)}</>
-                                              )}
-                                            </Td>
-                                            <Td color="gray.900" border="none" textAlign="right">
-                                              {typeof line.amount_total === 'number' && (
-                                                <b>${(line.amount_total / 100).toFixed(2)}</b>
-                                              )}
-                                            </Td>
-                                          </Tr>
-                                        ))}
-                                      </Tbody>
-                                    </Table>
-                                    <Flex justify="flex-end">
-                                      <Text fontWeight="bold" color="green.700" fontSize="md">
-                                        Quote Total: ${(quoteTotal / 100).toFixed(2)}
+                                      <Text fontSize="sm" color="gray.500" mt={1}>
+                                        {q.status && (
+                                          <Badge
+                                            colorScheme={q.status === 'open' || q.status === 'accepted' ? 'green' : 'gray'}
+                                            mr={2}
+                                            textTransform="uppercase"
+                                            px={2}
+                                            py={1}
+                                            fontWeight="bold"
+                                            fontSize="sm"
+                                            letterSpacing="wide"
+                                          >
+                                            {q.status}
+                                          </Badge>
+                                        )}
+                                        {q.created && <>• {new Date(q.created * 1000).toLocaleDateString()}</>}
                                       </Text>
-                                    </Flex>
-                                  </Box>
-                                )}
-                              </Box>
-                            );
-                          })}
-                        </VStack>
-                      ) : (
-                        <Text color="gray.400" fontSize="sm">No quotes linked to this project.</Text>
-                      )}
-                    </Box>
-                    {/* 3. In the Quotes & Billings CardBody, after Linked Quotes, add: */}
-                    <Box mt={8}>
-                      <Text fontWeight="semibold" mb={2}>Linked Invoices:</Text>
-                      {/* Invoice search and link UI */}
-                      <HStack mb={2}>
-                        <Select
-                          placeholder={fetchingInvoices ? 'Loading invoices...' : 'Select an invoice to link'}
-                          value={selectedInvoiceId}
-                          onChange={e => setSelectedInvoiceId(e.target.value)}
-                          isDisabled={fetchingInvoices || customerInvoices.length === 0}
-                          size="md"
-                        >
-                          {customerInvoices.map((inv: any) => {
-                            const alreadyLinked = Array.isArray(project.linkedInvoices) && project.linkedInvoices.some((i: any) => i.invoiceId === inv.id);
-                            return (
-                              <option key={inv.id} value={inv.id} disabled={alreadyLinked}>
-                                {inv.number || inv.id} {inv.amount_due ? `- $${(inv.amount_due / 100).toFixed(2)}` : ''} {alreadyLinked ? '(Linked)' : ''}
-                              </option>
-                            );
-                          })}
-                        </Select>
-                        <Button
-                          leftIcon={<LinkIcon />}
-                          colorScheme="blue"
-                          size="md"
-                          isDisabled={!selectedInvoiceId || linkingInvoiceId === selectedInvoiceId || (Array.isArray(project.linkedInvoices) && project.linkedInvoices.some((i: any) => i.invoiceId === selectedInvoiceId))}
-                          isLoading={linkingInvoiceId === selectedInvoiceId}
-                          onClick={async () => {
-                            setLinkingInvoiceId(selectedInvoiceId);
-                            const inv = customerInvoices.find((i: any) => i.id === selectedInvoiceId);
-                            try {
-                              const newLinked = Array.isArray(project.linkedInvoices) ? [...project.linkedInvoices] : [];
-                              newLinked.push({
-                                invoiceId: inv.id,
-                                invoiceNumber: inv.number,
-                                amount_due: inv.amount_due,
-                                status: inv.status,
-                                created: inv.created,
-                                due_date: inv.due_date,
-                                hosted_invoice_url: inv.hosted_invoice_url, // <-- add this
-                                invoice_pdf: inv.invoice_pdf, // <-- add this
-                                lines: inv.lines // Save line items
-                              });
-                              // Persist to backend
-                              await fetch(`/api/projects/${projectCode}`, {
-                                method: 'PUT',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ linkedInvoices: newLinked })
-                              });
-                              setProject((prev: any) => ({ ...prev, linkedInvoices: newLinked }));
-                              toast({
-                                title: 'Invoice linked',
-                                description: `Invoice ${inv.number || inv.id} linked to this project.`,
-                                status: 'success',
-                                duration: 4000,
-                                isClosable: true,
-                                position: 'top-right',
-                                variant: 'solid',
-                              });
-                              setSelectedInvoiceId('');
-                            } catch (err) {
-                              toast({
-                                title: 'Failed to link invoice',
-                                status: 'error',
-                                duration: 4000,
-                                isClosable: true,
-                                position: 'top-right',
-                              });
-                            } finally {
-                              setLinkingInvoiceId(null);
-                            }
-                          }}
-                        >
-                          Link
-                        </Button>
-                      </HStack>
-                      {/* Linked invoices display */}
-                      {Array.isArray(project.linkedInvoices) && project.linkedInvoices.length > 0 ? (
-                        <VStack align="stretch" spacing={2}>
-                          {project.linkedInvoices.map((inv: any, idx: number) => {
-                            const invoiceTotal = Array.isArray(inv.lines)
-                              ? inv.lines.reduce((sum: number, line: any) => sum + (typeof line.amount === 'number' ? line.amount : 0), 0)
-                              : 0;
+                                    </Box>
+                                    <HStack spacing={2}>
+                                      <Button size="sm" colorScheme="red" variant="ghost" onClick={async () => {
+                                        const newLinked = project.linkedQuotes.filter((lq: any) => lq.quoteId !== q.quoteId);
+                                        await fetch(`/api/projects/${projectCode}`, {
+                                          method: 'PUT',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({ linkedQuotes: newLinked })
+                                        });
+                                        setProject((prev: any) => ({ ...prev, linkedQuotes: newLinked }));
+                                        toast({
+                                          title: 'Quote unlinked',
+                                          description: `Quote ${q.quoteNumber || q.quoteId} unlinked from this project.`,
+                                          status: 'info',
+                                          duration: 4000,
+                                          isClosable: true,
+                                          position: 'top-right',
+                                          variant: 'subtle',
+                                        });
+                                      }}>
+                                        Unlink
+                                      </Button>
+                                    </HStack>
+                                  </HStack>
+                                  <Divider mb={3} />
+                                  {Array.isArray(q.lines) && q.lines.length > 0 && (
+                                    <Box>
+                                      <Table size="sm" variant="simple" mb={2}>
+                                        <Tbody>
+                                          {q.lines.map((line: any, idx: number) => (
+                                            <Tr key={idx} _hover={{ bg: "gray.50" }}>
+                                              <Td fontWeight="medium" color="gray.800" border="none">
+                                                {line.description}
+                                              </Td>
+                                              <Td color="gray.600" border="none" textAlign="right">
+                                                {line.quantity && `x${line.quantity}`}
+                                              </Td>
+                                              <Td color="gray.600" border="none" textAlign="right">
+                                                {typeof line.unit_amount === 'number' && (
+                                                  <>@ ${(line.unit_amount / 100).toFixed(2)}</>
+                                                )}
+                                              </Td>
+                                              <Td color="gray.900" border="none" textAlign="right">
+                                                {typeof line.amount_total === 'number' && (
+                                                  <b>${(line.amount_total / 100).toFixed(2)}</b>
+                                                )}
+                                              </Td>
+                                            </Tr>
+                                          ))}
+                                        </Tbody>
+                                      </Table>
+                                      <Flex justify="flex-end">
+                                        <Text fontWeight="bold" color="green.700" fontSize="md">
+                                          Quote Total: ${(quoteTotal / 100).toFixed(2)}
+                                        </Text>
+                                      </Flex>
+                                    </Box>
+                                  )}
+                                </Box>
+                              );
+                            })}
+                          </VStack>
+                        ) : (
+                          <Text color="gray.400" fontSize="sm">No quotes linked to this project.</Text>
+                        )}
+                      </Box>
+                      {/* 3. In the Quotes & Billings CardBody, after Linked Quotes, add: */}
+                      <Box mt={8}>
+                        <Text fontWeight="semibold" mb={2}>Linked Invoices:</Text>
+                        {/* Invoice search and link UI */}
+                        <HStack mb={2}>
+                          <Select
+                            placeholder={fetchingInvoices ? 'Loading invoices...' : 'Select an invoice to link'}
+                            value={selectedInvoiceId}
+                            onChange={e => setSelectedInvoiceId(e.target.value)}
+                            isDisabled={fetchingInvoices || customerInvoices.length === 0}
+                            size="md"
+                          >
+                            {customerInvoices.map((inv: any) => {
+                              const alreadyLinked = Array.isArray(project.linkedInvoices) && project.linkedInvoices.some((i: any) => i.invoiceId === inv.id);
+                              return (
+                                <option key={inv.id} value={inv.id} disabled={alreadyLinked}>
+                                  {inv.number || inv.id} {inv.amount_due ? `- $${(inv.amount_due / 100).toFixed(2)}` : ''} {alreadyLinked ? '(Linked)' : ''}
+                                </option>
+                              );
+                            })}
+                          </Select>
+                          <Button
+                            leftIcon={<LinkIcon />}
+                            colorScheme="blue"
+                            size="md"
+                            isDisabled={!selectedInvoiceId || linkingInvoiceId === selectedInvoiceId || (Array.isArray(project.linkedInvoices) && project.linkedInvoices.some((i: any) => i.invoiceId === selectedInvoiceId))}
+                            isLoading={linkingInvoiceId === selectedInvoiceId}
+                            onClick={async () => {
+                              setLinkingInvoiceId(selectedInvoiceId);
+                              const inv = customerInvoices.find((i: any) => i.id === selectedInvoiceId);
+                              try {
+                                const newLinked = Array.isArray(project.linkedInvoices) ? [...project.linkedInvoices] : [];
+                                newLinked.push({
+                                  invoiceId: inv.id,
+                                  invoiceNumber: inv.number,
+                                  amount_due: inv.amount_due,
+                                  status: inv.status,
+                                  created: inv.created,
+                                  due_date: inv.due_date,
+                                  hosted_invoice_url: inv.hosted_invoice_url, // <-- add this
+                                  invoice_pdf: inv.invoice_pdf, // <-- add this
+                                  lines: inv.lines // Save line items
+                                });
+                                // Persist to backend
+                                await fetch(`/api/projects/${projectCode}`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ linkedInvoices: newLinked })
+                                });
+                                setProject((prev: any) => ({ ...prev, linkedInvoices: newLinked }));
+                                toast({
+                                  title: 'Invoice linked',
+                                  description: `Invoice ${inv.number || inv.id} linked to this project.`,
+                                  status: 'success',
+                                  duration: 4000,
+                                  isClosable: true,
+                                  position: 'top-right',
+                                  variant: 'solid',
+                                });
+                                setSelectedInvoiceId('');
+                              } catch (err) {
+                                toast({
+                                  title: 'Failed to link invoice',
+                                  status: 'error',
+                                  duration: 4000,
+                                  isClosable: true,
+                                  position: 'top-right',
+                                });
+                              } finally {
+                                setLinkingInvoiceId(null);
+                              }
+                            }}
+                          >
+                            Link
+                          </Button>
+                        </HStack>
+                        {/* Linked invoices display */}
+                        {Array.isArray(project.linkedInvoices) && project.linkedInvoices.length > 0 ? (
+                          <VStack align="stretch" spacing={2}>
+                            {project.linkedInvoices.map((inv: any, idx: number) => {
+                              const invoiceTotal = Array.isArray(inv.lines)
+                                ? inv.lines.reduce((sum: number, line: any) => sum + (typeof line.amount === 'number' ? line.amount : 0), 0)
+                                : 0;
                             // Status logic (copied from public page)
                             let status = (inv.status || '').toLowerCase();
                             let icon = FaExclamationTriangle;
@@ -2054,21 +2054,21 @@ export default function ProjectDetailsPage() {
                               color = 'gray.400';
                               tooltip = 'Invoice void/uncollectible';
                             }
-                            return (
-                              <Box
-                                key={inv.invoiceId}
-                                bg="white"
-                                borderRadius="lg"
-                                boxShadow="sm"
-                                p={5}
-                                mb={4}
-                                border="1px solid"
-                                borderColor="gray.200"
-                                _hover={{ boxShadow: "md", borderColor: "blue.300" }}
-                                transition="box-shadow 0.2s, border-color 0.2s"
-                              >
-                                <HStack justify="space-between" align="start" mb={2}>
-                                  <Box>
+                              return (
+                                <Box
+                                  key={inv.invoiceId}
+                                  bg="white"
+                                  borderRadius="lg"
+                                  boxShadow="sm"
+                                  p={5}
+                                  mb={4}
+                                  border="1px solid"
+                                  borderColor="gray.200"
+                                  _hover={{ boxShadow: "md", borderColor: "blue.300" }}
+                                  transition="box-shadow 0.2s, border-color 0.2s"
+                                >
+                                  <HStack justify="space-between" align="start" mb={2}>
+                                    <Box>
                                     <HStack>
                                       <Tooltip label={tooltip} hasArrow>
                                         <span><Icon as={icon} color={color} boxSize={4} mr={1} /></span>
@@ -2077,130 +2077,130 @@ export default function ProjectDetailsPage() {
                                         {inv.invoiceNumber || inv.invoiceId}
                                       </Text>
                                     </HStack>
-                                    <Text fontSize="sm" color="gray.500" mt={1}>
-                                      {inv.status && (
-                                        <Badge
-                                          colorScheme={
-                                            (inv.status === 'open' && inv.due_date && new Date(inv.due_date * 1000) < new Date()) ? 'red' :
-                                            inv.status === 'paid' ? 'green' :
-                                            inv.status === 'open' ? 'blue' :
-                                            inv.status === 'overdue' ? 'red' :
-                                            'gray'
-                                          }
-                                          mr={2}
-                                          textTransform="uppercase"
-                                          px={2}
-                                          py={1}
-                                          fontWeight="bold"
-                                          fontSize="sm"
-                                          letterSpacing="wide"
-                                        >
-                                          {(inv.status === 'open' && inv.due_date && new Date(inv.due_date * 1000) < new Date())
-                                            ? `OVERDUE — ${Math.ceil((Date.now() - inv.due_date * 1000) / (1000 * 60 * 60 * 24))} days overdue`
-                                            : inv.status}
-                                        </Badge>
-                                      )}
-                                      <span style={{ marginLeft: 4 }}>
-                                        <b>Created:</b> {inv.created ? new Date(inv.created * 1000).toLocaleDateString() : 'N/A'}
-                                        {inv.due_date && (
-                                          <>
-                                            <span style={{ margin: '0 8px', color: '#bbb' }}>|</span>
-                                            <b>Due:</b> <span style={{ color: '#b91c1c', fontWeight: 500 }}>{new Date(inv.due_date * 1000).toLocaleDateString()}</span>
-                                          </>
+                                      <Text fontSize="sm" color="gray.500" mt={1}>
+                                        {inv.status && (
+                                          <Badge
+                                            colorScheme={
+                                              (inv.status === 'open' && inv.due_date && new Date(inv.due_date * 1000) < new Date()) ? 'red' :
+                                              inv.status === 'paid' ? 'green' :
+                                              inv.status === 'open' ? 'blue' :
+                                              inv.status === 'overdue' ? 'red' :
+                                              'gray'
+                                            }
+                                            mr={2}
+                                            textTransform="uppercase"
+                                            px={2}
+                                            py={1}
+                                            fontWeight="bold"
+                                            fontSize="sm"
+                                            letterSpacing="wide"
+                                          >
+                                            {(inv.status === 'open' && inv.due_date && new Date(inv.due_date * 1000) < new Date())
+                                              ? `OVERDUE — ${Math.ceil((Date.now() - inv.due_date * 1000) / (1000 * 60 * 60 * 24))} days overdue`
+                                              : inv.status}
+                                          </Badge>
                                         )}
-                                      </span>
-                                    </Text>
-                                  </Box>
-                                  <HStack spacing={2}>
-                                    {inv.hosted_invoice_url && (
-                                      <Button
-                                        as="a"
-                                        href={inv.hosted_invoice_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        size="sm"
-                                        colorScheme="blue"
-                                        variant="outline"
-                                      >
-                                        View Invoice
-                                      </Button>
-                                    )}
-                                    {inv.invoice_pdf && (
-                                      <Button
-                                        as="a"
-                                        href={inv.invoice_pdf}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        size="sm"
-                                        colorScheme="gray"
-                                        variant="outline"
-                                        download
-                                      >
-                                        Download PDF
-                                      </Button>
-                                    )}
-                                    <Button size="sm" colorScheme="red" variant="ghost" onClick={async () => {
-                                      const newLinked = project.linkedInvoices.filter((li: any) => li.invoiceId !== inv.invoiceId);
-                                      await fetch(`/api/projects/${projectCode}`, {
-                                        method: 'PUT',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ linkedInvoices: newLinked })
-                                      });
-                                      setProject((prev: any) => ({ ...prev, linkedInvoices: newLinked }));
-                                      toast({
-                                        title: 'Invoice unlinked',
-                                        description: `Invoice ${inv.invoiceNumber || inv.invoiceId} unlinked from this project.`,
-                                        status: 'info',
-                                        duration: 4000,
-                                        isClosable: true,
-                                        position: 'top-right',
-                                        variant: 'subtle',
-                                      });
-                                    }}>
-                                      Unlink
-                                    </Button>
-                                  </HStack>
-                                </HStack>
-                                <Divider mb={3} />
-                                {Array.isArray(inv.lines) && inv.lines.length > 0 && (
-                                  <Box>
-                                    <Table size="sm" variant="simple" mb={2}>
-                                      <Tbody>
-                                        {inv.lines.map((line: any, idx: number) => (
-                                          <Tr key={idx} _hover={{ bg: "gray.50" }}>
-                                            <Td fontWeight="medium" color="gray.800" border="none">
-                                              {line.description}
-                                            </Td>
-                                            <Td color="gray.600" border="none" textAlign="right">
-                                              {line.quantity && `x${line.quantity}`}
-                                            </Td>
-                                            <Td color="gray.900" border="none" textAlign="right">
-                                              {typeof line.amount === 'number' && (
-                                                <b>${(line.amount / 100).toFixed(2)}</b>
-                                              )}
-                                            </Td>
-                                          </Tr>
-                                        ))}
-                                      </Tbody>
-                                    </Table>
-                                    <Flex justify="flex-end">
-                                      <Text fontWeight="bold" color="blue.700" fontSize="md">
-                                        Invoice Total: ${(invoiceTotal / 100).toFixed(2)}
+                                        <span style={{ marginLeft: 4 }}>
+                                          <b>Created:</b> {inv.created ? new Date(inv.created * 1000).toLocaleDateString() : 'N/A'}
+                                          {inv.due_date && (
+                                            <>
+                                              <span style={{ margin: '0 8px', color: '#bbb' }}>|</span>
+                                              <b>Due:</b> <span style={{ color: '#b91c1c', fontWeight: 500 }}>{new Date(inv.due_date * 1000).toLocaleDateString()}</span>
+                                            </>
+                                          )}
+                                        </span>
                                       </Text>
-                                    </Flex>
-                                  </Box>
-                                )}
-                              </Box>
-                            );
-                          })}
-                        </VStack>
-                      ) : (
-                        <Text color="gray.400" fontSize="sm">No invoices linked to this project.</Text>
-                      )}
-                    </Box>
-                  </VStack>
-                </CardBody>
-              </Card>
+                                    </Box>
+                                    <HStack spacing={2}>
+                                      {inv.hosted_invoice_url && (
+                                        <Button
+                                          as="a"
+                                          href={inv.hosted_invoice_url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          size="sm"
+                                          colorScheme="blue"
+                                          variant="outline"
+                                        >
+                                          View Invoice
+                                        </Button>
+                                      )}
+                                      {inv.invoice_pdf && (
+                                        <Button
+                                          as="a"
+                                          href={inv.invoice_pdf}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          size="sm"
+                                          colorScheme="gray"
+                                          variant="outline"
+                                          download
+                                        >
+                                          Download PDF
+                                        </Button>
+                                      )}
+                                      <Button size="sm" colorScheme="red" variant="ghost" onClick={async () => {
+                                        const newLinked = project.linkedInvoices.filter((li: any) => li.invoiceId !== inv.invoiceId);
+                                        await fetch(`/api/projects/${projectCode}`, {
+                                          method: 'PUT',
+                                          headers: { 'Content-Type': 'application/json' },
+                                          body: JSON.stringify({ linkedInvoices: newLinked })
+                                        });
+                                        setProject((prev: any) => ({ ...prev, linkedInvoices: newLinked }));
+                                        toast({
+                                          title: 'Invoice unlinked',
+                                          description: `Invoice ${inv.invoiceNumber || inv.invoiceId} unlinked from this project.`,
+                                          status: 'info',
+                                          duration: 4000,
+                                          isClosable: true,
+                                          position: 'top-right',
+                                          variant: 'subtle',
+                                        });
+                                      }}>
+                                        Unlink
+                                      </Button>
+                                    </HStack>
+                                  </HStack>
+                                  <Divider mb={3} />
+                                  {Array.isArray(inv.lines) && inv.lines.length > 0 && (
+                                    <Box>
+                                      <Table size="sm" variant="simple" mb={2}>
+                                        <Tbody>
+                                          {inv.lines.map((line: any, idx: number) => (
+                                            <Tr key={idx} _hover={{ bg: "gray.50" }}>
+                                              <Td fontWeight="medium" color="gray.800" border="none">
+                                                {line.description}
+                                              </Td>
+                                              <Td color="gray.600" border="none" textAlign="right">
+                                                {line.quantity && `x${line.quantity}`}
+                                              </Td>
+                                              <Td color="gray.900" border="none" textAlign="right">
+                                                {typeof line.amount === 'number' && (
+                                                  <b>${(line.amount / 100).toFixed(2)}</b>
+                                                )}
+                                              </Td>
+                                            </Tr>
+                                          ))}
+                                        </Tbody>
+                                      </Table>
+                                      <Flex justify="flex-end">
+                                        <Text fontWeight="bold" color="blue.700" fontSize="md">
+                                          Invoice Total: ${(invoiceTotal / 100).toFixed(2)}
+                                        </Text>
+                                      </Flex>
+                                    </Box>
+                                  )}
+                                </Box>
+                              );
+                            })}
+                          </VStack>
+                        ) : (
+                          <Text color="gray.400" fontSize="sm">No invoices linked to this project.</Text>
+                        )}
+                      </Box>
+                    </VStack>
+                  </CardBody>
+                </Card>
 
               {/* Timeline & Resources */}
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
@@ -2653,75 +2653,75 @@ export default function ProjectDetailsPage() {
               {/* Project Details */}
               <Card shadow="sm" border="1px solid" borderColor="gray.200">
                 <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
-                  <HStack>
+                    <HStack>
                     <Icon as={FaInfoCircle} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
                     <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Project Details</Heading>
                   </HStack>
                 </CardHeader>
                 <CardBody py={{ base: 4, md: 6 }}>
                   <VStack spacing={{ base: 3, md: 4 }} align="stretch">
-                    <Box>
+                      <Box>
                       <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
-                        Project Owner
-                      </Text>
+                          Project Owner
+                        </Text>
                       <HStack>
                         <Icon as={FaUserTie} color="#003f2d" boxSize={{ base: 3, md: 4 }} />
                         <Text fontSize={{ base: "md", md: "lg" }} whiteSpace="normal" wordBreak="break-word">{project.projectOwner}</Text>
                       </HStack>
-                    </Box>
-                    <Box>
+                      </Box>
+                      <Box>
                       <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                         Start Date
-                      </Text>
+                        </Text>
                       <HStack>
                         <Icon as={FaCalendarDay} color="#003f2d" boxSize={{ base: 3, md: 4 }} />
                         <Text fontSize={{ base: "md", md: "lg" }}>{new Date(project.startDate).toLocaleDateString()}</Text>
                       </HStack>
-                    </Box>
-                    <Box>
+                      </Box>
+                      <Box>
                       <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                         End Date
-                      </Text>
-                      <HStack>
+                        </Text>
+                    <HStack>
                         <Icon as={FaCalendarDay} color="#003f2d" boxSize={{ base: 3, md: 4 }} />
                         <Text fontSize={{ base: "md", md: "lg" }}>{new Date(project.endDate).toLocaleDateString()}</Text>
-                      </HStack>
+                    </HStack>
                     </Box>
-                    <Box>
+                      <Box>
                       <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                         Budget
-                      </Text>
-                      <HStack>
+                        </Text>
+                        <HStack>
                         <Icon as={FaDollarSign} color="#003f2d" boxSize={{ base: 3, md: 4 }} />
                         <Text fontSize={{ base: "md", md: "lg" }} fontWeight="semibold">${project.budget.toLocaleString()}</Text>
-                      </HStack>
-                    </Box>
-                    <Box>
+                        </HStack>
+                      </Box>
+                      <Box>
                       <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                         Estimated Hours
-                      </Text>
-                      <HStack>
+                        </Text>
+                        <HStack>
                         <Icon as={FaHourglassHalf} color="#003f2d" boxSize={{ base: 3, md: 4 }} />
                         <Text fontSize={{ base: "md", md: "lg" }}>{project.estimatedHours} hours</Text>
-                      </HStack>
-                    </Box>
-                    <Box>
+                        </HStack>
+                      </Box>
+                      <Box>
                       <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                         Created By
-                      </Text>
-                      <HStack>
+                        </Text>
+                        <HStack>
                         <Icon as={FaUser} color="#003f2d" boxSize={{ base: 3, md: 4 }} />
                         <Text fontSize={{ base: "md", md: "lg" }}>{project.createdBy}</Text>
-                      </HStack>
-                    </Box>
-                  </VStack>
-                </CardBody>
+                        </HStack>
+                      </Box>
+                      </VStack>
+                  </CardBody>
               </Card>
 
               {/* Team Members */}
               <Card shadow="sm" border="1px solid" borderColor="gray.200">
                 <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
-                  <HStack>
+                    <HStack>
                     <Icon as={FaUsers} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
                     <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Team Members</Heading>
                   </HStack>
@@ -2732,7 +2732,7 @@ export default function ProjectDetailsPage() {
                       <HStack key={index} p={{ base: 2, md: 3 }} bg="gray.50" borderRadius="lg" border="1px solid" borderColor="gray.200">
                         <Avatar size={{ base: "sm", md: "md" }} name={member} bg="#003f2d" color="white" />
                         <Text fontSize={{ base: "sm", md: "md" }} fontWeight="medium" whiteSpace="normal" wordBreak="break-word">{member}</Text>
-                      </HStack>
+                        </HStack>
                     ))}
                   </VStack>
                 </CardBody>
@@ -2752,7 +2752,7 @@ export default function ProjectDetailsPage() {
                      <Box>
                        <Text fontWeight="semibold" color="gray.700" mb={{ base: 2, md: 3 }} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                          Quotes ({customerQuotes.length})
-                       </Text>
+                            </Text>
                        <VStack spacing={{ base: 2, md: 3 }} align="stretch">
                          {customerQuotes.length === 0 ? (
                            <Text fontSize={{ base: "sm", md: "md" }} color="gray.500" textAlign="center" py={4}>
@@ -2782,14 +2782,14 @@ export default function ProjectDetailsPage() {
                                       boxSize={{ base: 3, md: 4 }}
                                     />
                                   </Tooltip>
-                                </HStack>
+                              </HStack>
                                 <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
                                   ${quote.amount?.toLocaleString() || '0'}
                                 </Text>
                                 <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500">
                                   {quote.status}
                                 </Text>
-                              </VStack>
+                        </VStack>
                             </Box>
                           ))
                         )}
@@ -2824,7 +2824,7 @@ export default function ProjectDetailsPage() {
                                 <HStack justify="space-between" w="full">
                                   <Text fontSize={{ base: "sm", md: "md" }} fontWeight="semibold" whiteSpace="normal" wordBreak="break-word">
                                     {invoice.title}
-                                  </Text>
+                            </Text>
                                   <Tooltip label={invoice.status === 'overdue' ? 'Overdue' : invoice.status === 'paid' ? 'Paid' : invoice.status === 'pending' ? 'Pending' : 'Unknown'}>
                                     <Icon
                                       as={invoice.status === 'overdue' ? FaExclamationCircle : invoice.status === 'paid' ? FaCheckCircle : FaExclamationTriangle}
@@ -2832,21 +2832,21 @@ export default function ProjectDetailsPage() {
                                       boxSize={{ base: 3, md: 4 }}
                                     />
                                   </Tooltip>
-                                </HStack>
+                              </HStack>
                                 <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
                                   ${invoice.amount?.toLocaleString() || '0'}
                                 </Text>
                                 <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500">
                                   {invoice.status}
                                 </Text>
-                              </VStack>
-                            </Box>
+                        </VStack>
+                      </Box>
                           ))
-                        )}
+                    )}
                       </VStack>
                     </Box>
                   </VStack>
-                </CardBody>
+                  </CardBody>
               </Card>
             </VStack>
           </Box>
