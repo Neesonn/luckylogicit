@@ -219,46 +219,44 @@ export default function PublicProjectPage() {
   return (
     <Box minH="100vh" bg="gray.50">
       {/* Header */}
-      <Box bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
-        <Container maxW="1400px">
+      <Box bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
+        <Container maxW="1400px" px={{ base: 4, md: 6 }}>
           {/* Project Header */}
-          <VStack spacing={4} align="stretch">
-            <HStack justify="space-between" align="start">
-              <VStack align="start" spacing={2}>
-                <HStack spacing={3}>
-                  <Badge 
-                    colorScheme={getStatusColor(project.status)} 
-                    fontSize="sm" 
-                    px={3} 
-                    py={1} 
-                    borderRadius="full"
-                  >
-                    <Icon as={getStatusIcon(project.status)} mr={2} />
-                    {project.status}
-                  </Badge>
-                  <Badge 
-                    colorScheme={getPriorityColor(project.priority)} 
-                    fontSize="sm" 
-                    px={3} 
-                    py={1} 
-                    borderRadius="full"
-                  >
-                    {project.priority} Priority
-                  </Badge>
-                </HStack>
-                <Heading size="2xl" color="#003f2d" fontWeight="bold">
-                  {project.name}
-                </Heading>
-                <Text fontSize="lg" color="gray.600" maxW="3xl">
-                  {project.description}
-                </Text>
-              </VStack>
-            </HStack>
+          <VStack spacing={{ base: 3, md: 4 }} align="stretch">
+            <VStack spacing={{ base: 3, md: 4 }} align="start">
+              <HStack spacing={{ base: 2, md: 3 }} flexWrap="wrap">
+                <Badge 
+                  colorScheme={getStatusColor(project.status)} 
+                  fontSize={{ base: "xs", md: "sm" }} 
+                  px={{ base: 2, md: 3 }} 
+                  py={{ base: 1, md: 1 }} 
+                  borderRadius="full"
+                >
+                  <Icon as={getStatusIcon(project.status)} mr={2} />
+                  {project.status}
+                </Badge>
+                <Badge 
+                  colorScheme={getPriorityColor(project.priority)} 
+                  fontSize={{ base: "xs", md: "sm" }} 
+                  px={{ base: 2, md: 3 }} 
+                  py={{ base: 1, md: 1 }} 
+                  borderRadius="full"
+                >
+                  {project.priority} Priority
+                </Badge>
+              </HStack>
+              <Heading size={{ base: "xl", md: "2xl" }} color="#003f2d" fontWeight="bold">
+                {project.name}
+              </Heading>
+              <Text fontSize={{ base: "md", md: "lg" }} color="gray.600" maxW="3xl">
+                {project.description}
+              </Text>
+            </VStack>
             
             {/* Public Access Notice */}
             <Alert status="info" borderRadius="lg">
               <AlertIcon />
-              <Text fontSize="sm">
+              <Text fontSize={{ base: "xs", md: "sm" }}>
                 This is a public view of your project. For full access and management, please contact your project administrator.
               </Text>
             </Alert>
@@ -267,17 +265,17 @@ export default function PublicProjectPage() {
       </Box>
 
       {/* Progress & Statistics Banner */}
-      <Box bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
-        <Container maxW="1400px">
-          <VStack spacing={8} align="stretch">
-            <Heading size="lg" color="#003f2d" fontWeight="bold" textAlign="center">
+      <Box bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
+        <Container maxW="1400px" px={{ base: 4, md: 6 }}>
+          <VStack spacing={{ base: 6, md: 8 }} align="stretch">
+            <Heading size={{ base: "md", md: "lg" }} color="#003f2d" fontWeight="bold" textAlign="center">
               Progress & Statistics
             </Heading>
             {/* Animated Progress Bar */}
             <Box>
               <Flex justify="space-between" align="center" mb={3}>
-                <Text fontWeight="semibold" color="gray.700" fontSize="lg">Overall Progress</Text>
-                <Text fontWeight="bold" color="#003f2d" fontSize="xl">{Math.round(getTaskCompletionPercentage())}%</Text>
+                <Text fontWeight="semibold" color="gray.700" fontSize={{ base: "md", md: "lg" }}>Overall Progress</Text>
+                <Text fontWeight="bold" color="#003f2d" fontSize={{ base: "lg", md: "xl" }}>{Math.round(getTaskCompletionPercentage())}%</Text>
               </Flex>
               <Progress 
                 value={getTaskCompletionPercentage()} 
@@ -290,43 +288,43 @@ export default function PublicProjectPage() {
             {/* Statistics Grid with Circular Progress */}
             <Box overflowX="auto" overflowY="hidden">
               <SimpleGrid 
-                columns={{ base: 2, md: 4 }} 
-                spacing={6} 
-                minW={{ base: "400px", md: "auto" }}
-                px={{ base: 2, md: 0 }}
+                columns={{ base: 1, sm: 2, md: 4 }} 
+                spacing={{ base: 4, md: 6 }} 
+                minW={{ base: "280px", sm: "400px", md: "auto" }}
+                px={{ base: 0, md: 0 }}
               >
                 {/* Tasks Completed */}
                 <Box 
                   textAlign="center" 
-                  p={6} 
+                  p={{ base: 4, md: 6 }} 
                   bg="gray.50" 
                   borderRadius="xl" 
                   border="1px solid" 
                   borderColor="gray.200"
-                  minH="200px"
+                  minH={{ base: "160px", md: "200px" }}
                   display="flex"
                   flexDirection="column"
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Text color="gray.600" fontSize="sm" textTransform="uppercase" letterSpacing="wide" mb={4}>
+                  <Text color="gray.600" fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide" mb={{ base: 3, md: 4 }}>
                     Tasks Completed
                   </Text>
                   <CircularProgress 
                     value={getTaskCompletionPercentage()} 
                     color={getProgressColor(getTaskCompletionPercentage())} 
-                    size="80px" 
+                    size={{ base: "60px", md: "80px" }} 
                     thickness="8px"
-                    mb={3}
+                    mb={{ base: 2, md: 3 }}
                   >
-                    <CircularProgressLabel fontSize="lg" fontWeight="bold">
+                    <CircularProgressLabel fontSize={{ base: "sm", md: "lg" }} fontWeight="bold">
                       {Math.round(getTaskCompletionPercentage())}%
                     </CircularProgressLabel>
                   </CircularProgress>
-                  <Text color="#003f2d" fontSize="lg" fontWeight="bold" mb={1}>
+                  <Text color="#003f2d" fontSize={{ base: "md", md: "lg" }} fontWeight="bold" mb={1}>
                     {project.tasks ? project.tasks.filter((task: any) => task.status === 'completed').length : 0}/{project.tasks ? project.tasks.length : 0}
                   </Text>
-                  <Text color="gray.500" fontSize="sm">
+                  <Text color="gray.500" fontSize={{ base: "xs", md: "sm" }}>
                     {getTaskCompletionPercentage() >= 75 ? 'On track' : 
                      getTaskCompletionPercentage() >= 50 ? 'Warning' : 'Off track'}
                   </Text>
@@ -334,63 +332,63 @@ export default function PublicProjectPage() {
                 {/* Budget Used */}
                 <Box 
                   textAlign="center" 
-                  p={6} 
+                  p={{ base: 4, md: 6 }} 
                   bg="gray.50" 
                   borderRadius="xl" 
                   border="1px solid" 
                   borderColor="gray.200"
-                  minH="200px"
+                  minH={{ base: "160px", md: "200px" }}
                   display="flex"
                   flexDirection="column"
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Text color="gray.600" fontSize="sm" textTransform="uppercase" letterSpacing="wide" mb={4}>
+                  <Text color="gray.600" fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide" mb={{ base: 3, md: 4 }}>
                     Budget Used
                   </Text>
                   <CircularProgress 
                     value={getBudgetUsagePercentage()} 
                     color={getProgressColor(getBudgetUsagePercentage())} 
-                    size="80px" 
+                    size={{ base: "60px", md: "80px" }} 
                     thickness="8px"
-                    mb={3}
+                    mb={{ base: 2, md: 3 }}
                   >
-                    <CircularProgressLabel fontSize="lg" fontWeight="bold">
+                    <CircularProgressLabel fontSize={{ base: "sm", md: "lg" }} fontWeight="bold">
                       {Math.round(getBudgetUsagePercentage())}%
                     </CircularProgressLabel>
                   </CircularProgress>
-                  <Text color="#003f2d" fontSize="lg" fontWeight="bold" mb={1}>
+                  <Text color="#003f2d" fontSize={{ base: "md", md: "lg" }} fontWeight="bold" mb={1}>
                     ${project.budget ? project.budget.toLocaleString() : 0}
                   </Text>
-                  <Text color="gray.500" fontSize="sm">
+                  <Text color="gray.500" fontSize={{ base: "xs", md: "sm" }}>
                     {project.budget ? `$${project.budget.toLocaleString()} total` : 'No budget set'}
                   </Text>
                 </Box>
                 {/* Time Remaining */}
                 <Box 
                   textAlign="center" 
-                  p={6} 
+                  p={{ base: 4, md: 6 }} 
                   bg="gray.50" 
                   borderRadius="xl" 
                   border="1px solid" 
                   borderColor="gray.200"
-                  minH="200px"
+                  minH={{ base: "160px", md: "200px" }}
                   display="flex"
                   flexDirection="column"
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Text color="gray.600" fontSize="sm" textTransform="uppercase" letterSpacing="wide" mb={4}>
+                  <Text color="gray.600" fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide" mb={{ base: 3, md: 4 }}>
                     Time Remaining
                   </Text>
                   <CircularProgress 
                     value={getTimeElapsedPercentage()} 
                     color={getProgressColor(getTimeElapsedPercentage())} 
-                    size="80px" 
+                    size={{ base: "60px", md: "80px" }} 
                     thickness="8px"
-                    mb={3}
+                    mb={{ base: 2, md: 3 }}
                   >
-                    <CircularProgressLabel fontSize="lg" fontWeight="bold">
+                    <CircularProgressLabel fontSize={{ base: "sm", md: "lg" }} fontWeight="bold">
                       {(() => {
                         const percent = getTimeElapsedPercentage();
                         if (!project.startDate || !project.endDate) return 'No dates set';
@@ -400,10 +398,10 @@ export default function PublicProjectPage() {
                       })()}
                     </CircularProgressLabel>
                   </CircularProgress>
-                  <Text color="#003f2d" fontSize="lg" fontWeight="bold" mb={1}>
+                  <Text color="#003f2d" fontSize={{ base: "md", md: "lg" }} fontWeight="bold" mb={1}>
                     {project.startDate && project.endDate ? `${project.startDate} - ${project.endDate}` : 'N/A'}
                   </Text>
-                  <Text color="gray.500" fontSize="sm">
+                  <Text color="gray.500" fontSize={{ base: "xs", md: "sm" }}>
                     {(() => {
                       const percent = getTimeElapsedPercentage();
                       if (!project.startDate || !project.endDate) return 'No dates set';
@@ -416,36 +414,36 @@ export default function PublicProjectPage() {
                 {/* Team Members */}
                 <Box 
                   textAlign="center" 
-                  p={6} 
+                  p={{ base: 4, md: 6 }} 
                   bg="gray.50" 
                   borderRadius="xl" 
                   border="1px solid" 
                   borderColor="gray.200"
-                  minH="200px"
+                  minH={{ base: "160px", md: "200px" }}
                   display="flex"
                   flexDirection="column"
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Text color="gray.600" fontSize="sm" textTransform="uppercase" letterSpacing="wide" mb={4}>
+                  <Text color="gray.600" fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide" mb={{ base: 3, md: 4 }}>
                     Team Members
                   </Text>
-                  <Box position="relative" mb={3}>
+                  <Box position="relative" mb={{ base: 2, md: 3 }}>
                     <CircularProgress 
                       value={100} 
                       color="green" 
-                      size="80px" 
+                      size={{ base: "60px", md: "80px" }} 
                       thickness="8px"
                     >
-                      <CircularProgressLabel fontSize="lg" fontWeight="bold">
+                      <CircularProgressLabel fontSize={{ base: "sm", md: "lg" }} fontWeight="bold">
                         {project.team ? project.team.length : 0}
                       </CircularProgressLabel>
                     </CircularProgress>
                   </Box>
-                  <Text color="#003f2d" fontSize="lg" fontWeight="bold" mb={1}>
+                  <Text color="#003f2d" fontSize={{ base: "md", md: "lg" }} fontWeight="bold" mb={1}>
                     {project.team ? project.team.length : 0} Members
                   </Text>
-                  <Text color="gray.500" fontSize="sm">
+                  <Text color="gray.500" fontSize={{ base: "xs", md: "sm" }}>
                     {project.team && project.team.length > 5 ? 'Large team' : project.team && project.team.length > 2 ? 'Medium team' : 'Small team'}
                   </Text>
                 </Box>
@@ -456,63 +454,63 @@ export default function PublicProjectPage() {
       </Box>
 
       {/* Main Content */}
-      <Container maxW="1400px" py={8}>
-        <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={8}>
+      <Container maxW="1400px" py={{ base: 6, md: 8 }} px={{ base: 4, md: 6 }}>
+        <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={{ base: 6, md: 8 }}>
           {/* Left Column - Project Details */}
           <Box gridColumn={{ lg: 'span 2' }}>
-            <VStack spacing={6} align="stretch">
+            <VStack spacing={{ base: 4, md: 6 }} align="stretch">
               {/* Project Overview */}
               <Card shadow="sm" border="1px solid" borderColor="gray.200">
-                <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
+                <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
                   <HStack>
-                    <Icon as={FaInfoCircle} color="#003f2d" boxSize={5} />
-                    <Heading size="md" color="#003f2d" fontWeight="bold">Project Overview</Heading>
+                    <Icon as={FaInfoCircle} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
+                    <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Project Overview</Heading>
                   </HStack>
                 </CardHeader>
-                <CardBody py={6}>
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-                    <VStack align="start" spacing={4}>
+                <CardBody py={{ base: 4, md: 6 }}>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 4, md: 6 }}>
+                    <VStack align="start" spacing={{ base: 3, md: 4 }}>
                       <Box>
-                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                           Project Code
                         </Text>
-                        <Text fontSize="lg" fontWeight="medium">{project.code}</Text>
+                        <Text fontSize={{ base: "md", md: "lg" }} fontWeight="medium">{project.code}</Text>
                       </Box>
                       <Box>
-                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                           Client
                         </Text>
-                        <Text fontSize="lg" fontWeight="medium">{project.client}</Text>
+                        <Text fontSize={{ base: "md", md: "lg" }} fontWeight="medium">{project.client}</Text>
                       </Box>
                       <Box>
-                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                           Category
                         </Text>
-                        <Text fontSize="lg" fontWeight="medium" textTransform="capitalize">{project.category}</Text>
+                        <Text fontSize={{ base: "md", md: "lg" }} fontWeight="medium" textTransform="capitalize">{project.category}</Text>
                       </Box>
                     </VStack>
-                    <VStack align="start" spacing={4}>
+                    <VStack align="start" spacing={{ base: 3, md: 4 }}>
                       <Box>
-                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                           Start Date
                         </Text>
-                        <Text fontSize="lg" fontWeight="medium">
+                        <Text fontSize={{ base: "md", md: "lg" }} fontWeight="medium">
                           {project.startDate ? new Date(project.startDate).toLocaleDateString() : 'Not set'}
                         </Text>
                       </Box>
                       <Box>
-                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                           End Date
                         </Text>
-                        <Text fontSize="lg" fontWeight="medium">
+                        <Text fontSize={{ base: "md", md: "lg" }} fontWeight="medium">
                           {project.endDate ? new Date(project.endDate).toLocaleDateString() : 'Not set'}
                         </Text>
                       </Box>
                       <Box>
-                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                        <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                           Estimated Hours
                         </Text>
-                        <Text fontSize="lg" fontWeight="medium">{project.estimatedHours || 0} hours</Text>
+                        <Text fontSize={{ base: "md", md: "lg" }} fontWeight="medium">{project.estimatedHours || 0} hours</Text>
                       </Box>
                     </VStack>
                   </SimpleGrid>
@@ -520,20 +518,20 @@ export default function PublicProjectPage() {
               </Card>
 
               {/* Progress & Budget */}
-              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 4, md: 6 }}>
                 <Card shadow="sm" border="1px solid" borderColor="gray.200">
-                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={4}>
+                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 3, md: 4 }}>
                     <HStack>
-                      <Icon as={FaChartLine} color="#003f2d" boxSize={5} />
-                      <Heading size="md" color="#003f2d" fontWeight="bold">Project Progress</Heading>
+                      <Icon as={FaChartLine} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
+                      <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Project Progress</Heading>
                     </HStack>
                   </CardHeader>
-                  <CardBody py={6}>
-                    <VStack spacing={4} align="stretch">
+                  <CardBody py={{ base: 4, md: 6 }}>
+                    <VStack spacing={{ base: 3, md: 4 }} align="stretch">
                       <Box>
                         <HStack justify="space-between" mb={2}>
-                          <Text fontSize="sm" fontWeight="medium" color="gray.700">Task Completion</Text>
-                          <Text fontSize="sm" fontWeight="bold" color="gray.700">
+                          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="medium" color="gray.700">Task Completion</Text>
+                          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="bold" color="gray.700">
                             {Math.round(getTaskCompletionPercentage())}%
                           </Text>
                         </HStack>
@@ -546,8 +544,8 @@ export default function PublicProjectPage() {
                       </Box>
                       <Box>
                         <HStack justify="space-between" mb={2}>
-                          <Text fontSize="sm" fontWeight="medium" color="gray.700">Time Progress</Text>
-                          <Text fontSize="sm" fontWeight="bold" color="gray.700">
+                          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="medium" color="gray.700">Time Progress</Text>
+                          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="bold" color="gray.700">
                             {Math.round(getTimeElapsedPercentage())}%
                           </Text>
                         </HStack>
@@ -563,24 +561,24 @@ export default function PublicProjectPage() {
                 </Card>
 
                 <Card shadow="sm" border="1px solid" borderColor="gray.200">
-                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={4}>
+                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 3, md: 4 }}>
                     <HStack>
-                      <Icon as={FaMoneyBillWave} color="#003f2d" boxSize={5} />
-                      <Heading size="md" color="#003f2d" fontWeight="bold">Budget Overview</Heading>
+                      <Icon as={FaMoneyBillWave} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
+                      <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Budget Overview</Heading>
                     </HStack>
                   </CardHeader>
-                  <CardBody py={6}>
-                    <VStack spacing={4} align="stretch">
+                  <CardBody py={{ base: 4, md: 6 }}>
+                    <VStack spacing={{ base: 3, md: 4 }} align="stretch">
                       <Stat>
-                        <StatLabel fontSize="sm" color="gray.600">Total Budget</StatLabel>
-                        <StatNumber fontSize="2xl" color="#003f2d" fontWeight="bold">
+                        <StatLabel fontSize={{ base: "xs", md: "sm" }} color="gray.600">Total Budget</StatLabel>
+                        <StatNumber fontSize={{ base: "xl", md: "2xl" }} color="#003f2d" fontWeight="bold">
                           ${project.budget?.toLocaleString() || 0}
                         </StatNumber>
                       </Stat>
                       <Box>
                         <HStack justify="space-between" mb={2}>
-                          <Text fontSize="sm" fontWeight="medium" color="gray.700">Budget Usage</Text>
-                          <Text fontSize="sm" fontWeight="bold" color="gray.700">
+                          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="medium" color="gray.700">Budget Usage</Text>
+                          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="bold" color="gray.700">
                             {Math.round(getBudgetUsagePercentage())}%
                           </Text>
                         </HStack>
@@ -599,14 +597,14 @@ export default function PublicProjectPage() {
               {/* Tasks */}
               {project.tasks && project.tasks.length > 0 && (
                 <Card shadow="sm" border="1px solid" borderColor="gray.200">
-                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
+                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
                     <HStack>
-                      <Icon as={FaTasks} color="#003f2d" boxSize={5} />
-                      <Heading size="md" color="#003f2d" fontWeight="bold">Tasks ({project.tasks.length})</Heading>
+                      <Icon as={FaTasks} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
+                      <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Tasks ({project.tasks.length})</Heading>
                     </HStack>
                   </CardHeader>
-                  <CardBody py={6}>
-                    <VStack spacing={4} align="stretch">
+                  <CardBody py={{ base: 4, md: 6 }}>
+                    <VStack spacing={{ base: 3, md: 4 }} align="stretch">
                       {project.tasks.map((task: any, index: number) => {
                         // Flexible regex to match any InLIFE Wellness KIOSK URL
                         const kioskUrlPattern = /https:\/\/central\.inlifewellness\.com\.au\/monitor_board\/getRollCall\/[^\s]+/g;
@@ -617,31 +615,29 @@ export default function PublicProjectPage() {
                         return (
                           <Box 
                             key={task.id || index} 
-                            p={4} 
+                            p={{ base: 3, md: 4 }} 
                             border="1px solid" 
                             borderColor="gray.200" 
                             borderRadius="lg"
                             bg="white"
                           >
-                            <HStack justify="space-between" align="start" mb={3}>
-                              <VStack align="start" spacing={1} flex={1}>
-                                <Text fontWeight="semibold" fontSize="lg">{displayTitle}</Text>
-                              </VStack>
-                              <HStack spacing={2}>
-                                <Badge colorScheme={getStatusColor(task.status)} fontSize="xs">
+                            <VStack align="start" spacing={{ base: 2, md: 3 }}>
+                              <Text fontWeight="semibold" fontSize={{ base: "md", md: "lg" }}>{displayTitle}</Text>
+                              <HStack spacing={{ base: 2, md: 2 }} flexWrap="wrap">
+                                <Badge colorScheme={getStatusColor(task.status)} fontSize={{ base: "xs", md: "xs" }}>
                                   {task.status}
                                 </Badge>
-                                <Badge colorScheme={getPriorityColor(task.priority)} fontSize="xs">
+                                <Badge colorScheme={getPriorityColor(task.priority)} fontSize={{ base: "xs", md: "xs" }}>
                                   {task.priority}
                                 </Badge>
                               </HStack>
-                            </HStack>
-                            <HStack justify="space-between" fontSize="sm" color="gray.600">
-                              <Text>Assignee: {task.assignee}</Text>
-                              {task.dueDate && (
-                                <Text>Due: {new Date(task.dueDate).toLocaleDateString()}</Text>
-                              )}
-                            </HStack>
+                              <VStack align="start" spacing={1} fontSize={{ base: "xs", md: "sm" }} color="gray.600">
+                                <Text>Assignee: {task.assignee}</Text>
+                                {task.dueDate && (
+                                  <Text>Due: {new Date(task.dueDate).toLocaleDateString()}</Text>
+                                )}
+                              </VStack>
+                            </VStack>
                           </Box>
                         );
                       })}
@@ -653,11 +649,11 @@ export default function PublicProjectPage() {
               {/* Project Updates */}
               {project.updates && project.updates.length > 0 && (
                 <Card shadow="sm" border="1px solid" borderColor="gray.200">
-                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
-                    <HStack justify="space-between">
+                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
+                    <VStack align="start" spacing={{ base: 3, md: 4 }}>
                       <HStack>
-                        <Icon as={FaInfoCircle} color="#003f2d" boxSize={5} />
-                        <Heading size="md" color="#003f2d" fontWeight="bold">Project Updates ({project.updates.length})</Heading>
+                        <Icon as={FaInfoCircle} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
+                        <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Project Updates ({project.updates.length})</Heading>
                       </HStack>
                       {/* Blur/Unblur All Button */}
                       <Box>
@@ -677,7 +673,7 @@ export default function PublicProjectPage() {
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '8px',
-                                fontSize: '1rem',
+                                fontSize: '0.875rem',
                                 transition: 'background 0.2s, border 0.2s',
                               }}
                               onClick={handleToggleAllBlur}
@@ -688,17 +684,17 @@ export default function PublicProjectPage() {
                           );
                         })()}
                       </Box>
-                    </HStack>
+                    </VStack>
                   </CardHeader>
-                  <CardBody py={6}>
-                    <VStack spacing={4} align="stretch">
+                  <CardBody py={{ base: 4, md: 6 }}>
+                    <VStack spacing={{ base: 3, md: 4 }} align="stretch">
                       {project.updates.map((update: any, index: number) => {
                         const updateId = update.id || index;
                         const isBlurred = blurredUpdates.has(updateId);
                         return (
                           <Box 
                             key={updateId} 
-                            p={6} 
+                            p={{ base: 4, md: 6 }} 
                             border="1px solid" 
                             borderColor="gray.200" 
                             borderRadius="lg"
@@ -706,38 +702,40 @@ export default function PublicProjectPage() {
                             _hover={{ borderColor: "gray.300", shadow: "sm" }}
                           >
                             {/* Update Header */}
-                            <HStack justify="space-between" mb={4} align="start">
-                              <VStack align="start" spacing={1} flex={1}>
-                                {update.title && (
-                                  <Text fontWeight="bold" fontSize="lg" color="#003f2d">
-                                    {update.title}
-                                  </Text>
-                                )}
-                                <HStack spacing={4} fontSize="sm" color="gray.600">
-                                  <HStack spacing={1}>
-                                    <Icon as={FaRegCalendarAlt} boxSize={3} />
-                                    <Text>
-                                      {update.timestamp || 'Unknown date'}
+                            <VStack align="start" spacing={{ base: 3, md: 4 }} mb={{ base: 3, md: 4 }}>
+                              <HStack justify="space-between" align="start" w="full">
+                                <VStack align="start" spacing={1} flex={1}>
+                                  {update.title && (
+                                    <Text fontWeight="bold" fontSize={{ base: "md", md: "lg" }} color="#003f2d">
+                                      {update.title}
                                     </Text>
-                                  </HStack>
-                                  {update.author && (
+                                  )}
+                                  <VStack align="start" spacing={{ base: 2, md: 4 }} fontSize={{ base: "xs", md: "sm" }} color="gray.600">
                                     <HStack spacing={1}>
-                                      <Icon as={FaUser} boxSize={3} />
-                                      <Text>{update.author}</Text>
+                                      <Icon as={FaRegCalendarAlt} boxSize={3} />
+                                      <Text>
+                                        {update.timestamp || 'Unknown date'}
+                                      </Text>
                                     </HStack>
-                                  )}
-                                  {update.type && (
-                                    <Badge colorScheme="blue" fontSize="xs" px={2} py={1}>
-                                      {update.type}
-                                    </Badge>
-                                  )}
-                                </HStack>
-                              </VStack>
-                              {/* Security Lock Icon */}
-                              <Box cursor="pointer" onClick={() => toggleBlur(updateId)} ml={4}>
-                                <Icon as={isBlurred ? FaLock : FaLockOpen} color={isBlurred ? 'red.500' : 'gray.400'} boxSize={5} />
-                              </Box>
-                            </HStack>
+                                    {update.author && (
+                                      <HStack spacing={1}>
+                                        <Icon as={FaUser} boxSize={3} />
+                                        <Text>{update.author}</Text>
+                                      </HStack>
+                                    )}
+                                    {update.type && (
+                                      <Badge colorScheme="blue" fontSize="xs" px={2} py={1}>
+                                        {update.type}
+                                      </Badge>
+                                    )}
+                                  </VStack>
+                                </VStack>
+                                {/* Security Lock Icon */}
+                                <Box cursor="pointer" onClick={() => toggleBlur(updateId)} ml={4}>
+                                  <Icon as={isBlurred ? FaLock : FaLockOpen} color={isBlurred ? 'red.500' : 'gray.400'} boxSize={5} />
+                                </Box>
+                              </HStack>
+                            </VStack>
                             {/* Update Content */}
                             <Box>
                               {update.text && (
@@ -755,22 +753,22 @@ export default function PublicProjectPage() {
                                 <VStack align="start" spacing={3} mt={4} pt={4} borderTop="1px solid" borderColor="gray.100">
                                   {update.changes && (
                                     <Box>
-                                      <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>
+                                      <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
                                         Changes Made:
                                       </Text>
-                                      <Text fontSize="sm" color="gray.600">
+                                      <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
                                         {update.changes}
                                       </Text>
                                     </Box>
                                   )}
                                   {update.attachments && update.attachments.length > 0 && (
                                     <Box>
-                                      <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>
+                                      <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
                                         Attachments ({update.attachments.length}):
                                       </Text>
                                       <VStack align="start" spacing={1}>
                                         {update.attachments.map((attachment: string, idx: number) => (
-                                          <Text key={idx} fontSize="sm" color="blue.600">
+                                          <Text key={idx} fontSize={{ base: "xs", md: "sm" }} color="blue.600">
                                             • {attachment}
                                           </Text>
                                         ))}
@@ -779,10 +777,10 @@ export default function PublicProjectPage() {
                                   )}
                                   {update.comments && (
                                     <Box>
-                                      <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>
+                                      <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
                                         Comments:
                                       </Text>
-                                      <Text fontSize="sm" color="gray.600">
+                                      <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
                                         {update.comments}
                                       </Text>
                                     </Box>
@@ -802,42 +800,42 @@ export default function PublicProjectPage() {
 
           {/* Right Column - Sidebar */}
           <Box>
-            <VStack spacing={6} align="stretch">
+            <VStack spacing={{ base: 4, md: 6 }} align="stretch">
               {/* Team & Ownership */}
               <Card shadow="sm" border="1px solid" borderColor="gray.200">
-                <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
+                <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
                   <HStack>
-                    <Icon as={FaUserTie} color="#003f2d" boxSize={5} />
-                    <Heading size="md" color="#003f2d" fontWeight="bold">Team & Ownership</Heading>
+                    <Icon as={FaUserTie} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
+                    <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Team & Ownership</Heading>
                   </HStack>
                 </CardHeader>
-                <CardBody py={6}>
-                  <VStack spacing={4} align="stretch">
+                <CardBody py={{ base: 4, md: 6 }}>
+                  <VStack spacing={{ base: 3, md: 4 }} align="stretch">
                     <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                         Project Owner
                       </Text>
-                      <Text fontSize="lg" fontWeight="medium">{project.projectOwner}</Text>
+                      <Text fontSize={{ base: "md", md: "lg" }} fontWeight="medium">{project.projectOwner}</Text>
                     </Box>
                     <Divider />
                     <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                         Created By
                       </Text>
-                      <Text fontSize="lg" fontWeight="medium">{project.createdBy}</Text>
+                      <Text fontSize={{ base: "md", md: "lg" }} fontWeight="medium">{project.createdBy}</Text>
                     </Box>
                     {project.team && project.team.length > 0 && (
                       <>
                         <Divider />
                         <Box>
-                          <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                          <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                             Team
                           </Text>
                           <VStack align="start" spacing={2}>
                             {project.team.map((member: string, index: number) => (
                               <HStack key={index} spacing={2}>
-                                <Avatar size="xs" name={member} />
-                                <Text fontSize="sm">{member}</Text>
+                                <Avatar size={{ base: "xs", md: "xs" }} name={member} />
+                                <Text fontSize={{ base: "sm", md: "sm" }}>{member}</Text>
                               </HStack>
                             ))}
                           </VStack>
@@ -850,28 +848,28 @@ export default function PublicProjectPage() {
 
               {/* Customer Information */}
               <Card shadow="sm" border="1px solid" borderColor="gray.200">
-                <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
+                <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
                   <HStack>
-                    <Icon as={FaUser} color="#003f2d" boxSize={5} />
-                    <Heading size="md" color="#003f2d" fontWeight="bold">Customer Information</Heading>
+                    <Icon as={FaUser} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
+                    <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Customer Information</Heading>
                   </HStack>
                 </CardHeader>
-                <CardBody py={6}>
-                  <VStack spacing={4} align="stretch">
+                <CardBody py={{ base: 4, md: 6 }}>
+                  <VStack spacing={{ base: 3, md: 4 }} align="stretch">
                     <Box>
-                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                         Customer Name
                       </Text>
-                      <Text fontSize="lg" fontWeight="medium">{project.customer}</Text>
+                      <Text fontSize={{ base: "md", md: "lg" }} fontWeight="medium">{project.customer}</Text>
                     </Box>
                     {project.customerEmail && (
                       <>
                         <Divider />
                         <Box>
-                          <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                          <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                             Email
                           </Text>
-                          <Text fontSize="lg" fontWeight="medium">{project.customerEmail}</Text>
+                          <Text fontSize={{ base: "md", md: "lg" }} fontWeight="medium">{project.customerEmail}</Text>
                         </Box>
                       </>
                     )}
@@ -879,10 +877,10 @@ export default function PublicProjectPage() {
                       <>
                         <Divider />
                         <Box>
-                          <Text fontWeight="semibold" color="gray.700" mb={2} fontSize="sm" textTransform="uppercase" letterSpacing="wide">
+                          <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                             Phone
                           </Text>
-                          <Text fontSize="lg" fontWeight="medium">{project.customerPhone}</Text>
+                          <Text fontSize={{ base: "md", md: "lg" }} fontWeight="medium">{project.customerPhone}</Text>
                         </Box>
                       </>
                     )}
@@ -893,19 +891,19 @@ export default function PublicProjectPage() {
               {/* Quotes & Billings */}
               {(Array.isArray(project.linkedQuotes) || Array.isArray(project.linkedInvoices)) && (
                 <Card shadow="sm" border="1px solid" borderColor="gray.200">
-                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={6}>
+                  <CardHeader bg="white" borderBottom="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }}>
                     <HStack>
-                      <Icon as={FaDollarSign} color="#003f2d" boxSize={5} />
-                      <Heading size="md" color="#003f2d" fontWeight="bold">Quotes & Billings</Heading>
+                      <Icon as={FaDollarSign} color="#003f2d" boxSize={{ base: 4, md: 5 }} />
+                      <Heading size={{ base: "sm", md: "md" }} color="#003f2d" fontWeight="bold">Quotes & Billings</Heading>
                     </HStack>
                   </CardHeader>
-                  <CardBody py={6}>
+                  <CardBody py={{ base: 4, md: 6 }}>
                     {/* Linked Quotes */}
                     {Array.isArray(project.linkedQuotes) && project.linkedQuotes.length > 0 && (
                       <Box mb={6}>
                         <HStack justify="space-between">
-                          <Text fontWeight="semibold" color="gray.700">Linked Quotes</Text>
-                          <Badge colorScheme="green">{project.linkedQuotes.length}</Badge>
+                          <Text fontWeight="semibold" color="gray.700" fontSize={{ base: "xs", md: "sm" }}>Linked Quotes</Text>
+                          <Badge colorScheme="green" fontSize={{ base: "xs", md: "sm" }}>{project.linkedQuotes.length}</Badge>
                         </HStack>
                         <Divider my={2} />
                         {/* Grand total of all quotes */}
@@ -917,7 +915,7 @@ export default function PublicProjectPage() {
                             return sum + quoteTotal;
                           }, 0);
                           return (
-                            <Text fontWeight="bold" color="green.700" fontSize="md" mb={2}>
+                            <Text fontWeight="bold" color="green.700" fontSize={{ base: "sm", md: "md" }} mb={2}>
                               Total Value: A${(grandTotal / 100).toFixed(2)} inc GST
                             </Text>
                           );
@@ -966,9 +964,9 @@ export default function PublicProjectPage() {
                                   <Tooltip label={tooltip} hasArrow>
                                     <span><Icon as={icon} color={color} boxSize={4} mr={1} /></span>
                                   </Tooltip>
-                                  <Text fontWeight="medium" color="gray.800">{q.quoteNumber || q.quoteId}</Text>
+                                  <Text fontWeight="medium" color="gray.800" fontSize={{ base: "xs", md: "sm" }}>{q.quoteNumber || q.quoteId}</Text>
                                 </HStack>
-                                <Text color="green.700" fontWeight="bold">${(quoteTotal / 100).toFixed(2)}</Text>
+                                <Text color="green.700" fontWeight="bold" fontSize={{ base: "xs", md: "sm" }}>${(quoteTotal / 100).toFixed(2)}</Text>
                               </HStack>
                             );
                           })}
@@ -979,8 +977,8 @@ export default function PublicProjectPage() {
                     {Array.isArray(project.linkedInvoices) && project.linkedInvoices.length > 0 && (
                       <Box>
                         <HStack justify="space-between">
-                          <Text fontWeight="semibold" color="gray.700">Linked Invoices</Text>
-                          <Badge colorScheme="blue">{project.linkedInvoices.length}</Badge>
+                          <Text fontWeight="semibold" color="gray.700" fontSize={{ base: "xs", md: "sm" }}>Linked Invoices</Text>
+                          <Badge colorScheme="blue" fontSize={{ base: "xs", md: "sm" }}>{project.linkedInvoices.length}</Badge>
                         </HStack>
                         <Divider my={2} />
                         {/* Grand total of all invoices */}
@@ -992,7 +990,7 @@ export default function PublicProjectPage() {
                             return sum + invoiceTotal;
                           }, 0);
                           return (
-                            <Text fontWeight="bold" color="blue.700" fontSize="md" mb={2}>
+                            <Text fontWeight="bold" color="blue.700" fontSize={{ base: "sm", md: "md" }} mb={2}>
                               Total Value: A${(grandTotal / 100).toFixed(2)} inc GST
                             </Text>
                           );
@@ -1034,9 +1032,9 @@ export default function PublicProjectPage() {
                                   <Tooltip label={tooltip} hasArrow>
                                     <span><Icon as={icon} color={color} boxSize={4} mr={1} /></span>
                                   </Tooltip>
-                                  <Text fontWeight="medium" color="gray.800">{inv.invoiceNumber || inv.invoiceId}</Text>
+                                  <Text fontWeight="medium" color="gray.800" fontSize={{ base: "xs", md: "sm" }}>{inv.invoiceNumber || inv.invoiceId}</Text>
                                 </HStack>
-                                <Text color="blue.700" fontWeight="bold">${(invoiceTotal / 100).toFixed(2)}</Text>
+                                <Text color="blue.700" fontWeight="bold" fontSize={{ base: "xs", md: "sm" }}>${(invoiceTotal / 100).toFixed(2)}</Text>
                               </HStack>
                             );
                           })}
@@ -1052,9 +1050,9 @@ export default function PublicProjectPage() {
       </Container>
 
       {/* Footer */}
-      <Box bg="white" borderTop="1px solid" borderColor="gray.200" py={6} mt={12}>
-        <Container maxW="1400px">
-          <Text textAlign="center" color="gray.500" fontSize="sm">
+      <Box bg="white" borderTop="1px solid" borderColor="gray.200" py={{ base: 4, md: 6 }} mt={{ base: 8, md: 12 }}>
+        <Container maxW="1400px" px={{ base: 4, md: 6 }}>
+          <Text textAlign="center" color="gray.500" fontSize={{ base: "xs", md: "sm" }}>
             This is a shared project view. For full access and management, please contact your project administrator.
           </Text>
         </Container>
