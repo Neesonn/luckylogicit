@@ -2,7 +2,7 @@
 import { Box, Heading, Text, Button, HStack, Tooltip, Skeleton, SkeletonText, Badge, IconButton, SimpleGrid } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FaUserPlus, FaUsers, FaFileInvoiceDollar, FaMoneyBillWave, FaBoxOpen, FaLock, FaUnlock, FaProjectDiagram, FaFile } from 'react-icons/fa';
+import { FaUserPlus, FaUsers, FaFileInvoiceDollar, FaMoneyBillWave, FaBoxOpen, FaLock, FaUnlock, FaProjectDiagram, FaFile, FaShoppingCart } from 'react-icons/fa';
 import { Icon } from '@chakra-ui/react';
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
@@ -369,6 +369,15 @@ export default function AdminDashboard() {
                     boxShadow="md"
                     borderRadius="lg">
                     Products
+                  </Button>
+                  <Button as={Link} href="/admin/orders" leftIcon={<Icon as={FaShoppingCart} />} 
+                    bg="white" color="purple.600" border="2px solid" borderColor="purple.600"
+                    _hover={{ bg: 'purple.50', transform: 'translateY(-1px)' }}
+                    _focus={{ bg: 'purple.50' }}
+                    size="lg" w="100%" mb={3}
+                    boxShadow="sm"
+                    borderRadius="lg">
+                    Orders
                   </Button>
                   <Button as={Link} href="/admin/internal-products" leftIcon={<Icon as={FaBoxOpen} />} 
                     bg="white" color="purple.600" border="2px solid" borderColor="purple.600"
