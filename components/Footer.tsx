@@ -133,6 +133,10 @@ export default function Footer() {
             <ChakraLink as={NextLink} href="/legal" textDecoration="underline" color="white">
               Legal
             </ChakraLink>
+            {' • '}
+            <ChakraLink as={NextLink} href="/sitemap" textDecoration="underline" color="white">
+              Site Map
+            </ChakraLink>
           </Text>
         </Stack>
 
