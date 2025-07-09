@@ -111,7 +111,7 @@ export default function Footer() {
           <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={2} maxW="6xl" mx="auto" textAlign={{ base: 'center', md: 'left' }}>
             {/* Business */}
             <Box as="nav" aria-label="Company navigation">
-              <Text fontWeight="bold" mb={2} color="white" textDecoration="underline">Company</Text>
+              <Text fontWeight="bold" mb={2} color="white">Company</Text>
               <Stack as="ul" spacing={0.5} listStyleType="none">
                 <Box as="li">
                   <ChakraLink as={NextLink} href="/" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to home page">Home</ChakraLink>
@@ -132,7 +132,7 @@ export default function Footer() {
             </Box>
             {/* Billing */}
             <Box as="nav" aria-label="Billing navigation" borderLeft={{ base: 'none', md: '1px solid' }} borderColor={{ md: 'whiteAlpha.400' }} pl={{ md: 3 }}>
-              <Text fontWeight="bold" mb={2} color="white" textDecoration="underline">Billing</Text>
+              <Text fontWeight="bold" mb={2} color="white">Billing</Text>
               <Stack as="ul" spacing={0.5} listStyleType="none">
                 <Box as="li">
                   <ChakraLink as={NextLink} href="/invoice-search" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to invoice search page">Invoice Search</ChakraLink>
@@ -141,7 +141,7 @@ export default function Footer() {
             </Box>
             {/* Help & Support */}
             <Box as="nav" aria-label="Help and support navigation" borderLeft={{ base: 'none', md: '1px solid' }} borderColor={{ md: 'whiteAlpha.400' }} pl={{ md: 3 }}>
-              <Text fontWeight="bold" mb={2} color="white" textDecoration="underline">Help & Support</Text>
+              <Text fontWeight="bold" mb={2} color="white">Help & Support</Text>
               <Stack as="ul" spacing={0.5} listStyleType="none">
                 <Box as="li">
                   <ChakraLink as={NextLink} href="/contact-us" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to contact us page">Contact Us</ChakraLink>
@@ -157,11 +157,11 @@ export default function Footer() {
             {/* Legal */}
             <Box as="nav" aria-label="Legal navigation" borderLeft={{ base: 'none', md: '1px solid' }} borderColor={{ md: 'whiteAlpha.400' }} pl={{ md: 3 }}>
               <Box as="li" listStyleType="none">
-                <ChakraLink as={NextLink} href="/legal" fontWeight="bold" mb={2} color="white" textDecoration="underline" _hover={{ color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to legal page">
+                <ChakraLink as={NextLink} href="/legal" fontWeight="bold" mb={2} color="white" _hover={{ color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to legal page">
                   Legal
                 </ChakraLink>
               </Box>
-              <Stack as="ul" spacing={0.5} listStyleType="none">
+              <Stack as="ul" spacing={0.5} listStyleType="none" mt={2}>
                 <Box as="li">
                   <ChakraLink as={NextLink} href="/privacy-policy" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to privacy policy page">Privacy Policy</ChakraLink>
                 </Box>
