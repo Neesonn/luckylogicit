@@ -273,20 +273,104 @@ export default function ContactUsPage() {
 
         <ContactForm />
 
-        <VStack spacing={2} align="center" mt={10} textAlign="center">
-          <Text fontSize="lg" fontWeight="semibold" color="brand.green">Or reach us directly:</Text>
-          <Text fontSize="md" display="flex" alignItems="center" justifyContent="center" gap={2}>
-            <Icon as={FiMail} boxSize={5} color="brand.green" />
-            Email: <Link href="mailto:support@luckylogic.com.au" color="brand.green" rel="noopener noreferrer">support@luckylogic.com.au</Link>
-          </Text>
-          <Text fontSize="md" display="flex" alignItems="center" justifyContent="center" gap={2}>
-            <Icon as={FiPhone} boxSize={5} color="brand.green" />
-            Phone: <Link href="tel:+61426901209" color="brand.green" rel="noopener noreferrer">+61 426 901 209</Link>
-          </Text>
-          <Text fontSize="md" display="flex" alignItems="center" justifyContent="center" gap={2}>
-            <Icon as={FiMapPin} boxSize={5} color="brand.green" />
-            Address: South Village, 2 Kiln Rd, Kirrawee 2232 (Pickup and Dropoff only)
-          </Text>
+        <VStack spacing={{ base: 3, md: 2 }} align="center" mt={{ base: 8, md: 10 }} textAlign="center" px={{ base: 2, md: 0 }}>
+          <Text fontSize={{ base: "md", md: "lg" }} fontWeight="semibold" color="brand.green">Or reach us directly:</Text>
+          <VStack spacing={{ base: 3, md: 2 }} align="center" w="full">
+            <HStack gap={2} justify="center" flexWrap="wrap">
+              <Icon as={FiMail} boxSize={{ base: 4, md: 5 }} color="brand.green" />
+              <Text fontSize={{ base: "sm", md: "md" }} textAlign="center">
+                Email: <Link href="mailto:support@luckylogic.com.au" color="brand.green" rel="noopener noreferrer">support@luckylogic.com.au</Link>
+              </Text>
+            </HStack>
+            <HStack gap={2} justify="center" flexWrap="wrap">
+              <Icon as={FiPhone} boxSize={{ base: 4, md: 5 }} color="brand.green" />
+              <Text fontSize={{ base: "sm", md: "md" }} textAlign="center">
+                Phone: <Link href="tel:+61426901209" color="brand.green" rel="noopener noreferrer">+61 426 901 209</Link>
+              </Text>
+            </HStack>
+            <VStack gap={2} align="center" maxW="full">
+              <HStack gap={2} justify="center" flexWrap="wrap">
+                <Icon as={FiMapPin} boxSize={{ base: 4, md: 5 }} color="brand.green" />
+                <Text fontSize={{ base: "sm", md: "md" }} textAlign="center">
+                  Address:
+                </Text>
+              </HStack>
+              <Text fontSize={{ base: "sm", md: "md" }} textAlign="center" px={2}>
+                South Village, 2 Kiln Rd, Kirrawee 2232 <strong style={{ color: '#003f2d' }}>(Pickup and Dropoff only)</strong>
+              </Text>
+            </VStack>
+          </VStack>
+          
+          {/* Opening Hours */}
+          <Box mt={{ base: 4, md: 6 }} p={{ base: 4, md: 6 }} bg="white" borderRadius="lg" w="full" maxW="md" border="1px solid" borderColor="gray.200" shadow="sm">
+            <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold" color="brand.green" mb={4} textAlign="center">
+              Opening Hours
+            </Text>
+            <VStack spacing={{ base: 2, md: 3 }} align="stretch">
+              <HStack justify="space-between" py={{ base: 1.5, md: 2 }} px={{ base: 2, md: 3 }} bg="gray.50" borderRadius="md">
+                <Text fontSize={{ base: "sm", md: "md" }} fontWeight="medium">Monday</Text>
+                <Text fontSize={{ base: "sm", md: "md" }} color="brand.green" fontWeight="semibold">9:00 AM - 5:00 PM</Text>
+              </HStack>
+              <HStack justify="space-between" py={{ base: 1.5, md: 2 }} px={{ base: 2, md: 3 }} bg="gray.50" borderRadius="md">
+                <Text fontSize={{ base: "sm", md: "md" }} fontWeight="medium">Tuesday</Text>
+                <Text fontSize={{ base: "sm", md: "md" }} color="brand.green" fontWeight="semibold">9:00 AM - 5:00 PM</Text>
+              </HStack>
+              <HStack justify="space-between" py={{ base: 1.5, md: 2 }} px={{ base: 2, md: 3 }} bg="gray.50" borderRadius="md">
+                <Text fontSize={{ base: "sm", md: "md" }} fontWeight="medium">Wednesday</Text>
+                <Text fontSize={{ base: "sm", md: "md" }} color="brand.green" fontWeight="semibold">9:00 AM - 5:00 PM</Text>
+              </HStack>
+              <HStack justify="space-between" py={{ base: 1.5, md: 2 }} px={{ base: 2, md: 3 }} bg="gray.50" borderRadius="md">
+                <Text fontSize={{ base: "sm", md: "md" }} fontWeight="medium">Thursday</Text>
+                <Text fontSize={{ base: "sm", md: "md" }} color="brand.green" fontWeight="semibold">9:00 AM - 5:00 PM</Text>
+              </HStack>
+              <HStack justify="space-between" py={{ base: 1.5, md: 2 }} px={{ base: 2, md: 3 }} bg="gray.50" borderRadius="md">
+                <Text fontSize={{ base: "sm", md: "md" }} fontWeight="medium">Friday</Text>
+                <Text fontSize={{ base: "sm", md: "md" }} color="brand.green" fontWeight="semibold">9:00 AM - 5:00 PM</Text>
+              </HStack>
+              <HStack justify="space-between" py={{ base: 1.5, md: 2 }} px={{ base: 2, md: 3 }} bg="red.50" borderRadius="md">
+                <Text fontSize={{ base: "sm", md: "md" }} fontWeight="medium">Saturday</Text>
+                <Text fontSize={{ base: "sm", md: "md" }} color="red.500" fontWeight="semibold">Closed</Text>
+              </HStack>
+              <HStack justify="space-between" py={{ base: 1.5, md: 2 }} px={{ base: 2, md: 3 }} bg="red.50" borderRadius="md">
+                <Text fontSize={{ base: "sm", md: "md" }} fontWeight="medium">Sunday</Text>
+                <Text fontSize={{ base: "sm", md: "md" }} color="red.500" fontWeight="semibold">Closed</Text>
+              </HStack>
+              
+              {/* After Hours Banner */}
+              <Box mt={4} p={{ base: 3, md: 4 }} bg="green.100" borderRadius="md" border="2px solid" borderColor="brand.green">
+                <VStack spacing={{ base: 2, md: 3 }} align="center">
+                  <HStack gap={2} flexWrap="wrap" justify="center">
+                    <Icon as={FiPhone} boxSize={{ base: 4, md: 5 }} color="brand.green" />
+                    <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color="brand.green" textAlign="center">
+                      After Hours Support Available
+                    </Text>
+                  </HStack>
+                  <Text fontSize={{ base: "xs", md: "sm" }} textAlign="center" color="gray.700" fontWeight="medium" px={2}>
+                    For urgent support outside business hours
+                  </Text>
+                  <Link 
+                    href="https://wa.me/61426901209" 
+                    color="brand.green" 
+                    rel="noopener noreferrer" 
+                    isExternal
+                    fontSize={{ base: "sm", md: "md" }}
+                    fontWeight="bold"
+                    bg="white"
+                    px={{ base: 3, md: 4 }}
+                    py={{ base: 1.5, md: 2 }}
+                    borderRadius="md"
+                    border="1px solid"
+                    borderColor="brand.green"
+                    _hover={{ bg: "green.50", textDecoration: 'underline' }}
+                    textAlign="center"
+                    whiteSpace="nowrap"
+                  >
+                    Text or WhatsApp: +61 426 901 209
+                  </Link>
+                </VStack>
+              </Box>
+            </VStack>
+          </Box>
         </VStack>
 
       </Box>
