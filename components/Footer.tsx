@@ -1,9 +1,9 @@
 'use client';
 
-import { Box, Text, Link, Stack, Button, InputGroup, InputRightElement, Spinner, Center } from '@chakra-ui/react';
+import { Box, Text, Link, Stack, Button, InputGroup, InputRightElement, Spinner, Center, SimpleGrid, HStack, Icon } from '@chakra-ui/react';
 import { useRef, useState, useEffect } from 'react';
 import CookieBanner from './CookieBanner';
-import { FaWrench } from 'react-icons/fa';
+import { FaWrench, FaWhatsapp, FaInstagram, FaFacebook, FaLinkedin } from 'react-icons/fa';
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, Input, useDisclosure, FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
@@ -105,50 +105,123 @@ export default function Footer() {
 
   return (
     <>
-      <Box textAlign="center" py={6} bg="brand.green" position="relative">
-        {/* Sitemap/Quick Links */}
-        <Box mb={4}>
-          <Stack direction={{ base: 'column', sm: 'row' }} spacing={4} justify="center" align="center">
-            <ChakraLink as={NextLink} href="/" color="white" textDecoration="underline">Home</ChakraLink>
-            <ChakraLink as={NextLink} href="/about-us" color="white" textDecoration="underline">About Us</ChakraLink>
-            <ChakraLink as={NextLink} href="/services" color="white" textDecoration="underline">Services</ChakraLink>
-            <ChakraLink as={NextLink} href="/troubleshoot" color="white" textDecoration="underline">Troubleshoot</ChakraLink>
-            <ChakraLink as={NextLink} href="/faq" color="white" textDecoration="underline">FAQ</ChakraLink>
-
-            <ChakraLink as={NextLink} href="/contact-us" color="white" textDecoration="underline">Contact Us</ChakraLink>
-          </Stack>
+      <Box as="footer" textAlign="center" py={4} bgGradient="linear(to-b, brand.green, #14543a)" position="relative" borderTop="1px solid rgba(255,255,255,0.1)">
+        {/* Sitemap/Quick Links - REPLACED WITH CATEGORIZED FOOTER */}
+        <Box mb={3} px={{ base: 2, md: 4 }}>
+          <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={2} maxW="6xl" mx="auto" textAlign={{ base: 'center', md: 'left' }}>
+            {/* Business */}
+            <Box as="nav" aria-label="Company navigation">
+              <Text fontWeight="bold" mb={2} color="white" textDecoration="underline">Company</Text>
+              <Stack as="ul" spacing={0.5} listStyleType="none">
+                <Box as="li">
+                  <ChakraLink as={NextLink} href="/" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to home page">Home</ChakraLink>
+                </Box>
+                <Box as="li">
+                  <ChakraLink as={NextLink} href="/about-us" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to about us page">About Us</ChakraLink>
+                </Box>
+                <Box as="li">
+                  <ChakraLink as={NextLink} href="/services" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to services page">Services</ChakraLink>
+                </Box>
+                <Box as="li">
+                  <ChakraLink as={NextLink} href="/troubleshoot" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to troubleshoot page">Troubleshoot</ChakraLink>
+                </Box>
+                <Box as="li">
+                  <ChakraLink as={NextLink} href="/travel-assistance" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to frequent flyer help page">Frequent Flyer Help</ChakraLink>
+                </Box>
+              </Stack>
+            </Box>
+            {/* Billing */}
+            <Box as="nav" aria-label="Billing navigation" borderLeft={{ base: 'none', md: '1px solid' }} borderColor={{ md: 'whiteAlpha.400' }} pl={{ md: 3 }}>
+              <Text fontWeight="bold" mb={2} color="white" textDecoration="underline">Billing</Text>
+              <Stack as="ul" spacing={0.5} listStyleType="none">
+                <Box as="li">
+                  <ChakraLink as={NextLink} href="/invoice-search" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to invoice search page">Invoice Search</ChakraLink>
+                </Box>
+              </Stack>
+            </Box>
+            {/* Help & Support */}
+            <Box as="nav" aria-label="Help and support navigation" borderLeft={{ base: 'none', md: '1px solid' }} borderColor={{ md: 'whiteAlpha.400' }} pl={{ md: 3 }}>
+              <Text fontWeight="bold" mb={2} color="white" textDecoration="underline">Help & Support</Text>
+              <Stack as="ul" spacing={0.5} listStyleType="none">
+                <Box as="li">
+                  <ChakraLink as={NextLink} href="/contact-us" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to contact us page">Contact Us</ChakraLink>
+                </Box>
+                <Box as="li">
+                  <ChakraLink as={NextLink} href="/troubleshoot" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to troubleshoot page">Troubleshoot</ChakraLink>
+                </Box>
+                <Box as="li">
+                  <ChakraLink as={NextLink} href="/faq" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to FAQ page">FAQ</ChakraLink>
+                </Box>
+              </Stack>
+            </Box>
+            {/* Legal */}
+            <Box as="nav" aria-label="Legal navigation" borderLeft={{ base: 'none', md: '1px solid' }} borderColor={{ md: 'whiteAlpha.400' }} pl={{ md: 3 }}>
+              <Box as="li" listStyleType="none">
+                <ChakraLink as={NextLink} href="/legal" fontWeight="bold" mb={2} color="white" textDecoration="underline" _hover={{ color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to legal page">
+                  Legal
+                </ChakraLink>
+              </Box>
+              <Stack as="ul" spacing={0.5} listStyleType="none">
+                <Box as="li">
+                  <ChakraLink as={NextLink} href="/privacy-policy" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to privacy policy page">Privacy Policy</ChakraLink>
+                </Box>
+                <Box as="li">
+                  <ChakraLink as={NextLink} href="/terms" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to terms and conditions page">Terms & Conditions</ChakraLink>
+                </Box>
+                <Box as="li">
+                  <ChakraLink as={NextLink} href="/cookie-policy" color="white" _hover={{ textDecoration: 'underline', color: 'yellow.300', transform: 'translateX(2px)' }} transition="all 0.2s" aria-label="Navigate to cookie policy page">Cookie Policy</ChakraLink>
+                </Box>
+              </Stack>
+            </Box>
+          </SimpleGrid>
         </Box>
 
-        <Stack spacing={1} mb={3}>
-          <Text fontSize="sm" color="white">
-            © {new Date().getFullYear()} Lucky Logic. All rights reserved.
-          </Text>
-
-          <Text fontSize="sm" color="white" mb={2}>
-            ABN 68 522 123 312
+        <Stack spacing={1} mb={2} px={{ base: 2, md: 4 }}>
+          <Text fontSize="xs" color="gray.300" mb={1} textAlign="center" lineHeight="1.4">
+            © {new Date().getFullYear()} Lucky Logic. All rights reserved. | ABN 68 522 123 312
           </Text>
           
+          {/* Social Media Icons */}
+          <HStack spacing={4} justify="center" mt={2} as="nav" aria-label="Social media links">
+            <Icon 
+              as={FaWhatsapp} 
+              color="white" 
+              boxSize={5} 
+              cursor="pointer"
+              _hover={{ color: 'yellow.300', transform: 'scale(1.1)' }}
+              transition="all 0.2s"
+              aria-label="Visit our WhatsApp"
+            />
+            <Icon 
+              as={FaInstagram} 
+              color="white" 
+              boxSize={5} 
+              cursor="pointer"
+              _hover={{ color: 'yellow.300', transform: 'scale(1.1)' }}
+              transition="all 0.2s"
+              aria-label="Visit our Instagram"
+            />
+            <Icon 
+              as={FaFacebook} 
+              color="white" 
+              boxSize={5} 
+              cursor="pointer"
+              _hover={{ color: 'yellow.300', transform: 'scale(1.1)' }}
+              transition="all 0.2s"
+              aria-label="Visit our Facebook"
+            />
+            <Icon 
+              as={FaLinkedin} 
+              color="white" 
+              boxSize={5} 
+              cursor="pointer"
+              _hover={{ color: 'yellow.300', transform: 'scale(1.1)' }}
+              transition="all 0.2s"
+              aria-label="Visit our LinkedIn"
+            />
+          </HStack>
 
-          <Text fontSize="sm" color="white">
-            <ChakraLink as={NextLink} href="/legal" textDecoration="underline" color="white">
-              Legal
-            </ChakraLink>
-            {' • '}
-            <ChakraLink as={NextLink} href="/sitemap" textDecoration="underline" color="white">
-              Site Map
-            </ChakraLink>
-          </Text>
         </Stack>
-
-        <Button
-          size="sm"
-          onClick={handleChangePreferences}
-          variant="outline"
-          colorScheme="yellow"
-          aria-label="Change Cookie Preferences"
-        >
-          Change Cookie Preferences
-        </Button>
       </Box>
 
       {/* Floating chat button (bottom right) */}
