@@ -15,17 +15,19 @@ export default function GoogleAnalytics() {
     }
   }, []);
 
-  if (!hasConsent) return null;
+  const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+
+  if (!hasConsent || !GA_ID) return null;
 
   return (
     <>
-      <Script async src="https://www.googletagmanager.com/gtag/js?id=G-88W370Y84T" />
+      <Script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
       <Script id="ga-setup">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', 'G-88W370Y84T');
+          gtag('config', '${GA_ID}');
         `}
       </Script>
     </>
