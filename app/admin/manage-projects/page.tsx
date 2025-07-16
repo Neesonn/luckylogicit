@@ -42,16 +42,73 @@ import {
   Th,
   Td,
   TableContainer,
+  Badge,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowBackIcon, AddIcon } from '@chakra-ui/icons';
-import { useState, useEffect } from 'react';
+import { ArrowBackIcon, AddIcon, SearchIcon } from '@chakra-ui/icons';
+import { useState, useEffect, useMemo } from 'react';
 import { FaInfoCircle, FaRegCalendarAlt, FaUserTie, FaMoneyBillWave, FaUser } from 'react-icons/fa';
 import StickyNavBar from '../../../components/StickyNavBar';
 import AdminSessionTimeout from '../../../components/AdminSessionTimeout';
 
 // Customer search functionality using live Stripe data
+
+// Helper function to capitalize status
+const capitalizeStatus = (status: string) => {
+  if (!status) return '';
+  
+  // Handle special cases like "in-progress" -> "In Progress"
+  if (status.toLowerCase() === 'in-progress') {
+    return 'In Progress';
+  }
+  
+  // Handle "on-hold" -> "On Hold"
+  if (status.toLowerCase() === 'on-hold') {
+    return 'On Hold';
+  }
+  
+  // General capitalization: first letter uppercase, rest lowercase
+  return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+};
+
+// Helper function to get status color
+const getStatusColor = (status: string) => {
+  if (!status) return 'gray';
+  
+  const statusLower = status.toLowerCase();
+  
+  switch (statusLower) {
+    case 'planned':
+      return 'blue';
+    case 'in-progress':
+    case 'in progress':
+      return 'orange';
+    case 'completed':
+      return 'green';
+    case 'on-hold':
+    case 'on hold':
+      return 'red';
+    default:
+      return 'gray';
+  }
+};
+
+// Helper function to get priority color
+const getPriorityColor = (priority: string) => {
+  if (!priority) return 'gray';
+  
+  switch (priority.toLowerCase()) {
+    case 'low':
+      return 'green';
+    case 'medium':
+      return 'yellow';
+    case 'high':
+      return 'red';
+    default:
+      return 'gray';
+  }
+};
 
 export default function ManageProjectsPage() {
   const router = useRouter();
@@ -59,6 +116,9 @@ export default function ManageProjectsPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+
+  // Search state
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -88,6 +148,18 @@ export default function ManageProjectsPage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [projectsError, setProjectsError] = useState('');
+
+  // Filtered projects based on search term
+  const filteredProjects = useMemo(() => {
+    if (!searchTerm.trim()) return projects;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return projects.filter(project => 
+      project.code?.toLowerCase().includes(searchLower) ||
+      project.name?.toLowerCase().includes(searchLower) ||
+      project.customer?.toLowerCase().includes(searchLower)
+    );
+  }, [projects, searchTerm]);
 
   // Load projects from Supabase on component mount
   useEffect(() => {
@@ -308,6 +380,46 @@ export default function ManageProjectsPage() {
         
         <VStack spacing={{ base: 6, md: 8 }} w="100%" maxW="1200px" bg="white" p={{ base: 6, md: 8 }} borderRadius="xl" boxShadow="xl" align="stretch" mb={6}>
           
+          {/* Search Bar */}
+          <Box bg="white" borderRadius="xl" boxShadow="md" border="1px solid #e2e8f0" p={6}>
+            <HStack justify="space-between" flexWrap="wrap" gap={4}>
+              <Box flex="1" minW="250px">
+                <HStack>
+                  <Box position="relative" flex="1">
+                    <Input
+                      placeholder="Search projects by code, name, or customer..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      pl={10}
+                      size="md"
+                      borderWidth="2px"
+                      borderColor="gray.200"
+                      _focus={{ borderColor: 'brand.green', boxShadow: '0 0 0 1px var(--chakra-colors-brand-green)' }}
+                      _hover={{ borderColor: 'gray.300' }}
+                    />
+                    <SearchIcon position="absolute" left={3} top="50%" transform="translateY(-50%)" color="gray.400" />
+                  </Box>
+                </HStack>
+              </Box>
+              {searchTerm && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  color="gray.500"
+                  onClick={() => setSearchTerm('')}
+                  _hover={{ color: 'gray.700' }}
+                >
+                  Clear Search
+                </Button>
+              )}
+            </HStack>
+            {searchTerm && (
+              <Text fontSize="sm" color="gray.600" mt={2}>
+                Showing {filteredProjects.length} of {projects.length} projects
+              </Text>
+            )}
+          </Box>
+          
           {/* Projects Table */}
           <Box bg="white" borderRadius="xl" boxShadow="md" border="1px solid #e2e8f0" p={6} overflowX={{ base: 'auto', md: 'visible' }}>
             <Heading size="md" color="#14543a" fontWeight="bold" mb={4} display="flex" alignItems="center" gap={2}>
@@ -324,10 +436,14 @@ export default function ManageProjectsPage() {
                 <AlertIcon />
                 {projectsError}
               </Alert>
-            ) : projects.length === 0 ? (
+            ) : filteredProjects.length === 0 ? (
               <Box textAlign="center" py={8}>
-                <Text color="gray.500" fontSize="lg">No projects found</Text>
-                <Text color="gray.400" fontSize="md" mt={2}>Create your first project to get started</Text>
+                <Text color="gray.500" fontSize="lg">
+                  {searchTerm ? 'No projects found matching your search' : 'No projects found'}
+                </Text>
+                <Text color="gray.400" fontSize="md" mt={2}>
+                  {searchTerm ? 'Try adjusting your search terms' : 'Create your first project to get started'}
+                </Text>
               </Box>
             ) : (
               <Table variant="simple" size="md" w="100%" minW={{ base: '600px', md: '100%' }}>
@@ -342,7 +458,7 @@ export default function ManageProjectsPage() {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {projects.map((proj, idx) => (
+                  {filteredProjects.map((proj: any, idx: number) => (
                     <Tr key={proj.code + idx} _hover={{ bg: 'gray.50' }} cursor="pointer">
                       <Td fontWeight="bold">
                         <Link href={`/admin/project/${proj.code}`} style={{ textDecoration: 'none' }}>
@@ -353,9 +469,29 @@ export default function ManageProjectsPage() {
                       </Td>
                       <Td>{proj.name}</Td>
                       <Td>{proj.customer}</Td>
-                      <Td>{proj.status}</Td>
+                      <Td>
+                        <Badge 
+                          colorScheme={getStatusColor(proj.status)} 
+                          fontSize="sm" 
+                          px={2} 
+                          py={1} 
+                          borderRadius="full"
+                        >
+                          {capitalizeStatus(proj.status)}
+                        </Badge>
+                      </Td>
                       <Td>{proj.startDate}</Td>
-                      <Td>{proj.priority}</Td>
+                      <Td>
+                        <Badge 
+                          colorScheme={getPriorityColor(proj.priority)} 
+                          fontSize="sm" 
+                          px={2} 
+                          py={1} 
+                          borderRadius="full"
+                        >
+                          {proj.priority?.charAt(0).toUpperCase() + proj.priority?.slice(1).toLowerCase()}
+                        </Badge>
+                      </Td>
                     </Tr>
                   ))}
                 </Tbody>
