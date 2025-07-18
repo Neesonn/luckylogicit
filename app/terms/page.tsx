@@ -22,7 +22,7 @@ export default function TermsPage() {
       <JsonLd data={termsData} />
       <Box px={6} py={{ base: 16, md: 24 }} maxW="3xl" mx="auto">
         <Text mb={2} fontSize="sm" color="gray.500" textAlign="right">
-          Last updated: 01/07/2025
+          Last updated: 19/07/2025
         </Text>
         <Heading as="h1" size="xl" mb={6} color="brand.green">
           Terms & Conditions
@@ -147,33 +147,72 @@ export default function TermsPage() {
         </Text>
         <UnorderedList mb={6} pl={6}>
           <ListItem>
-            Invoices are issued with payment due upon receipt unless otherwise agreed in writing.
+            <strong>Payment Terms:</strong> Payment is due in full upon receipt of invoice unless otherwise agreed in writing. Alternative payment terms (7, 14, or 30 days) must be expressly stated in the issued quote or invoice to be valid.
           </ListItem>
           <ListItem>
-            Stripe fees may apply: 1.75% + $0.30 for Visa/Mastercard; 3.5% + $0.30 for AMEX.
+            <strong>Client Responsibility:</strong> The Client accepts full responsibility for all fees, charges, and disbursements arising from or relating to the services outlined in quotations and invoices. All payments are to be made in full, without deduction, counterclaim, or set-off, unless otherwise agreed in writing.
           </ListItem>
           <ListItem>
-            Hardware and software purchases are non-refundable once installed, delivered, or digitally transferred.
+            <strong>Commencement of Work:</strong> Lucky Logic shall not be obligated to commence any work until written acceptance of quotation has been received and, where applicable, the agreed deposit or prepayment has been paid in full by the Client.
           </ListItem>
           <ListItem>
-            A 14-day warranty applies to all services provided unless otherwise specified in writing.
+            <strong>Payment Surcharges:</strong> Stripe fees apply: 1.75% + $0.30 for Visa/Mastercard; 3.5% + $0.30 for AMEX. By proceeding with payment via card, the Client expressly accepts these surcharges.
           </ListItem>
           <ListItem>
-            No GST has been charged. Lucky Logic is not currently registered for GST.
+            <strong>Overdue Accounts:</strong> Interest will accrue on any overdue amounts at a rate of 10% per annum, calculated daily, from the due date until payment is received in full. The Client agrees to indemnify Lucky Logic for any reasonable legal, administrative, or collection costs incurred in the recovery of outstanding debts.
+          </ListItem>
+          <ListItem>
+            <strong>Intellectual Property:</strong> All intellectual property (IP), including code, designs, documentation, and deliverables, developed solely by Lucky Logic remains the property of Lucky Logic until full payment has been received. Upon full payment, ownership of final project deliverables will transfer to the Client, excluding any pre-existing tools, code libraries, templates, or proprietary systems.
+          </ListItem>
+          <ListItem>
+            <strong>Service Guarantee:</strong> Lucky Logic warrants that all services will be provided with due care, skill, and diligence. If any deliverables are found to be materially defective within 7 days of delivery, Lucky Logic will, at its discretion, rectify the issue at no additional charge. This guarantee does not cover faults caused by misuse, unauthorised modifications, or third-party interference.
           </ListItem>
           <ListItem>
             <strong>No Fix, No Fee:</strong> If we are unable to resolve your issue and it falls outside the scope of our services, no call-out fee will be charged.
           </ListItem>
           <ListItem>
-            In circumstances where time has been spent attempting a resolution, including diagnostics, system testing, or third-party coordination, a partial fee may apply to cover time invested, even if a full solution was not provided.
+            <strong>Partial Fees:</strong> In circumstances where time has been spent attempting a resolution, including diagnostics, system testing, or third-party coordination, a partial fee may apply to cover time invested, even if a full solution was not provided.
           </ListItem>
           <ListItem>
-            All quotes must be approved by the customer prior to work commencing. If an updated quote is required (e.g. for further diagnostics, part sourcing, or expanded work scope), it will be sent and must be accepted before further action is taken.
+            <strong>Site Readiness:</strong> Where Lucky Logic has been engaged for work, if the site is not ready when we arrive (e.g., equipment not accessible, work area not prepared, or client not available), an additional call-out fee may be charged prior to Lucky Logic returning onsite. All outstanding invoices must be paid in full prior to any re-visit.
+          </ListItem>
+          <ListItem>
+            <strong>Quote Approval:</strong> All quotes must be approved by the customer prior to work commencing. If an updated quote is required (e.g. for further diagnostics, part sourcing, or expanded work scope), it will be sent and must be accepted before further action is taken.
+          </ListItem>
+          <ListItem>
+            <strong>Hardware and Software:</strong> Hardware and software purchases are non-refundable once installed, delivered, or digitally transferred.
+          </ListItem>
+          <ListItem>
+            <strong>Tax:</strong> No GST has been charged. Lucky Logic is not currently registered for GST.
           </ListItem>
         </UnorderedList>
-        <Text>
+        <Text mb={6}>
           For direct deposit payments, please refer to your invoice for bank account details.
         </Text>
+
+        <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
+          9a. Additional Payment Terms & Dispute Resolution
+        </Heading>
+        <Text mb={6}>
+          The following additional terms apply to all services and payments:
+        </Text>
+        <UnorderedList mb={6} pl={6}>
+          <ListItem>
+            <strong>Variations to Scope:</strong> Any changes to the scope of work after acceptance of quotation must be agreed upon in writing by both parties and may result in additional fees. A revised quotation may be issued to reflect the agreed variations.
+          </ListItem>
+          <ListItem>
+            <strong>Cancellation Policy:</strong> Should the Client cancel the agreed works following acceptance, Lucky Logic reserves the right to charge for all work completed to date, third-party commitments, and any losses incurred due to rescheduling or cancellation.
+          </ListItem>
+          <ListItem>
+            <strong>Dispute Resolution:</strong> Any disputes, claims, or issues arising in connection with this agreement must be raised in writing within seven (7) days of delivery of the relevant goods, services, or invoice. Both parties agree to act in good faith to resolve disputes promptly and amicably.
+          </ListItem>
+          <ListItem>
+            <strong>Confidentiality:</strong> Both parties agree to maintain the confidentiality of any proprietary or sensitive information disclosed during the course of the project. Neither party shall disclose such information to any third party without prior written consent, unless required by law.
+          </ListItem>
+          <ListItem>
+            <strong>Portfolio Rights:</strong> Lucky Logic retains the right to showcase non-confidential aspects of the work in its portfolio or promotional material, unless otherwise restricted in writing.
+          </ListItem>
+        </UnorderedList>
 
         <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
           10. Live Chat Usage
