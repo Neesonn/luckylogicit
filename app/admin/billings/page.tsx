@@ -79,13 +79,14 @@ export default function BillingsPage() {
       customerMap[key] = { name: inv.customer_name || '', email: inv.customer_email, count: 0, total: 0, paid: 0, due: 0, since: null };
     }
     customerMap[key].count++;
-    customerMap[key].total += inv.amount_due;
     const status = getStatus(inv);
     if (status === 'Paid') {
       customerMap[key].paid += inv.amount_due;
+      customerMap[key].total += inv.amount_due; // Only count paid invoices in total
     } else if (status === 'Open' || status === 'Past Due') {
       customerMap[key].due += inv.amount_due;
     }
+    // Note: void invoices are not counted in total, paid, or due amounts
     if (!customerMap[key].since || (inv.created && inv.created < customerMap[key].since)) {
       customerMap[key].since = inv.created;
     }
