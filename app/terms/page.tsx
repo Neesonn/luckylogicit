@@ -29,8 +29,7 @@ export default function TermsPage() {
         </Heading>
 
         <Text mb={6}>
-          Welcome to Lucky Logic. By accessing and using this website, you agree to comply with and be
-          bound by these Terms and Conditions. Please read them carefully before using our services.
+          Welcome to Lucky Logic. These Terms and Conditions ("Terms") apply to your use of this website and to any services, products, or support provided by Lucky Logic, whether engaged through this website, by phone, email, or in person. By accessing our website, requesting a quote, engaging our services, or making a payment, you agree to comply with and be bound by these Terms. Please read them carefully, as they set out your rights and obligations when dealing with Lucky Logic.
         </Text>
 
         <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
@@ -125,10 +124,10 @@ export default function TermsPage() {
         </Text>
 
         <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
-          7. Governing Law
+          7. Governing Law & Jurisdiction
         </Heading>
         <Text mb={6}>
-          These Terms and Conditions are governed by the laws of New South Wales, Australia. Any disputes arising will be subject to the exclusive jurisdiction of the courts in New South Wales.
+          These Terms and Conditions are governed by the laws of New South Wales, Australia. Any disputes arising will be subject to the exclusive jurisdiction of the courts in New South Wales. The Client agrees to submit to the personal jurisdiction of the courts of New South Wales for any legal proceedings related to these Terms & Conditions or the services provided by Lucky Logic.
         </Text>
 
         <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
@@ -211,6 +210,69 @@ export default function TermsPage() {
           </ListItem>
           <ListItem>
             <strong>Portfolio Rights:</strong> Lucky Logic retains the right to showcase non-confidential aspects of the work in its portfolio or promotional material, unless otherwise restricted in writing.
+          </ListItem>
+        </UnorderedList>
+
+        <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
+          9b. Enhanced Payment Terms & Collections
+        </Heading>
+        <Text mb={6}>
+          The following enhanced terms apply to payment processing and debt collection:
+        </Text>
+        <UnorderedList mb={6} pl={6}>
+          <ListItem>
+            <strong>Enhanced Interest Rate:</strong> Overdue amounts accrue interest at 10% per annum, calculated daily, or at the statutory rate (RBA cash rate + 8%) as permitted by law, whichever is greater, until paid in full. This clause applies only where the Client has agreed to these Terms & Conditions.
+          </ListItem>
+          <ListItem>
+            <strong>Collections Process:</strong> Lucky Logic may refer unpaid debts to a licensed debt collector, and all recovery costs (including legal fees, collection agency fees, and administrative costs) will be added to the outstanding debt amount.
+          </ListItem>
+          <ListItem>
+            <strong>Payment Priority:</strong> All outstanding invoices must be paid in full before Lucky Logic will undertake any additional work or re-visits, regardless of the nature of the new work requested.
+          </ListItem>
+        </UnorderedList>
+
+        <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
+          9c. Liability Limitations & Warranties
+        </Heading>
+        <Text mb={6}>
+          The following limitations and warranties apply to all services:
+        </Text>
+        <UnorderedList mb={6} pl={6}>
+          <ListItem>
+            <strong>Liability Cap:</strong> To the extent permitted by law, Lucky Logic's total liability for any claim arising from its services is limited to the amount paid by the Client for those services, regardless of cause. This limitation applies to all claims including negligence, breach of contract, or any other legal theory.
+          </ListItem>
+          <ListItem>
+            <strong>Third-Party Exclusions:</strong> Lucky Logic is not liable for any failures, delays, or issues caused by third-party services, software, hardware, or external factors beyond our control, including but not limited to internet outages, software bugs, vendor service disruptions, or power failures.
+          </ListItem>
+          <ListItem>
+            <strong>Data Loss Disclaimer:</strong> Lucky Logic is not responsible for any data loss unless specifically caused by our negligence and only where the Client has engaged us to handle data backup services. Clients are responsible for backing up their data before any work commences unless we have expressly agreed to handle backups.
+          </ListItem>
+          <ListItem>
+            <strong>Force Majeure:</strong> Lucky Logic is not liable for any delays, failures, or inability to perform services due to circumstances beyond our reasonable control, including but not limited to natural disasters, pandemics, government actions, power outages, supplier delays, or other unforeseeable events.
+          </ListItem>
+        </UnorderedList>
+
+        <Heading as="h2" size="lg" mt={8} mb={4} color="brand.green">
+          9d. Client Obligations & Responsibilities
+        </Heading>
+        <Text mb={6}>
+          The Client acknowledges and agrees to the following obligations:
+        </Text>
+        <UnorderedList mb={6} pl={6}>
+          <ListItem>
+            <strong>Accurate Information:</strong> The Client must provide accurate, complete, and up-to-date information regarding their requirements, existing systems, and any relevant technical details necessary for the provision of services.
+          </ListItem>
+          <ListItem>
+            <strong>Access & Cooperation:</strong> The Client must provide reasonable access to equipment, systems, and premises as required for the provision of services, and must cooperate with Lucky Logic's reasonable requests for information or assistance.
+          </ListItem>
+          <ListItem>
+            <strong>Data Backup:</strong> The Client is responsible for backing up all important data before any work commences, unless Lucky Logic has expressly agreed to handle data backup services as part of the agreed scope of work.
+          </ListItem>
+          <ListItem>
+            <strong>Site Preparation:</strong> The Client must ensure the work site is properly prepared, equipment is accessible, and the Client or an authorized representative is available at the agreed time for onsite work.
+          </ListItem>
+          <ListItem>
+            <strong>Third-Party Permissions:</strong> The Client must obtain any necessary permissions, licenses, or access credentials required for Lucky Logic to perform the agreed services, including but not limited to software licenses, system passwords, or building access.
           </ListItem>
         </UnorderedList>
 

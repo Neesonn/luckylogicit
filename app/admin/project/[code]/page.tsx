@@ -1197,6 +1197,54 @@ export default function ProjectDetailsPage() {
     return () => clearInterval(interval);
   }, [project?.customer_stripe_id]);
 
+  // Refresh linked quotes every 30 seconds to get latest status updates
+  useEffect(() => {
+    if (!project?.customer_stripe_id || !Array.isArray(project.linkedQuotes) || project.linkedQuotes.length === 0) return;
+    
+    const refreshLinkedQuotes = async () => {
+      try {
+        const res = await fetch(`/api/list-stripe-quotes?customer=${project.customer_stripe_id}`);
+        const data = await res.json();
+        const freshQuotes = data.quotes || [];
+        
+        // Update linked quotes with fresh status data
+        const updatedLinkedQuotes = project.linkedQuotes.map((linkedQuote: any) => {
+          const freshQuote = freshQuotes.find((q: any) => q.id === linkedQuote.quoteId);
+          if (freshQuote) {
+            return {
+              ...linkedQuote,
+              status: freshQuote.status,
+              expires_at: freshQuote.expires_at,
+              // Keep other linked quote data but update status
+            };
+          }
+          return linkedQuote;
+        });
+        
+        // Only update if there are changes
+        const hasChanges = updatedLinkedQuotes.some((q: any, index: number) => 
+          q.status !== project.linkedQuotes[index]?.status
+        );
+        
+        if (hasChanges) {
+          setProject((prev: any) => ({ ...prev, linkedQuotes: updatedLinkedQuotes }));
+          // Also persist to backend
+          await fetch(`/api/projects/${projectCode}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ linkedQuotes: updatedLinkedQuotes })
+          });
+        }
+      } catch (err) {
+        console.error('Failed to refresh linked quotes:', err);
+      }
+    };
+    
+    const interval = setInterval(refreshLinkedQuotes, 30000); // Refresh every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [project?.customer_stripe_id, project?.linkedQuotes, projectCode]);
+
   if (loading) {
     return (
       <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="gray.50">
