@@ -87,6 +87,7 @@ import {
   FaExclamationCircle,
   FaBan,
   FaNewspaper,
+  FaDownload,
 } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 // Fix import at the top
@@ -220,6 +221,238 @@ export default function ProjectDetailsPage() {
   const [isPublicTokenModalOpen, setIsPublicTokenModalOpen] = useState(false);
   const [generatingToken, setGeneratingToken] = useState(false);
   const [revokingToken, setRevokingToken] = useState(false);
+  
+  // Project sign-off modal state
+  const [isProjectSignOffModalOpen, setIsProjectSignOffModalOpen] = useState(false);
+  const [signOffChecklist, setSignOffChecklist] = useState({
+    preInstallation: {
+      confirmTVs: false,
+      confirmSpeakers: false,
+      confirmiPad: false,
+      confirmInternet: false,
+      confirmTimings: false,
+      confirmCabling: false
+    },
+    installation: {
+      mountTVs: false,
+      configureTVs: false,
+      configureSpeakers: false,
+      setupiPad: false,
+      confirmCabling: false,
+      verifyWiFi: false
+    },
+    postInstallation: {
+      demonstrateRollCall: false,
+      demonstrateMediaTVs: false,
+      confirmSpeakers: false,
+      confirmiPadSoftware: false,
+      validateNetwork: false,
+      provideTroubleshooting: false
+    }
+  });
+  
+  // Section comments state
+  const [sectionComments, setSectionComments] = useState({
+    preInstallation: '',
+    installation: '',
+    postInstallation: ''
+  });
+  const [savingChecklist, setSavingChecklist] = useState(false);
+  const [showSignatureModal, setShowSignatureModal] = useState(false);
+  const [signatureData, setSignatureData] = useState<string>('');
+  const [signatureTimestamp, setSignatureTimestamp] = useState<string>('');
+  const signatureCanvasRef = useRef<HTMLCanvasElement>(null);
+  
+  // Comment modal state
+  const [commentModal, setCommentModal] = useState({
+    isOpen: false,
+    section: '',
+    taskKey: '',
+    comment: ''
+  });
+  
+  // Save checklist function
+  const handleSaveChecklist = async () => {
+    setSavingChecklist(true);
+    try {
+      // Save to backend - you can implement this based on your data storage
+      await fetch(`/api/projects/${projectCode}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          signOffChecklist,
+          lastUpdated: new Date().toISOString()
+        })
+      });
+      
+      toast({
+        title: 'Checklist Saved',
+        description: 'Your progress has been saved successfully.',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+        variant: 'solid',
+      });
+    } catch (error) {
+      toast({
+        title: 'Save Failed',
+        description: 'Failed to save checklist. Please try again.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+        variant: 'solid',
+      });
+    } finally {
+      setSavingChecklist(false);
+    }
+  };
+
+  // Handle complete sign off
+  const handleCompleteSignOff = () => {
+    setSignatureTimestamp(new Date().toISOString());
+    setIsViewingCompletedSignOff(false);
+    setShowSignatureModal(true);
+  };
+
+  // Clear signature canvas
+  const clearSignature = () => {
+    if (signatureCanvasRef.current) {
+      const canvas = signatureCanvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      setSignatureData('');
+    }
+  };
+
+  // Get readable task description for checklist summary
+  const getTaskDescription = (section: 'preInstallation' | 'installation' | 'postInstallation', taskKey: string) => {
+    const descriptions: { [key: string]: { [key: string]: string } } = {
+      preInstallation: {
+        confirmTVs: 'Confirm number of TVs required per studio: • 1x Roll Call TV (55" Google OS) • 1–2x Media TVs(65–75" Google OS)',
+        confirmSpeakers: 'Confirm Wi-Fi enabled speakers (Sonos or equivalent)',
+        confirmiPad: 'Confirm iPad for kiosk software is ready',
+        confirmInternet: 'Confirm reliable internet connection is active and tested',
+        confirmTimings: 'Confirm TV delivery & installation timings with electricians',
+        confirmCabling: 'Ensure backend cabling requirements are completed prior to installation'
+      },
+      installation: {
+        mountTVs: 'Mount TVs securely and confirm functionality',
+        configureTVs: 'Connect and configure all TVs to the network',
+        configureSpeakers: 'Install and configure Sonos or approved speakers',
+        setupiPad: 'Set up iPad with kiosk software and test login',
+        confirmCabling: 'Confirm backend cabling is neat and labelled',
+        verifyWiFi: 'Verify Wi-Fi strength and stability across all devices'
+      },
+      postInstallation: {
+        demonstrateRollCall: 'Demonstrate operation of Roll Call TV',
+        demonstrateMediaTVs: 'Demonstrate operation of Media TVs',
+        confirmSpeakers: 'Confirm speakers are connected and tested',
+        confirmiPadSoftware: 'Confirm iPad kiosk software is functional',
+        validateNetwork: 'Validate network stability and speed tests',
+        provideTroubleshooting: 'Provide instructions for basic troubleshooting'
+      }
+    };
+    
+    return descriptions[section]?.[taskKey] || taskKey.replace(/([A-Z])/g, ' $1').trim();
+  };
+
+  // Restore signature to canvas
+  const restoreSignature = (signatureDataUrl: string) => {
+    if (signatureCanvasRef.current && signatureDataUrl) {
+      const canvas = signatureCanvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+        img.src = signatureDataUrl;
+      }
+    }
+  };
+
+  // Save signature and complete sign off
+  const saveSignatureAndComplete = async () => {
+    if (!signatureData) {
+      toast({
+        title: 'Signature Required',
+        description: 'Please provide your signature before completing the sign-off.',
+        status: 'warning',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+        variant: 'solid',
+      });
+      return;
+    }
+
+    try {
+      // Save signature and completed checklist to backend
+      const signOffData = {
+        signature: signatureData,
+        timestamp: signatureTimestamp,
+        completedChecklist: signOffChecklist,
+        sectionComments: sectionComments,
+        projectCode,
+        customerName: project?.customer,
+        customerEmail: project?.customerEmail,
+        completedBy: 'Current User', // Replace with actual user if available
+        completedAt: new Date().toISOString()
+      };
+
+      await fetch(`/api/projects/${projectCode}/sign-off`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(signOffData)
+      });
+
+      toast({
+        title: 'Sign Off Completed',
+        description: 'Project sign-off has been completed successfully.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right',
+        variant: 'solid',
+      });
+
+      // Close signature modal and project sign off modal
+      setShowSignatureModal(false);
+      setIsProjectSignOffModalOpen(false);
+      
+      // Reset signature data and flags
+      setSignatureData('');
+      setSignatureTimestamp('');
+      setIsViewingCompletedSignOff(false);
+      
+      // Refresh project data to show updated sign-off status
+      const response = await fetch('/api/projects');
+      const data = await response.json();
+      
+      if (data.success) {
+        const updatedProject = data.projects.find((p: any) => p.code === projectCode);
+        if (updatedProject) {
+          setProject(updatedProject);
+        }
+      }
+    } catch (error) {
+      toast({
+        title: 'Sign Off Failed',
+        description: 'Failed to complete sign-off. Please try again.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+        variant: 'solid',
+      });
+    }
+  };
+  
   const [expandedTasks, setExpandedTasks] = useState<string[]>([]); // store expanded task ids
   const tasksSectionRef = useRef<HTMLDivElement>(null);
   // At the top, after other refs:
@@ -250,6 +483,20 @@ export default function ProjectDetailsPage() {
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string>('');
   const [fetchingInvoices, setFetchingInvoices] = useState(false);
   const [linkingInvoiceId, setLinkingInvoiceId] = useState<string | null>(null);
+
+  // Track if we're viewing a completed sign-off (read-only mode)
+  const [isViewingCompletedSignOff, setIsViewingCompletedSignOff] = useState(false);
+
+  // Restore signature when signature modal opens
+  useEffect(() => {
+    if (showSignatureModal && signatureData) {
+      // Small delay to ensure modal is fully rendered
+      const timer = setTimeout(() => {
+        restoreSignature(signatureData);
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [showSignatureModal, signatureData]);
 
   useEffect(() => {
     // Fetch project details from database
@@ -1324,6 +1571,22 @@ export default function ProjectDetailsPage() {
               >
                 {publicToken ? "Manage Public Link" : "Generate Public Link"}
               </Button>
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  colorScheme="green"
+                  variant="outline"
+                  leftIcon={<CheckCircleIcon />}
+                  size={{ base: "sm", md: "md" }}
+                >
+                  Project Sign Off
+                </MenuButton>
+                <MenuList>
+                  <MenuItem onClick={() => setIsProjectSignOffModalOpen(true)}>
+                    inLIFE Wellness
+                  </MenuItem>
+                </MenuList>
+              </Menu>
               {/* Save button appears only when editing */}
               {isEditing && (
                 <Button
@@ -1614,7 +1877,7 @@ export default function ProjectDetailsPage() {
                         </Text>
                       )}
                     </Box>
-                  <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={{ base: 4, md: 6 }} alignItems="start">
+                  <SimpleGrid columns={{ base: 1, md: 2, lg: 5 }} spacing={{ base: 4, md: 6 }} alignItems="start">
                       <Box>
                       <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
                           Category
@@ -1706,6 +1969,47 @@ export default function ProjectDetailsPage() {
                         <Badge colorScheme={getPriorityColor(project.priority)} px={3} py={1} fontSize={{ base: "xs", md: "md" }} fontWeight="semibold">
                             {project.priority} Priority
                           </Badge>
+                        )}
+                      </Box>
+                      <Box>
+                      <Text fontWeight="semibold" color="gray.700" mb={2} fontSize={{ base: "xs", md: "sm" }} textTransform="uppercase" letterSpacing="wide">
+                          Sign Off Status
+                        </Text>
+                        {project.sign_off_data ? (
+                          <HStack>
+                            <Icon as={FaCheckCircle} color="green.500" boxSize={{ base: 3, md: 4 }} />
+                            <Text
+                              color="blue.500"
+                              fontSize={{ base: "md", md: "lg" }}
+                              onClick={() => {
+                                setSignatureTimestamp(project.sign_off_data.timestamp);
+                                setSignOffChecklist(project.sign_off_data.completedChecklist);
+                                setSignatureData(project.sign_off_data.signature);
+                                // Load section comments if they exist
+                                if (project.sign_off_data.sectionComments) {
+                                  setSectionComments(project.sign_off_data.sectionComments);
+                                }
+                                setIsViewingCompletedSignOff(true);
+                                setShowSignatureModal(true);
+                                // Restore signature to canvas after modal opens
+                                setTimeout(() => {
+                                  restoreSignature(project.sign_off_data.signature);
+                                }, 100);
+                              }}
+                              cursor="pointer"
+                              _hover={{ color: "blue.700" }}
+                              textDecoration="underline"
+                            >
+                              View Completed Sign Off
+                            </Text>
+                          </HStack>
+                        ) : (
+                          <HStack>
+                            <Icon as={FaExclamationCircle} color="gray.400" boxSize={{ base: 3, md: 4 }} />
+                            <Text fontSize={{ base: "md", md: "lg" }} color="gray.500">
+                              Not Signed Off
+                            </Text>
+                          </HStack>
                         )}
                       </Box>
                     </SimpleGrid>
@@ -4030,6 +4334,1194 @@ export default function ProjectDetailsPage() {
                   Generate Link
                 </Button>
               )}
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Project Sign Off Modal */}
+      <Modal isOpen={isProjectSignOffModalOpen} onClose={() => setIsProjectSignOffModalOpen(false)} size="full">
+        <ModalOverlay />
+        <ModalContent borderRadius="xl" mx={{ base: 1, md: 8 }} maxW="6xl" bg="white" shadow="lg">
+          <ModalHeader bg="#003f2d" color="white" borderTopRadius="xl" py={{ base: 3, md: 4 }}>
+            <HStack spacing={{ base: 2, md: 3 }}>
+              <Icon as={CheckCircleIcon} boxSize={{ base: 4, md: 5 }} />
+              <Heading size={{ base: "md", md: "lg" }} fontWeight="bold">
+                Project Sign Off - inLIFE Wellness
+              </Heading>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton 
+            color="white" 
+            bg="whiteAlpha.200"
+            borderRadius="full"
+            _hover={{ bg: "whiteAlpha.300" }}
+            top={{ base: 3, md: 6 }}
+            right={{ base: 3, md: 6 }}
+          />
+          <ModalBody py={{ base: 4, md: 8 }} px={{ base: 3, md: 8 }}>
+            <VStack spacing={{ base: 6, md: 8 }} align="stretch">
+              <Box bg="gray.50" p={{ base: 4, md: 6 }} borderRadius="lg" border="1px solid" borderColor="gray.200">
+                <Text fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="bold" mb={{ base: 3, md: 4 }}>
+                  Customer Details
+                </Text>
+                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 4, md: 8 }}>
+                  <VStack spacing={{ base: 3, md: 4 }} align="stretch">
+                    <Box>
+                      <Text fontSize={{ base: "sm", md: "md" }} color="gray.600" fontWeight="semibold">Name:</Text>
+                      <Text fontSize={{ base: "md", md: "lg" }} color="gray.800">{project?.customer || 'N/A'}</Text>
+                    </Box>
+                    <Box>
+                      <Text fontSize={{ base: "sm", md: "md" }} color="gray.600" fontWeight="semibold">Email:</Text>
+                      <Text fontSize={{ base: "md", md: "lg" }} color="gray.800">{project?.customerEmail || 'N/A'}</Text>
+                    </Box>
+                  </VStack>
+                  <Box>
+                    <Text fontSize={{ base: "sm", md: "md" }} color="gray.600" fontWeight="semibold">Address:</Text>
+                    <VStack align="start" spacing={{ base: 1, md: 2 }}>
+                      {project?.customerAddressLine1 && (
+                        <Text fontSize={{ base: "md", md: "lg" }} color="gray.800">{project.customerAddressLine1}</Text>
+                      )}
+                      {project?.customerAddressLine2 && (
+                        <Text fontSize={{ base: "md", md: "lg" }} color="gray.800">{project.customerAddressLine2}</Text>
+                      )}
+                      {(project?.customerCity || project?.customerState || project?.customerPostcode) && (
+                        <Text fontSize={{ base: "md", md: "lg" }} color="gray.800">
+                          {[project.customerCity, project.customerState, project.customerPostcode].filter(Boolean).join(', ')}
+                        </Text>
+                      )}
+                      {project?.customerCountry && (
+                        <Text fontSize={{ base: "md", md: "lg" }} color="gray.800">{project.customerCountry}</Text>
+                      )}
+                      {!project?.customerAddressLine1 && !project?.customerAddressLine2 && !project?.customerCity && !project?.customerState && !project?.customerPostcode && !project?.customerCountry && (
+                        <Text fontSize={{ base: "md", md: "lg" }} color="gray.500">No address information available</Text>
+                      )}
+                    </VStack>
+                  </Box>
+                </SimpleGrid>
+              </Box>
+
+              <Text fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="semibold">
+                Pre-Installation Requirements Checklist
+              </Text>
+              
+              <VStack spacing={{ base: 4, md: 6 }} align="stretch">
+                <Box>
+                  <Checkbox 
+                    size={{ base: "md", md: "lg" }}
+                    colorScheme="green"
+                    isChecked={signOffChecklist.preInstallation.confirmTVs}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      preInstallation: { ...prev.preInstallation, confirmTVs: e.target.checked }
+                    }))}
+                  >
+                    <VStack align="start" spacing={{ base: 1, md: 2 }}>
+                      <Text fontSize={{ base: "md", md: "lg" }} fontWeight="semibold">Confirm number of TVs required per studio:</Text>
+                      <Text fontSize={{ base: "sm", md: "md" }} color="gray.600" ml={{ base: 4, md: 6 }}>
+                        • 1x Roll Call TV (55" Google OS)<br/>
+                        • 1–2x Media TVs(65–75" Google OS)
+                      </Text>
+                    </VStack>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.preInstallation.confirmSpeakers}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      preInstallation: { ...prev.preInstallation, confirmSpeakers: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Confirm Wi-Fi enabled speakers (Sonos or equivalent)</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.preInstallation.confirmiPad}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      preInstallation: { ...prev.preInstallation, confirmiPad: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Confirm iPad for kiosk software is ready</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.preInstallation.confirmInternet}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      preInstallation: { ...prev.preInstallation, confirmInternet: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Confirm reliable internet connection is active and tested</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.preInstallation.confirmTimings}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      preInstallation: { ...prev.preInstallation, confirmTimings: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Confirm TV delivery & installation timings with electricians</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.preInstallation.confirmCabling}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      preInstallation: { ...prev.preInstallation, confirmCabling: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Ensure backend cabling requirements are completed prior to installation</Text>
+                  </Checkbox>
+                </Box>
+                
+                {/* Add Comment Button for Pre-Installation */}
+                <Box textAlign="center">
+                  <Button
+                    onClick={() => setCommentModal({
+                      isOpen: true,
+                      section: 'preInstallation',
+                      taskKey: '',
+                      comment: sectionComments.preInstallation
+                    })}
+                    leftIcon={<Icon as={FaEdit} />}
+                    variant="outline"
+                    colorScheme="blue"
+                    size={{ base: "sm", md: "md" }}
+                  >
+                    Add Comment
+                  </Button>
+                  {sectionComments.preInstallation && (
+                    <Box mt={3} bg="blue.50" p={4} borderRadius="lg" border="1px solid" borderColor="blue.200">
+                      <Text fontSize="sm" color="blue.800" fontWeight="medium" mb={2}>Lucky Logic Comments:</Text>
+                      <Text fontSize="sm" color="blue.700" whiteSpace="pre-line">{sectionComments.preInstallation}</Text>
+                    </Box>
+                  )}
+                </Box>
+              </VStack>
+
+              <Divider borderColor="gray.300" />
+              
+              <Text fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="semibold">
+                Installation Checks
+              </Text>
+              
+              <VStack spacing={{ base: 4, md: 6 }} align="stretch">
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.installation.mountTVs}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      installation: { ...prev.installation, mountTVs: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Mount TVs securely and confirm functionality</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.installation.configureTVs}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      installation: { ...prev.installation, configureTVs: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Connect and configure all TVs to the network</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.installation.configureSpeakers}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      installation: { ...prev.installation, configureSpeakers: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Install and configure Sonos or approved speakers</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.installation.setupiPad}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      installation: { ...prev.installation, setupiPad: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Set up iPad with kiosk software and test login</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.installation.confirmCabling}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      installation: { ...prev.installation, confirmCabling: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Confirm backend cabling is neat and labelled</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.installation.verifyWiFi}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      installation: { ...prev.installation, verifyWiFi: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Verify Wi-Fi strength and stability across all devices</Text>
+                  </Checkbox>
+                </Box>
+                
+                {/* Add Comment Button for Installation */}
+                <Box textAlign="center">
+                  <Button
+                    onClick={() => setCommentModal({
+                      isOpen: true,
+                      section: 'installation',
+                      taskKey: '',
+                      comment: sectionComments.installation
+                    })}
+                    leftIcon={<Icon as={FaEdit} />}
+                    variant="outline"
+                    colorScheme="blue"
+                    size={{ base: "sm", md: "md" }}
+                  >
+                    Add Comment
+                  </Button>
+                  {sectionComments.installation && (
+                    <Box mt={3} bg="blue.50" p={4} borderRadius="lg" border="1px solid" borderColor="blue.200">
+                      <Text fontSize="sm" color="blue.800" fontWeight="medium" mb={2}>Lucky Logic Comments:</Text>
+                      <Text fontSize="sm" color="blue.700" whiteSpace="pre-line">{sectionComments.installation}</Text>
+                    </Box>
+                  )}
+                </Box>
+              </VStack>
+
+              <Divider borderColor="gray.300" />
+              
+              <Text fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="semibold">
+                Post-Installation Sign-Off
+              </Text>
+              
+              <VStack spacing={{ base: 4, md: 6 }} align="stretch">
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.postInstallation.demonstrateRollCall}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      postInstallation: { ...prev.postInstallation, demonstrateRollCall: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Demonstrate operation of Roll Call TV</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.postInstallation.demonstrateMediaTVs}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      postInstallation: { ...prev.postInstallation, demonstrateMediaTVs: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Demonstrate operation of Media TVs</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.postInstallation.confirmSpeakers}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      postInstallation: { ...prev.postInstallation, confirmSpeakers: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Confirm speakers are connected and tested</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.postInstallation.confirmiPadSoftware}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      postInstallation: { ...prev.postInstallation, confirmiPadSoftware: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Confirm iPad kiosk software is functional</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.postInstallation.validateNetwork}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      postInstallation: { ...prev.postInstallation, validateNetwork: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Validate network stability and speed tests</Text>
+                  </Checkbox>
+                </Box>
+                
+                <Box>
+                  <Checkbox 
+                    size="lg" 
+                    colorScheme="green"
+                    isChecked={signOffChecklist.postInstallation.provideTroubleshooting}
+                    onChange={(e) => setSignOffChecklist(prev => ({
+                      ...prev,
+                      postInstallation: { ...prev.postInstallation, provideTroubleshooting: e.target.checked }
+                    }))}
+                  >
+                    <Text fontWeight="semibold">Provide instructions for basic troubleshooting</Text>
+                  </Checkbox>
+                </Box>
+                
+                {/* Add Comment Button for Post-Installation */}
+                <Box textAlign="center">
+                  <Button
+                    onClick={() => setCommentModal({
+                      isOpen: true,
+                      section: 'postInstallation',
+                      taskKey: '',
+                      comment: sectionComments.postInstallation
+                    })}
+                    leftIcon={<Icon as={FaEdit} />}
+                    variant="outline"
+                    colorScheme="blue"
+                    size={{ base: "sm", md: "md" }}
+                  >
+                    Add Comment
+                  </Button>
+                  {sectionComments.postInstallation && (
+                    <Box mt={3} bg="blue.50" p={4} borderRadius="lg" border="1px solid" borderColor="blue.200">
+                      <Text fontSize="sm" color="blue.800" fontWeight="medium" mb={2}>Lucky Logic Comments:</Text>
+                      <Text fontSize="sm" color="blue.700" whiteSpace="pre-line">{sectionComments.postInstallation}</Text>
+                    </Box>
+                  )}
+                </Box>
+              </VStack>
+            </VStack>
+          </ModalBody>
+          <ModalFooter py={{ base: 3, md: 4 }}>
+            <VStack spacing={{ base: 2, md: 3 }} w="full">
+              <HStack spacing={{ base: 2, md: 3 }} w="full" justify="center">
+                <Button 
+                  onClick={() => setIsProjectSignOffModalOpen(false)} 
+                  variant="outline"
+                  size={{ base: "sm", md: "md" }}
+                  flex={1}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleSaveChecklist}
+                  colorScheme="blue"
+                  variant="outline"
+                  isLoading={savingChecklist}
+                  loadingText="Saving..."
+                  size={{ base: "sm", md: "md" }}
+                  flex={1}
+                >
+                  Save Progress
+                </Button>
+              </HStack>
+              <Button 
+                onClick={handleCompleteSignOff}
+                colorScheme="green"
+                bg="#003f2d" 
+                color="white"
+                _hover={{ bg: '#14543a' }}
+                size={{ base: "sm", md: "md" }}
+                w="full"
+              >
+                Complete Sign Off
+              </Button>
+            </VStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Signature Modal */}
+      <Modal isOpen={showSignatureModal} onClose={() => setShowSignatureModal(false)} size="full">
+        <ModalOverlay />
+        <ModalContent borderRadius="xl" mx={{ base: 1, md: 8 }} maxW="6xl" bg="white" shadow="lg">
+          <ModalHeader bg="#003f2d" color="white" borderTopRadius="xl" py={{ base: 3, md: 4 }}>
+            <HStack spacing={{ base: 2, md: 3 }}>
+              <Icon as={CheckCircleIcon} boxSize={{ base: 4, md: 5 }} />
+              <Heading size={{ base: "md", md: "lg" }} fontWeight="bold">
+                Project Sign Off - Digital Signature
+              </Heading>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton 
+            color="white" 
+            bg="whiteAlpha.200"
+            borderRadius="full"
+            _hover={{ bg: "whiteAlpha.300" }}
+            top={{ base: 3, md: 6 }}
+            right={{ base: 3, md: 6 }}
+          />
+          <ModalBody 
+            py={{ base: 4, md: 8 }} 
+            px={{ base: 3, md: 8 }} 
+            maxH="85vh" 
+            overflowY="auto"
+            onWheel={(e) => {
+              e.currentTarget.scrollTop += e.deltaY;
+              e.preventDefault();
+            }}
+            css={{
+              '&::-webkit-scrollbar': {
+                width: '8px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: '#f1f1f1',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: '#c1c1c1',
+                borderRadius: '4px',
+                '&:hover': {
+                  background: '#a8a8a8',
+                },
+              },
+            }}
+          >
+            <VStack spacing={{ base: 4, md: 6 }} align="stretch">
+              <Box textAlign="center">
+                <Text fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="semibold" mb={{ base: 2, md: 3 }}>
+                  Sign Off Timestamp
+                </Text>
+                <Text fontSize={{ base: "md", md: "lg" }} color="gray.600">
+                  {signatureTimestamp ? new Date(signatureTimestamp).toLocaleString() : 'Loading...'}
+                </Text>
+              </Box>
+
+              {isViewingCompletedSignOff && (
+                <Box bg="gray.50" p={{ base: 4, md: 6 }} borderRadius="lg" border="1px solid" borderColor="gray.200">
+                  <Text fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="bold" mb={{ base: 3, md: 4 }}>
+                    Customer Details
+                  </Text>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 4, md: 8 }}>
+                    <Box>
+                      <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "sm", md: "md" }} textTransform="uppercase" letterSpacing="wide">
+                        Name
+                      </Text>
+                      <Text fontSize={{ base: "md", md: "lg" }} color="gray.800">
+                        {project?.customer || 'N/A'}
+                      </Text>
+                    </Box>
+                    <Box>
+                      <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "sm", md: "md" }} textTransform="uppercase" letterSpacing="wide">
+                        Email
+                      </Text>
+                      <Text fontSize={{ base: "md", md: "lg" }} color="gray.800">
+                        {project?.customerEmail || 'N/A'}
+                      </Text>
+                    </Box>
+                    <Box>
+                      <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "sm", md: "md" }} textTransform="uppercase" letterSpacing="wide">
+                        Install Cost
+                      </Text>
+                      <Text fontSize={{ base: "md", md: "lg" }} color="gray.800" fontWeight="semibold">
+                        ${project?.budget ? project.budget.toLocaleString() : 'N/A'}
+                      </Text>
+                    </Box>
+                    <Box>
+                      <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "sm", md: "md" }} textTransform="uppercase" letterSpacing="wide">
+                        Address
+                      </Text>
+                      <VStack align="start" spacing={1} fontSize={{ base: "md", md: "lg" }}>
+                        {project?.customerAddressLine1 && (
+                          <Text color="gray.800">{project.customerAddressLine1}</Text>
+                        )}
+                        {project?.customerAddressLine2 && (
+                          <Text color="gray.800">{project.customerAddressLine2}</Text>
+                        )}
+                        {(project?.customerCity || project?.customerState || project?.customerPostcode) && (
+                          <Text color="gray.800">
+                            {[project.customerCity, project.customerState, project.customerPostcode].filter(Boolean).join(', ')}
+                          </Text>
+                        )}
+                        {project?.customerCountry && (
+                          <Text color="gray.800">{project.customerCountry}</Text>
+                        )}
+                        {!project?.customerAddressLine1 && !project?.customerAddressLine2 && !project?.customerCity && !project?.customerState && !project?.customerPostcode && !project?.customerCountry && (
+                          <Text color="gray.500">No address information available</Text>
+                        )}
+                      </VStack>
+                    </Box>
+                  </SimpleGrid>
+                </Box>
+              )}
+
+              <Box>
+                <Text fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="semibold" mb={{ base: 3, md: 4 }}>
+                  Digital Signature
+                </Text>
+                {isViewingCompletedSignOff ? (
+                  <Text fontSize={{ base: "sm", md: "md" }} color="gray.600" mb={{ base: 4, md: 6 }}>
+                    This is the signature that was submitted with the completed sign-off.
+                  </Text>
+                ) : (
+                  <Text fontSize={{ base: "sm", md: "md" }} color="gray.600" mb={{ base: 4, md: 6 }}>
+                    Use your finger or iPad pen to sign below. This signature will be stored with your completed checklist.
+                  </Text>
+                )}
+                
+                <Box 
+                  border="2px dashed" 
+                  borderColor="gray.300" 
+                  borderRadius="lg" 
+                  p={{ base: 3, md: 4 }} 
+                  bg="gray.50"
+                  position="relative"
+                >
+                  <canvas
+                    ref={signatureCanvasRef}
+                    width={800}
+                    height={150}
+                    style={{
+                      width: '100%',
+                      height: '150px',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                      backgroundColor: 'white',
+                      cursor: isViewingCompletedSignOff ? 'default' : 'crosshair',
+                      touchAction: isViewingCompletedSignOff ? 'none' : 'none'
+                    }}
+                    onMouseDown={isViewingCompletedSignOff ? undefined : (e) => {
+                      const canvas = signatureCanvasRef.current;
+                      if (!canvas) return;
+                      
+                      const rect = canvas.getBoundingClientRect();
+                      const ctx = canvas.getContext('2d');
+                      if (!ctx) return;
+                      
+                      // Calculate scale factors for proper coordinate mapping
+                      const scaleX = canvas.width / rect.width;
+                      const scaleY = canvas.height / rect.height;
+                      
+                      ctx.beginPath();
+                      ctx.moveTo((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
+                      ctx.lineWidth = 2;
+                      ctx.strokeStyle = '#003f2d';
+                      ctx.lineCap = 'round';
+                      
+                      const handleMouseMove = (moveEvent: MouseEvent) => {
+                        ctx.lineTo((moveEvent.clientX - rect.left) * scaleX, (moveEvent.clientY - rect.top) * scaleY);
+                        ctx.stroke();
+                      };
+                      
+                      const handleMouseUp = () => {
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        document.removeEventListener('mouseup', handleMouseUp);
+                        
+                        // Convert canvas to data URL for storage
+                        const dataURL = canvas.toDataURL();
+                        setSignatureData(dataURL);
+                      };
+                      
+                      document.addEventListener('mousemove', handleMouseMove);
+                      document.addEventListener('mouseup', handleMouseUp);
+                    }}
+                    onTouchStart={isViewingCompletedSignOff ? undefined : (e) => {
+                      e.preventDefault();
+                      const canvas = signatureCanvasRef.current;
+                      if (!canvas) return;
+                      
+                      const rect = canvas.getBoundingClientRect();
+                      const ctx = canvas.getContext('2d');
+                      if (!ctx) return;
+                      
+                      // Calculate scale factors for proper coordinate mapping
+                      const scaleX = canvas.width / rect.width;
+                      const scaleY = canvas.height / rect.height;
+                      
+                      const touch = e.touches[0];
+                      ctx.beginPath();
+                      ctx.moveTo((touch.clientX - rect.left) * scaleX, (touch.clientY - rect.top) * scaleY);
+                      ctx.lineWidth = 3;
+                      ctx.strokeStyle = '#003f2d';
+                      ctx.lineCap = 'round';
+                      
+                      const handleTouchMove = (moveEvent: TouchEvent) => {
+                        moveEvent.preventDefault();
+                        const touch = moveEvent.touches[0];
+                        ctx.lineTo((touch.clientX - rect.left) * scaleX, (touch.clientY - rect.top) * scaleY);
+                        ctx.lineTo((touch.clientX - rect.left) * scaleX, (touch.clientY - rect.top) * scaleY);
+                        ctx.stroke();
+                      };
+                      
+                      const handleTouchEnd = () => {
+                        document.removeEventListener('touchmove', handleTouchMove);
+                        document.removeEventListener('touchend', handleTouchEnd);
+                        
+                        // Convert canvas to data URL for storage
+                        const dataURL = canvas.toDataURL();
+                        setSignatureData(dataURL);
+                      };
+                      
+                      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+                      document.addEventListener('touchend', handleTouchEnd);
+                    }}
+                  />
+                  
+                  <VStack spacing={{ base: 2, md: 3 }} mt={{ base: 2, md: 3 }} align="center">
+                    {!isViewingCompletedSignOff && (
+                      <Button
+                        onClick={clearSignature}
+                        size={{ base: "sm", md: "md" }}
+                        variant="outline"
+                        colorScheme="gray"
+                      >
+                        Clear Signature
+                      </Button>
+                    )}
+                    <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500" textAlign="center">
+                      {isViewingCompletedSignOff ? '✓ Signature from completed sign-off' : (signatureData ? '✓ Signature captured' : 'No signature yet')}
+                    </Text>
+                  </VStack>
+                </Box>
+              </Box>
+
+              <Box flex="1" display="flex" flexDirection="column">
+                <Text fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="semibold" mb={{ base: 2, md: 3 }}>
+                  Completed Checklist Summary
+                </Text>
+                <Box 
+                  bg="gray.50" 
+                  p={{ base: 4, md: 6 }} 
+                  borderRadius="lg" 
+                  flex="1"
+                  overflowY="auto"
+                  overflowX="hidden"
+                  css={{
+                    '&::-webkit-scrollbar': {
+                      width: '6px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                      background: '#f1f1f1',
+                      borderRadius: '4px',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                      background: '#c1c1c1',
+                      borderRadius: '4px',
+                      '&:hover': {
+                        background: '#a8a8a8',
+                      },
+                    },
+                  }}
+                  onWheel={(e) => {
+                    e.currentTarget.scrollTop += e.deltaY;
+                    e.preventDefault();
+                  }}
+                >
+                  <VStack spacing={{ base: 2, md: 3 }} align="stretch">
+                    {(['preInstallation', 'installation', 'postInstallation'] as const).map((section) => {
+                      const tasks = signOffChecklist[section];
+                      if (!tasks) return null;
+                      
+                      return (
+                        <Box key={section}>
+                          <Text fontWeight="semibold" color="gray.700" textTransform="capitalize" mb={{ base: 1, md: 2 }}>
+                            {section.replace(/([A-Z])/g, ' $1').trim()}
+                          </Text>
+                          <VStack spacing={{ base: 1, md: 2 }} align="stretch" ml={{ base: 2, md: 4 }}>
+                            {Object.entries(tasks).map(([taskKey, completed]) => (
+                              <HStack key={taskKey} spacing={{ base: 2, md: 3 }}>
+                                <Icon 
+                                  as={completed ? FaCheckCircle : FaExclamationCircle} 
+                                  color={completed ? 'green.500' : 'red.500'} 
+                                  boxSize={{ base: 4, md: 5 }} 
+                                />
+                                <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
+                                  {getTaskDescription(section, taskKey)}
+                                </Text>
+                              </HStack>
+                            ))}
+                          </VStack>
+                          {/* Section Comment Display */}
+                          {sectionComments[section] && (
+                            <Box mt={2} ml={{ base: 2, md: 4 }} bg="blue.50" p={3} borderRadius="md" border="1px solid" borderColor="blue.200">
+                              <Text fontSize="xs" color="blue.800" fontWeight="medium" mb={1}>Lucky Logic Comments:</Text>
+                              <Text fontSize="xs" color="blue.700" whiteSpace="pre-line">{sectionComments[section]}</Text>
+                            </Box>
+                          )}
+                        </Box>
+                      );
+                    })}
+                  </VStack>
+                </Box>
+              </Box>
+            </VStack>
+          </ModalBody>
+          <ModalFooter py={{ base: 4, md: 6 }} bg="white" borderTop="1px solid" borderColor="gray.200">
+            <VStack spacing={{ base: 2, md: 4 }} w="full">
+              <HStack spacing={{ base: 2, md: 4 }} w="full" justify="center">
+                {isViewingCompletedSignOff && (
+                  <>
+                    <Button 
+                      onClick={() => {
+                        const emailSubject = `Project Sign-Off Completed - ${project?.code}`;
+                        const emailBody = `Dear ${project?.customer},
+
+Your project sign-off has been completed successfully.
+
+Project Details:
+- Project Code: ${project?.code}
+- Project Name: ${project?.name}
+- Completed Date: ${signatureTimestamp ? new Date(signatureTimestamp).toLocaleDateString() : 'N/A'}
+
+The sign-off includes:
+- Pre-Installation Requirements${sectionComments.preInstallation ? `\n  • Lucky Logic Comments: ${sectionComments.preInstallation}` : ''}
+- Installation Checks${sectionComments.installation ? `\n  • Lucky Logic Comments: ${sectionComments.installation}` : ''}
+- Post-Installation Sign-Off${sectionComments.postInstallation ? `\n  • Lucky Logic Comments: ${sectionComments.postInstallation}` : ''}
+- Digital Signature
+
+Please find the completed checklist attached.
+
+Best regards,
+Your Team`;
+                        
+                        const mailtoLink = `mailto:${project?.customerEmail}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+                        window.open(mailtoLink);
+                      }}
+                      leftIcon={<Icon as={FaEnvelope} />}
+                      colorScheme="blue"
+                      size={{ base: "sm", md: "lg" }}
+                      flex={1}
+                    >
+                      Email to Customer
+                    </Button>
+                                        <Button 
+                      onClick={() => {
+                        // Generate HTML content for download
+                        const htmlContent = `
+                          <html>
+                            <head>
+                              <style>
+                                body { 
+                                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+                                  margin: 40px; 
+                                  line-height: 1.6;
+                                  color: #333;
+                                  background-color: #fafafa;
+                                }
+                                .header { 
+                                  text-align: center; 
+                                  margin-bottom: 40px; 
+                                  padding: 30px;
+                                  background: linear-gradient(135deg, #003f2d 0%, #14543a 100%);
+                                  color: white;
+                                  border-radius: 12px;
+                                  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                }
+                                .title { 
+                                  font-size: 28px; 
+                                  font-weight: 700; 
+                                  margin-bottom: 15px; 
+                                  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                                }
+                                .timestamp { 
+                                  font-size: 16px; 
+                                  color: rgba(255, 255, 255, 0.9); 
+                                  margin-bottom: 0;
+                                  font-weight: 500;
+                                }
+                                .section { 
+                                  margin-bottom: 30px; 
+                                  background: white;
+                                  padding: 25px;
+                                  border-radius: 12px;
+                                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                                  border: 1px solid #e5e7eb;
+                                }
+                                .section-title { 
+                                  font-size: 20px; 
+                                  font-weight: 700; 
+                                  color: #003f2d; 
+                                  margin-bottom: 20px; 
+                                  border-bottom: 3px solid #10B981; 
+                                  padding-bottom: 12px;
+                                  display: flex;
+                                  align-items: center;
+                                }
+                                .section-title::before {
+                                  content: '';
+                                  width: 8px;
+                                  height: 24px;
+                                  background: #10B981;
+                                  border-radius: 4px;
+                                  margin-right: 12px;
+                                }
+                                .customer-details { 
+                                  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); 
+                                  padding: 25px; 
+                                  border-radius: 12px; 
+                                  margin-bottom: 25px;
+                                  border: 1px solid #e2e8f0;
+                                }
+                                .customer-grid { 
+                                  display: grid; 
+                                  grid-template-columns: 1fr 1fr; 
+                                  gap: 25px; 
+                                }
+                                .customer-item { 
+                                  margin-bottom: 20px; 
+                                }
+                                .customer-label { 
+                                  font-weight: 600; 
+                                  color: #475569; 
+                                  margin-bottom: 8px; 
+                                  text-transform: uppercase; 
+                                  font-size: 11px; 
+                                  letter-spacing: 1.2px;
+                                  background: #e2e8f0;
+                                  padding: 4px 8px;
+                                  border-radius: 6px;
+                                  display: inline-block;
+                                }
+                                .customer-value { 
+                                  font-size: 15px; 
+                                  color: #1e293b;
+                                  font-weight: 500;
+                                }
+                                .signature-section { 
+                                  margin-top: 30px; 
+                                  text-align: center;
+                                  background: white;
+                                  padding: 25px;
+                                  border-radius: 12px;
+                                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                                  border: 1px solid #e5e7eb;
+                                }
+                                .signature-title { 
+                                  font-size: 20px; 
+                                  font-weight: 700; 
+                                  color: #003f2d; 
+                                  margin-bottom: 20px;
+                                  display: flex;
+                                  align-items: center;
+                                  justify-content: center;
+                                }
+                                .signature-title::before {
+                                  content: '✍️';
+                                  margin-right: 12px;
+                                  font-size: 24px;
+                                }
+                                .signature-image { 
+                                  max-width: 300px; 
+                                  border: 2px solid #e5e7eb; 
+                                  border-radius: 12px;
+                                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                                }
+                                .footer { 
+                                  margin-top: 40px; 
+                                  text-align: center; 
+                                  font-size: 13px; 
+                                  color: #64748b;
+                                  padding: 20px;
+                                  background: white;
+                                  border-radius: 12px;
+                                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                                  border: 1px solid #e5e7eb;
+                                }
+                                .checklist-item {
+                                  display: flex;
+                                  align-items: center;
+                                  margin-bottom: 12px;
+                                  padding: 8px 12px;
+                                  background: #f8fafc;
+                                  border-radius: 8px;
+                                  border-left: 4px solid #e2e8f0;
+                                  transition: all 0.2s ease;
+                                }
+                                .checklist-item:hover {
+                                  background: #f1f5f9;
+                                  transform: translateX(4px);
+                                }
+                                .comment-box {
+                                  margin-top: 12px;
+                                  padding: 12px 16px;
+                                  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+                                  border: 1px solid #93c5fd;
+                                  border-radius: 8px;
+                                  border-left: 4px solid #3b82f6;
+                                }
+                                .comment-label {
+                                  font-size: 11px;
+                                  font-weight: 600;
+                                  color: #1e40af;
+                                  margin-bottom: 6px;
+                                  text-transform: uppercase;
+                                  letter-spacing: 1px;
+                                }
+                                .comment-text {
+                                  font-size: 13px;
+                                  color: #1e40af;
+                                  line-height: 1.5;
+                                }
+                              </style>
+                            </head>
+                            <body>
+                              <div class="header">
+                                <div class="title">Project Sign-Off Completed</div>
+                                <div class="timestamp">Completed on: ${signatureTimestamp ? new Date(signatureTimestamp).toLocaleString() : 'N/A'}</div>
+                              </div>
+                              
+                              <div class="section">
+                                <div class="section-title">Project Information</div>
+                                <div><strong>Project Code:</strong> ${project?.code || 'N/A'}</div>
+                                <div><strong>Project Name:</strong> ${project?.name || 'N/A'}</div>
+                              </div>
+                              
+                              <div class="section">
+                                <div class="section-title">Customer Details</div>
+                                <div class="customer-details">
+                                  <div class="customer-grid">
+                                    <div class="customer-item">
+                                      <div class="customer-label">Name</div>
+                                      <div class="customer-value">${project?.customer || 'N/A'}</div>
+                                    </div>
+                                    <div class="customer-item">
+                                      <div class="customer-label">Email</div>
+                                      <div class="customer-value">${project?.customerEmail || 'N/A'}</div>
+                                    </div>
+                                    <div class="customer-item">
+                                                                              <div class="customer-label">Install Cost</div>
+                                      <div class="customer-value">${project?.budget ? '$' + project.budget.toLocaleString() : 'N/A'}</div>
+                                    </div>
+                                  </div>
+                                  <div class="customer-item">
+                                    <div class="customer-label">Address</div>
+                                    <div class="customer-value">
+                                      ${project?.customerAddressLine1 ? project.customerAddressLine1 + '<br/>' : ''}
+                                      ${project?.customerAddressLine2 ? project.customerAddressLine2 + '<br/>' : ''}
+                                      ${[project?.customerCity, project?.customerState, project?.customerPostcode].filter(Boolean).join(', ') || ''}
+                                      ${project?.customerCountry ? '<br/>' + project.customerCountry : ''}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div class="section">
+                                <div class="section-title">Completed Checklist</div>
+                                ${(['preInstallation', 'installation', 'postInstallation'] as const).map(section => {
+                                  const tasks = signOffChecklist[section];
+                                  if (!tasks) return '';
+                                  
+                                  const sectionTitle = section.replace(/([A-Z])/g, ' $1').trim();
+                                  const taskItems = Object.entries(tasks).map(([taskKey, completed]) => {
+                                    const taskDescription = getTaskDescription(section, taskKey);
+                                    
+                                    // Modern SVG icons for completed/incomplete items
+                                    const completedIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                      <circle cx="12" cy="12" r="10" fill="${completed ? '#10B981' : '#EF4444'}" stroke="${completed ? '#059669' : '#DC2626'}" stroke-width="2"/>
+                                      ${completed ? '<path d="M9 12L11 14L15 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' : '<path d="M15 9L9 15M9 9L15 15" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'}
+                                    </svg>`;
+                                    
+                                    return `<div class="checklist-item">
+                                      ${completedIcon}
+                                      <span style="color: ${completed ? '#059669' : '#DC2626'}; font-weight: 500;">${taskDescription}</span>
+                                    </div>`;
+                                  }).join('');
+                                  
+                                  // Add section comment if it exists
+                                  const sectionComment = sectionComments[section];
+                                  const commentHtml = sectionComment ? `
+                                    <div class="comment-box">
+                                      <div class="comment-label">Lucky Logic Comments:</div>
+                                      <div class="comment-text" style="white-space: pre-line;">${sectionComment}</div>
+                                    </div>
+                                  ` : '';
+                                  
+                                  return `
+                                    <div style="margin-bottom: 20px;">
+                                      <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">${sectionTitle}</div>
+                                      ${taskItems}
+                                      ${commentHtml}
+                                    </div>
+                                  `;
+                                }).join('')}
+                              </div>
+                              
+                              <div class="signature-section">
+                                <div class="signature-title">Digital Signature</div>
+                                ${signatureData ? `<img src="${signatureData}" class="signature-image" alt="Digital Signature" />` : '<div>No signature available</div>'}
+                              </div>
+                              
+                              <div class="footer">
+                                <p>This document was generated on ${new Date().toLocaleString()}</p>
+                                <p>Project Sign-Off - ${project?.code || 'N/A'}</p>
+                              </div>
+                            </body>
+                          </html>
+                        `;
+                        
+                        // Create blob and download
+                        const blob = new Blob([htmlContent], { type: 'text/html' });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `Project_SignOff_${project?.code || 'Unknown'}_${new Date().toISOString().split('T')[0]}.html`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                      }}
+                      leftIcon={<Icon as={FaDownload} />}
+                      colorScheme="green"
+                      size={{ base: "sm", md: "lg" }}
+                      flex={1}
+                    >
+                      Download PDF
+                    </Button>
+                  </>
+                )}
+                <Button 
+                  onClick={() => {
+                    setShowSignatureModal(false);
+                    setIsViewingCompletedSignOff(false);
+                  }} 
+                  variant="outline"
+                  size={{ base: "sm", md: "lg" }}
+                  flex={1}
+                >
+                  {isViewingCompletedSignOff ? 'Close' : 'Cancel'}
+                </Button>
+                {!isViewingCompletedSignOff && (
+                  <Button 
+                    onClick={saveSignatureAndComplete}
+                    colorScheme="green"
+                    bg="#003f2d" 
+                    color="white"
+                    _hover={{ bg: '#14543a' }}
+                    isDisabled={!signatureData}
+                    size={{ base: "sm", md: "lg" }}
+                    flex={1}
+                  >
+                    Complete Sign Off
+                  </Button>
+                )}
+              </HStack>
+            </VStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Comment Modal */}
+      <Modal isOpen={commentModal.isOpen} onClose={() => setCommentModal({ isOpen: false, section: '', taskKey: '', comment: '' })} size="md">
+        <ModalOverlay />
+        <ModalContent borderRadius="xl" mx={{ base: 1, md: 8 }} bg="white" shadow="lg">
+          <ModalHeader bg="blue.500" color="white" borderTopRadius="xl" py={{ base: 3, md: 4 }}>
+            <HStack spacing={{ base: 2, md: 3 }}>
+              <Icon as={FaEdit} boxSize={{ base: 4, md: 5 }} />
+              <Heading size={{ base: "md", md: "lg" }} fontWeight="bold">
+                Add Section Comment
+              </Heading>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton color="white" />
+          <ModalBody py={{ base: 4, md: 6 }}>
+            <VStack spacing={{ base: 4, md: 6 }} align="stretch">
+              <Box>
+                <Text fontWeight="semibold" color="gray.700" mb={2}>
+                  {commentModal.section === 'preInstallation' && 'Pre-Installation Requirements'}
+                  {commentModal.section === 'installation' && 'Installation Checks'}
+                  {commentModal.section === 'postInstallation' && 'Post-Installation Sign-Off'}
+                </Text>
+                <Textarea
+                  value={commentModal.comment}
+                  onChange={(e) => setCommentModal(prev => ({ ...prev, comment: e.target.value }))}
+                  placeholder="Enter your comment for this section..."
+                  size="lg"
+                  rows={4}
+                  borderWidth="2px"
+                  borderColor="gray.200"
+                  borderRadius="lg"
+                  _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 2px #3182ce' }}
+                  _hover={{ borderColor: 'blue.500' }}
+                />
+              </Box>
+            </VStack>
+          </ModalBody>
+          <ModalFooter py={{ base: 3, md: 4 }}>
+            <HStack spacing={{ base: 2, md: 3 }} w="full">
+              <Button 
+                onClick={() => setCommentModal({ isOpen: false, section: '', taskKey: '', comment: '' })} 
+                variant="outline"
+                size={{ base: "sm", md: "md" }}
+                flex={1}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => {
+                  setSectionComments(prev => ({
+                    ...prev,
+                    [commentModal.section]: commentModal.comment
+                  }));
+                  setCommentModal({ isOpen: false, section: '', taskKey: '', comment: '' });
+                }}
+                colorScheme="blue"
+                size={{ base: "sm", md: "md" }}
+                flex={1}
+              >
+                Save Comment
+              </Button>
             </HStack>
           </ModalFooter>
         </ModalContent>

@@ -30,6 +30,14 @@ import {
   Tooltip,
   IconButton,
   Collapse,
+  Button,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
 } from '@chakra-ui/react';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -74,6 +82,41 @@ export default function PublicProjectPage() {
   // Collapsible state for sections
   const [tasksExpanded, setTasksExpanded] = useState(false);
   const [updatesExpanded, setUpdatesExpanded] = useState(false);
+  
+  // Sign-off modal state
+  const [showSignOffModal, setShowSignOffModal] = useState(false);
+
+  // Function to get task descriptions for checklist items
+  const getTaskDescription = (section: string, taskKey: string): string => {
+    const descriptions: { [key: string]: { [key: string]: string } } = {
+      preInstallation: {
+        confirmTVs: 'Confirm number of TVs required per studio: • 1x Roll Call TV (55" Google OS) • 1–2x Media TVs(65–75" Google OS)',
+        confirmSpeakers: 'Confirm Wi-Fi enabled speakers (Sonos or equivalent)',
+        confirmiPad: 'Confirm iPad for kiosk software is ready',
+        confirmInternet: 'Confirm reliable internet connection is active and tested',
+        confirmTimings: 'Confirm TV delivery & installation timings with electricians',
+        confirmCabling: 'Ensure backend cabling requirements are completed prior to installation'
+      },
+      installation: {
+        mountTVs: 'Mount TVs securely and confirm functionality',
+        configureTVs: 'Connect and configure all TVs to the network',
+        configureSpeakers: 'Install and configure Sonos or approved speakers',
+        setupiPad: 'Set up iPad with kiosk software and test login',
+        confirmCabling: 'Confirm backend cabling is neat and labelled',
+        verifyWiFi: 'Verify Wi-Fi strength and stability across all devices'
+      },
+      postInstallation: {
+        demonstrateRollCall: 'Demonstrate operation of Roll Call TV',
+        demonstrateMediaTVs: 'Demonstrate operation of Media TVs',
+        confirmSpeakers: 'Confirm speakers are connected and tested',
+        confirmiPadSoftware: 'Confirm iPad kiosk software is functional',
+        validateNetwork: 'Validate network stability and speed tests',
+        provideTroubleshooting: 'Provide instructions for basic troubleshooting'
+      }
+    };
+    
+    return descriptions[section]?.[taskKey] || taskKey;
+  };
 
   useEffect(() => {
     const fetchPublicProject = async () => {
@@ -578,6 +621,42 @@ export default function PublicProjectPage() {
                           borderRadius="full"
                           size="lg"
                         />
+                      </Box>
+
+                      <Box>
+                        <HStack justify="space-between" mb={2}>
+                          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="medium" color="gray.700">Sign Off Status</Text>
+                          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="bold" color="gray.700">
+                            {project.sign_off_data ? 'Completed' : 'Not Signed Off'}
+                          </Text>
+                        </HStack>
+                        <HStack spacing={2} align="center">
+                          <Icon 
+                            as={project.sign_off_data ? FaCheckCircle : FaExclamationCircle} 
+                            color={project.sign_off_data ? 'green.500' : 'orange.500'} 
+                            boxSize={4} 
+                          />
+                          <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
+                            {project.sign_off_data ? 
+                              `Completed on ${new Date(project.sign_off_data.timestamp).toLocaleDateString()}` : 
+                              'Project sign-off pending'
+                            }
+                          </Text>
+                        </HStack>
+                        {project.sign_off_data && (
+                          <Box mt={3}>
+                            <Button
+                              onClick={() => setShowSignOffModal(true)}
+                              leftIcon={<Icon as={FaCheckCircle} />}
+                              colorScheme="green"
+                              size="sm"
+                              variant="outline"
+                              w="full"
+                            >
+                              View Completed Sign Off
+                            </Button>
+                          </Box>
+                        )}
                       </Box>
 
                     </VStack>
@@ -1115,6 +1194,206 @@ export default function PublicProjectPage() {
           </Text>
         </Container>
       </Box>
+
+      {/* Sign Off Modal */}
+      <Modal isOpen={showSignOffModal} onClose={() => setShowSignOffModal(false)} size="full">
+        <ModalOverlay />
+        <ModalContent borderRadius="xl" mx={{ base: 1, md: 8 }} maxW="6xl" bg="white" shadow="lg">
+          <ModalHeader bg="#003f2d" color="white" borderTopRadius="xl" py={{ base: 3, md: 4 }}>
+            <HStack spacing={{ base: 2, md: 3 }}>
+              <Icon as={FaCheckCircle} boxSize={{ base: 4, md: 5 }} />
+              <Heading size={{ base: "md", md: "lg" }} fontWeight="bold">
+                Project Sign Off - Completed
+              </Heading>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton color="white" />
+          <ModalBody py={{ base: 4, md: 6 }} maxH="85vh" overflowY="auto" onWheel={(e) => e.stopPropagation()}>
+            <VStack spacing={{ base: 4, md: 6 }} align="stretch">
+              {/* Timestamp */}
+              <Box textAlign="center">
+                <Text fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="semibold" mb={{ base: 2, md: 3 }}>
+                  Sign Off Timestamp
+                </Text>
+                <Text fontSize={{ base: "md", md: "lg" }} color="gray.600">
+                  {project?.sign_off_data?.timestamp ? new Date(project.sign_off_data.timestamp).toLocaleString() : 'Loading...'}
+                </Text>
+              </Box>
+
+              {/* Customer Details */}
+              <Box bg="gray.50" p={{ base: 4, md: 6 }} borderRadius="lg" border="1px solid" borderColor="gray.200">
+                <Text fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="bold" mb={{ base: 3, md: 4 }}>
+                  Customer Details
+                </Text>
+                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 4, md: 8 }}>
+                  <Box>
+                    <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "sm", md: "md" }} textTransform="uppercase" letterSpacing="wide">
+                      Name
+                    </Text>
+                    <Text fontSize={{ base: "md", md: "lg" }} color="gray.800">
+                      {project?.customer || 'N/A'}
+                    </Text>
+                  </Box>
+                  <Box>
+                    <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "sm", md: "md" }} textTransform="uppercase" letterSpacing="wide">
+                      Email
+                    </Text>
+                    <Text fontSize={{ base: "md", md: "lg" }} color="gray.800">
+                      {project?.customerEmail || 'N/A'}
+                    </Text>
+                    </Box>
+                  <Box>
+                    <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "sm", md: "md" }} textTransform="uppercase" letterSpacing="wide">
+                      Install Cost
+                    </Text>
+                    <Text fontSize={{ base: "md", md: "lg" }} color="gray.800" fontWeight="semibold">
+                      ${project?.budget ? project.budget.toLocaleString() : 'N/A'}
+                    </Text>
+                  </Box>
+                  <Box>
+                    <Text fontWeight="semibold" color="gray.700" mb={1} fontSize={{ base: "sm", md: "md" }} textTransform="uppercase" letterSpacing="wide">
+                      Address
+                    </Text>
+                    <VStack align="start" spacing={1} fontSize={{ base: "md", md: "lg" }}>
+                      {project?.customerAddressLine1 && (
+                        <Text color="gray.800">{project.customerAddressLine1}</Text>
+                      )}
+                      {project?.customerAddressLine2 && (
+                        <Text color="gray.800">{project.customerAddressLine2}</Text>
+                      )}
+                      {(project?.customerCity || project?.customerState || project?.customerPostcode) && (
+                        <Text color="gray.800">
+                          {[project.customerCity, project.customerState, project.customerPostcode].filter(Boolean).join(', ')}
+                        </Text>
+                      )}
+                      {project?.customerCountry && (
+                        <Text color="gray.800">{project.customerCountry}</Text>
+                      )}
+                      {!project?.customerAddressLine1 && !project?.customerAddressLine2 && !project?.customerCity && !project?.customerState && !project?.customerPostcode && !project?.customerCountry && (
+                        <Text color="gray.800">No address information available</Text>
+                      )}
+                    </VStack>
+                  </Box>
+                </SimpleGrid>
+              </Box>
+
+              {/* Completed Checklist Summary */}
+              <Box>
+                <Text fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="semibold" mb={{ base: 3, md: 4 }}>
+                  Completed Checklist Summary
+                </Text>
+                <Box 
+                  bg="gray.50" 
+                  p={{ base: 4, md: 6 }} 
+                  borderRadius="lg" 
+                  border="1px solid" 
+                  borderColor="gray.200"
+                  maxH="400px"
+                  overflowY="auto"
+                  css={{
+                    '&::-webkit-scrollbar': {
+                      width: '8px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                      background: '#f1f1f1',
+                      borderRadius: '4px',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                      background: '#c1c1c1',
+                      borderRadius: '4px',
+                    },
+                    '&::-webkit-scrollbar-thumb:hover': {
+                      background: '#a8a8a8',
+                    },
+                  }}
+                >
+                  <VStack spacing={{ base: 2, md: 3 }} align="stretch">
+                    {(['preInstallation', 'installation', 'postInstallation'] as const).map((section) => {
+                      const tasks = project?.sign_off_data?.completedChecklist?.[section];
+                      if (!tasks) return null;
+                      
+                      return (
+                        <Box key={section}>
+                          <Text fontWeight="semibold" color="gray.700" textTransform="capitalize" mb={{ base: 1, md: 2 }}>
+                            {section.replace(/([A-Z])/g, ' $1').trim()}
+                          </Text>
+                          <VStack spacing={{ base: 1, md: 2 }} align="stretch" ml={{ base: 2, md: 4 }}>
+                            {Object.entries(tasks).map(([taskKey, completed]) => (
+                              <HStack key={taskKey} spacing={{ base: 2, md: 3 }}>
+                                <Icon 
+                                  as={completed ? FaCheckCircle : FaExclamationCircle} 
+                                  color={completed ? 'green.500' : 'red.500'} 
+                                  boxSize={{ base: 4, md: 5 }} 
+                                />
+                                <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
+                                  {getTaskDescription(section, taskKey)}
+                                </Text>
+                              </HStack>
+                            ))}
+                          </VStack>
+                          {/* Section Comment Display */}
+                          {project?.sign_off_data?.sectionComments?.[section] && (
+                            <Box mt={2} ml={{ base: 2, md: 4 }} bg="blue.50" p={3} borderRadius="md" border="1px solid" borderColor="blue.200">
+                              <Text fontSize="xs" color="blue.800" fontWeight="medium" mb={1}>Lucky Logic Comments:</Text>
+                              <Text fontSize="xs" color="blue.700" whiteSpace="pre-line">{project.sign_off_data.sectionComments[section]}</Text>
+                            </Box>
+                          )}
+                        </Box>
+                      );
+                    })}
+                  </VStack>
+                </Box>
+              </Box>
+
+              {/* Digital Signature */}
+              <Box>
+                <Text fontSize={{ base: "lg", md: "xl" }} color="gray.700" fontWeight="semibold" mb={{ base: 3, md: 4 }}>
+                  Digital Signature
+                </Text>
+                <Text fontSize={{ base: "sm", md: "md" }} color="gray.600" mb={{ base: 4, md: 6 }}>
+                  This is the signature that was submitted with the completed sign-off.
+                </Text>
+                
+                <Box 
+                  border="2px dashed" 
+                  borderColor="gray.300" 
+                  borderRadius="lg" 
+                  p={{ base: 3, md: 4 }} 
+                  bg="gray.50"
+                  position="relative"
+                  textAlign="center"
+                >
+                  {project?.sign_off_data?.signature ? (
+                    <img 
+                      src={project.sign_off_data.signature} 
+                      alt="Digital Signature" 
+                      style={{
+                        maxWidth: '100%',
+                        height: 'auto',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        backgroundColor: 'white'
+                      }}
+                    />
+                  ) : (
+                    <Text color="gray.500">No signature available</Text>
+                  )}
+                </Box>
+              </Box>
+            </VStack>
+          </ModalBody>
+          <ModalFooter py={{ base: 3, md: 4 }}>
+            <Button 
+              onClick={() => setShowSignOffModal(false)} 
+              variant="outline"
+              size={{ base: "sm", md: "lg" }}
+              w="full"
+            >
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 } 

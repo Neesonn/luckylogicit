@@ -52,6 +52,12 @@ export async function GET(
       customer: data.customer,
       customerEmail: data.customerEmail,
       customerPhone: data.customerPhone,
+      customerAddressLine1: data.customerAddressLine1,
+      customerAddressLine2: data.customerAddressLine2,
+      customerCity: data.customerCity,
+      customerState: data.customerState,
+      customerPostcode: data.customerPostcode,
+      customerCountry: data.customerCountry,
       projectOwner: data.projectOwner,
       createdBy: data.createdBy,
       team: data.team,
@@ -59,6 +65,7 @@ export async function GET(
       updates: data.updates,
       linkedQuotes: addStatus(data.linkedQuotes),
       linkedInvoices: addStatus(data.linkedInvoices),
+      sign_off_data: data.sign_off_data,
       // Exclude sensitive fields like actualCost, history, etc.
     };
 
